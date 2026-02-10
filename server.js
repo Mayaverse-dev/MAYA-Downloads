@@ -6,7 +6,7 @@ const { v4: uuidv4 } = require('uuid');
 const multer = require('multer');
 const sharp = require('sharp');
 const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
-
+const archiver = require('archiver');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -123,6 +123,30 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// ─── Public: stream thumbnail from S3 (so thumbnails work with private bucket) ─
+app.get('/api/thumbnail/:id', async (req, res) => {
+  try {
+    const data = await readData();
+    const item = (Array.isArray(data) ? data : []).find((i) => i.id === req.params.id);
+    if (!item || !item.thumbnailUrl || item.thumbnailUrl === '#') {
+      return res.status(404).end();
+    }
+    const s3 = getS3Client();
+    if (!s3) return res.status(503).end();
+    const key = keyFromDownloadUrl(item.thumbnailUrl);
+    if (!key) return res.status(404).end();
+    const bucket = getBucket();
+    const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+    const obj = await s3.send(command);
+    if (obj.ContentType) res.set('Content-Type', obj.ContentType);
+    if (obj.CacheControl) res.set('Cache-Control', obj.CacheControl);
+    obj.Body.pipe(res);
+  } catch (e) {
+    console.error('Thumbnail error:', e);
+    if (!res.headersSent) res.status(500).end();
+  }
+});
+
 // ─── Public: stream download from S3 (or redirect if S3 not configured) ─
 app.get('/api/download/:id', async (req, res) => {
   try {
@@ -152,6 +176,60 @@ app.get('/api/download/:id', async (req, res) => {
   } catch (e) {
     console.error('Download error:', e);
     res.status(500).send('Download failed');
+  }
+});
+
+// ─── Public: batch download as ZIP ───────────────────────────────────────
+app.post('/api/download-zip', async (req, res) => {
+  const ids = Array.isArray(req.body?.ids) ? req.body.ids : [];
+  if (ids.length === 0) {
+    return res.status(400).json({ error: 'No ids provided' });
+  }
+  const s3 = getS3Client();
+  if (!s3) {
+    return res.status(503).json({ error: 'Downloads not available' });
+  }
+  try {
+    const data = await readData();
+    const list = Array.isArray(data) ? data : [];
+    const items = ids
+      .map((id) => list.find((i) => i.id === id))
+      .filter((i) => i && i.downloadUrl && i.downloadUrl !== '#');
+    if (items.length === 0) {
+      return res.status(404).json({ error: 'No valid downloads found' });
+    }
+    const bucket = getBucket();
+    const category = items[0].category || 'downloads';
+    const zipName = 'maya-' + category + '.zip';
+
+    res.set('Content-Type', 'application/zip');
+    res.set('Content-Disposition', 'attachment; filename="' + zipName.replace(/"/g, '\\"') + '"');
+
+    const archive = archiver('zip', { zlib: { level: 6 } });
+    archive.on('error', (err) => {
+      console.error('Zip error:', err);
+      if (!res.headersSent) res.status(500).end();
+    });
+    archive.pipe(res);
+
+    for (const item of items) {
+      const key = keyFromDownloadUrl(item.downloadUrl);
+      if (!key) continue;
+      const ext = path.extname(key) || '';
+      const base = (item.title || item.id || 'file').replace(/[<>:"/\\|?*]/g, '-').trim() || item.id;
+      const name = base + ext;
+      try {
+        const cmd = new GetObjectCommand({ Bucket: bucket, Key: key });
+        const obj = await s3.send(cmd);
+        archive.append(obj.Body, { name });
+      } catch (e) {
+        console.warn('Skip zip entry:', key, e.message);
+      }
+    }
+    await archive.finalize();
+  } catch (e) {
+    console.error('Download zip error:', e);
+    if (!res.headersSent) res.status(500).json({ error: 'Failed to create zip' });
   }
 });
 

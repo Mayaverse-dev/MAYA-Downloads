@@ -293,7 +293,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: var(--gap);
-  margin-bottom: var(--gap);
+  margin-bottom: var(--gap-lg);
   padding-bottom: var(--gap);
   border-bottom: 1px solid var(--border);
 }
@@ -367,6 +367,12 @@ body {
   background: var(--accent-hover);
   border-color: var(--accent-hover);
   color: #fff;
+}
+
+.btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 /* Wallpaper filters */

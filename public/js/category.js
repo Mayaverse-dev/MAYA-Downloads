@@ -16,8 +16,12 @@
     return d.innerHTML;
   }
 
-  function thumbUrl(url) {
-    if (!url) return '';
+  function thumbUrl(itemOrUrl) {
+    if (!itemOrUrl) return '';
+    var item = itemOrUrl && itemOrUrl.id != null ? itemOrUrl : null;
+    var url = item ? item.thumbnailUrl : itemOrUrl;
+    if (!url || url === '#') return '';
+    if (item && item.id) return '/api/thumbnail/' + encodeURIComponent(item.id);
     if (url.startsWith('/') && !url.startsWith('//')) return window.location.origin + url;
     return url;
   }
@@ -44,7 +48,7 @@
       badge = 'STL';
     }
 
-    var thumb = thumbUrl(item.thumbnailUrl);
+    var thumb = thumbUrl(item);
     itemsById[item.id] = item;
 
     // Single download button
@@ -108,7 +112,7 @@
 
     if (!modal || !img) return;
 
-    img.src = thumbUrl(item.thumbnailUrl);
+    img.src = thumbUrl(item);
     img.alt = item.title || 'Preview';
     
     var modalTitle = item.title;
@@ -145,14 +149,38 @@
 
   function handleDownloadAll() {
     var filtered = filterList(list);
-    var urls = filtered
-      .filter(function (item) { return !isPlaceholderUrl(item.downloadUrl); })
-      .map(function (item) { return '/api/download/' + encodeURIComponent(item.id); });
-    urls.forEach(function (url, i) {
-      setTimeout(function () {
-        window.open(url, '_blank', 'noopener');
-      }, i * 500);
-    });
+    var items = filtered.filter(function (item) { return !isPlaceholderUrl(item.downloadUrl); });
+    if (items.length === 0) return;
+    var btn = document.getElementById('download-all-btn');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Preparing zip…';
+    }
+    fetch('/api/download-zip', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids: items.map(function (i) { return i.id; }) })
+    })
+      .then(function (r) {
+        if (!r.ok) throw new Error(r.status === 503 ? 'Downloads unavailable' : 'Failed to create zip');
+        return r.blob();
+      })
+      .then(function (blob) {
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'maya-' + (filtered[0] && filtered[0].category) + '.zip';
+        a.click();
+        URL.revokeObjectURL(a.href);
+      })
+      .catch(function (err) {
+        alert(err.message || 'Download failed');
+      })
+      .finally(function () {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Download All (' + filtered.length + ')';
+        }
+      });
   }
 
   function init() {
