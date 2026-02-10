@@ -798,7 +798,8 @@ body {
   background: var(--accent-subtle);
 }
 
-.admin-upload-zone.has-file {
+.admin-upload-zone.has-file,
+.admin-upload-zone.drag-over {
   border-style: solid;
   border-color: var(--accent);
   background: var(--accent-subtle);

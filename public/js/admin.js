@@ -253,6 +253,9 @@
     }
     var fileInput = document.getElementById('edit-file-input');
     var thumbInput = document.getElementById('edit-thumb-input');
+    var saveBtn = editForm.querySelector('button[type="submit"]');
+    var btnText = saveBtn ? saveBtn.textContent : '';
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
     var p = Promise.resolve();
     if (fileInput.files && fileInput.files[0]) {
       p = p.then(function () { return apiUpload(fileInput.files[0]); })
@@ -270,7 +273,10 @@
     }
     p.then(function () { return api('PATCH', '/api/admin/downloads/' + encodeURIComponent(id), payload); })
       .then(function () { closeEditModal(); currentEditItem = null; loadList(); })
-      .catch(function (err) { alert('Failed: ' + (err.message || 'Unknown')); });
+      .catch(function (err) { alert('Failed: ' + (err.message || 'Unknown')); })
+      .finally(function () {
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = btnText; }
+      });
   });
 
   // Add form: file upload zones
@@ -326,10 +332,41 @@
   }
   editCategorySelect.addEventListener('change', updateEditVisibility);
 
+  function setFileInputFiles(input, file) {
+    if (!file || !input) return;
+    try {
+      var dt = new DataTransfer();
+      dt.items.add(file);
+      input.files = dt.files;
+    } catch (err) {}
+  }
+  function setupDropZone(zone, input, label) {
+    zone.addEventListener('dragover', function (e) { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', function () { zone.classList.remove('drag-over'); });
+    zone.addEventListener('drop', function (e) {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if (f) {
+        setFileInputFiles(input, f);
+        zone.textContent = f.name;
+        zone.classList.add('has-file');
+      }
+    });
+  }
+  setupDropZone(addUploadZone, addFileInput, 'Click or drop file to upload');
+  setupDropZone(addThumbZone, addThumbInput, 'Click or drop image for thumbnail');
+  setupDropZone(editUploadZone, editFileInput, 'Click or drop file to replace');
+  setupDropZone(editThumbZone, editThumbInput, 'Click or drop image');
+
   addForm.addEventListener('submit', function (e) {
     e.preventDefault();
+    var title = (document.getElementById('add-title') || {}).value || '';
+    var desc = (document.getElementById('add-desc') || {}).value || '';
+    if (!title.trim()) { alert('Please enter a title.'); return; }
+    if (!desc.trim()) { alert('Please enter a description.'); return; }
     if (!addFileInput.files || !addFileInput.files[0]) {
-      alert('Please upload a download file.');
+      alert('Please choose a download file (click or drop on the upload area).');
       return;
     }
     var file = addFileInput.files[0];
@@ -352,6 +389,9 @@
       if (ch) payload.chapter = parseInt(ch, 10);
       payload.format = document.getElementById('add-format').value || 'PDF';
     }
+    var saveBtn = addForm.querySelector('button[type="submit"]');
+    var btnText = saveBtn ? saveBtn.textContent : '';
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
     apiUpload(file)
       .then(function (res) {
         payload.downloadUrl = res.url;
@@ -375,7 +415,10 @@
         updateAddVisibility();
         loadList();
       })
-      .catch(function (err) { alert('Failed: ' + (err.message || 'Unknown')); });
+      .catch(function (err) { alert('Failed: ' + (err.message || 'Unknown')); })
+      .finally(function () {
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = btnText; }
+      });
   });
 
   if (getPw()) {
