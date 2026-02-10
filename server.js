@@ -26,26 +26,32 @@ function checkAdmin(req) {
   return pw && pw === process.env.ADMIN_PASSWORD;
 }
 
+/** Trim whitespace/newlines and strip accidental leading = or tab chars from env values */
+function cleanEnv(val) {
+  if (!val) return val;
+  return val.replace(/^[\s=]+/, '').replace(/[\s]+$/, '');
+}
+
 function getS3Client() {
-  const endpoint = process.env.S3_ENDPOINT || 'https://t3.storageapi.dev';
-  const accessKeyId = process.env.S3_ACCESS_KEY_ID;
-  const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY;
+  const endpoint = cleanEnv(process.env.S3_ENDPOINT) || 'https://t3.storageapi.dev';
+  const accessKeyId = cleanEnv(process.env.S3_ACCESS_KEY_ID);
+  const secretAccessKey = cleanEnv(process.env.S3_SECRET_ACCESS_KEY);
   if (!accessKeyId || !secretAccessKey) return null;
   return new S3Client({
     endpoint,
-    region: process.env.S3_REGION || 'auto',
+    region: cleanEnv(process.env.S3_REGION) || 'auto',
     credentials: { accessKeyId, secretAccessKey },
     forcePathStyle: true,
   });
 }
 
 function getBucket() {
-  return process.env.S3_BUCKET || 'embedded-drop-iunbltzf2y1';
+  return cleanEnv(process.env.S3_BUCKET) || 'embedded-drop-iunbltzf2y1';
 }
 
 /** Build public URL for a key (Tigris style: endpoint/bucket/key) */
 function getPublicUrl(key) {
-  const endpoint = (process.env.S3_ENDPOINT || 'https://t3.storageapi.dev').replace(/\/$/, '');
+  const endpoint = (cleanEnv(process.env.S3_ENDPOINT) || 'https://t3.storageapi.dev').replace(/\/$/, '');
   const bucket = getBucket();
   const encodedKey = key.split('/').map((s) => encodeURIComponent(s)).join('/');
   return `${endpoint}/${bucket}/${encodedKey}`;
@@ -107,18 +113,13 @@ app.get('/stl', (req, res) => {
 
 // ─── Health check (S3 diagnostics) ──────────────────────────────────────
 app.get('/api/health', (req, res) => {
-  const hasKey = !!process.env.S3_ACCESS_KEY_ID;
-  const hasSecret = !!process.env.S3_SECRET_ACCESS_KEY;
-  const bucket = process.env.S3_BUCKET || '(default)';
-  const endpoint = process.env.S3_ENDPOINT || '(default)';
   const s3 = getS3Client();
   res.json({
     s3Configured: !!s3,
-    hasAccessKeyId: hasKey,
-    hasSecretAccessKey: hasSecret,
-    bucket,
-    endpoint,
-    envKeys: Object.keys(process.env).filter(k => k.startsWith('S3_')).sort(),
+    hasAccessKeyId: !!cleanEnv(process.env.S3_ACCESS_KEY_ID),
+    hasSecretAccessKey: !!cleanEnv(process.env.S3_SECRET_ACCESS_KEY),
+    bucket: getBucket(),
+    endpoint: cleanEnv(process.env.S3_ENDPOINT) || '(default)',
   });
 });
 
