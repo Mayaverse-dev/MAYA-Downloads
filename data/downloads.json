@@ -1,0 +1,11 @@
+[
+    {
+        "id": "1",
+        "title": "The Benevolent Divya",
+        "description": "High resolution digital asset from the MAYA Narrative universe.",
+        "category": "Characters",
+        "imageUrl": "https://picsum.photos/seed/maya1/800/600",
+        "downloadUrl": "https://example.com/download/divya",
+        "createdAt": "2026-02-10T16:50:00Z"
+    }
+]
