@@ -44,12 +44,16 @@ Replace `YOUR_USERNAME` and `YOUR_REPO_NAME` with your GitHub repo URL.
 2. Go to the **Variables** tab.
 3. Add:
 
-| Name             | Value                          |
-|------------------|--------------------------------|
-| `ADMIN_PASSWORD` | Your chosen admin password     |
+| Name                     | Value                              |
+|--------------------------|------------------------------------|
+| `ADMIN_PASSWORD`         | Your chosen admin password         |
+| `S3_ACCESS_KEY_ID`       | Tigris access key (for downloads)  |
+| `S3_SECRET_ACCESS_KEY`   | Tigris secret key                  |
+| `S3_BUCKET`              | e.g. `embedded-drop-iunbltzf2y1`   |
+| `S3_ENDPOINT`            | `https://t3.storageapi.dev`        |
 
-- No quotes in the value.
-- This password is used for the `/admin` page and the API. Keep it secret.
+- No quotes in values.
+- `ADMIN_PASSWORD` is for the `/admin` page. S3 vars are **required for downloads** to work (presigned URLs); without them, download links will fail.
 
 ### 4. Confirm build and start commands
 

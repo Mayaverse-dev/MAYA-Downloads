@@ -105,7 +105,7 @@ app.get('/stl', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'stl.html'));
 });
 
-// ─── Public: redirect to presigned download URL ───────────────────────────
+// ─── Public: redirect to presigned download URL (or direct URL if S3 not configured) ─
 app.get('/api/download/:id', async (req, res) => {
   try {
     const data = await readData();
@@ -113,15 +113,16 @@ app.get('/api/download/:id', async (req, res) => {
     if (!item || !item.downloadUrl || item.downloadUrl === '#') {
       return res.status(404).send('Download not found');
     }
+    const s3 = getS3Client();
+    if (!s3) {
+      console.warn('S3 not configured (missing S3_ACCESS_KEY_ID/S3_SECRET_ACCESS_KEY). Redirecting to direct URL.');
+      return res.redirect(302, item.downloadUrl);
+    }
     const key = keyFromDownloadUrl(item.downloadUrl);
     if (!key) {
-      return res.status(400).send('Invalid download URL');
+      return res.redirect(302, item.downloadUrl);
     }
-    const s3 = getS3Client();
     const bucket = getBucket();
-    if (!s3) {
-      return res.status(503).send('Download service unavailable');
-    }
     const filename = key.split('/').pop() || 'download';
     const command = new GetObjectCommand({
       Bucket: bucket,
