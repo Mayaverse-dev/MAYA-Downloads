@@ -28,54 +28,45 @@
 
   function filterList(items) {
     if (category !== 'wallpapers' || currentFilter === 'all') return items;
-    return items.filter(function (i) {
-      return (i.variants || []).some(function (v) { return v.type === currentFilter; });
-    });
-  }
-
-  function getVariants(item) {
-    var v = item.variants || [];
-    if (category === 'wallpapers' && currentFilter !== 'all') {
-      v = v.filter(function (x) { return x.type === currentFilter; });
-    }
-    return v;
+    return items.filter(function (i) { return i.type === currentFilter; });
   }
 
   function renderCard(item) {
-    var variants = getVariants(item);
-    if (variants.length === 0) return '';
-
-    var badge = item.category === 'ebook' && item.chapter
-      ? 'Ch. ' + item.chapter
-      : item.category === 'stl'
-        ? 'STL'
-        : (variants[0].type || 'Image').toUpperCase();
+    // Badge: show type for wallpapers, format for ebook, STL for 3D files
+    var badge = '';
+    if (item.category === 'wallpapers') {
+      badge = (item.type || 'wallpaper').toUpperCase();
+      if (item.resolution) badge += ' · ' + item.resolution;
+    } else if (item.category === 'ebook') {
+      badge = item.chapter ? 'CH. ' + item.chapter : 'EBOOK';
+      if (item.format) badge += ' · ' + item.format;
+    } else if (item.category === 'stl') {
+      badge = 'STL';
+    }
 
     var thumb = thumbUrl(item.thumbnailUrl);
     itemsById[item.id] = item;
 
-    var actionsHtml = '';
-    if (variants.length === 1) {
-      var u = variants[0].url;
-      var isPh = isPlaceholderUrl(u);
-      actionsHtml = isPh
-        ? '<span class="btn no-url">Set URL in Admin</span>'
-        : '<a href="' + escapeHtml(u) + '" target="_blank" rel="noopener" class="btn btn-primary">Download</a>';
-    } else {
-      actionsHtml = variants.map(function (v) {
-        var isPh = isPlaceholderUrl(v.url);
-        var label = v.label + (v.fileSize ? ' (' + v.fileSize + ')' : '');
-        if (isPh) return '<button type="button" class="btn no-url">' + escapeHtml(label) + '</button>';
-        return '<a href="' + escapeHtml(v.url) + '" target="_blank" rel="noopener" class="btn">' + escapeHtml(label) + '</a>';
-      }).join('');
-    }
+    // Single download button
+    var isPh = isPlaceholderUrl(item.downloadUrl);
+    var btnLabel = 'Download';
+    if (item.fileSize) btnLabel += ' · ' + item.fileSize;
+    
+    var downloadHref = isPh ? '' : ('/api/download/' + encodeURIComponent(item.id));
+    var actionsHtml = isPh
+      ? '<span class="btn no-url">Coming Soon</span>'
+      : '<a href="' + escapeHtml(downloadHref) + '" target="_blank" rel="noopener" class="btn btn-primary">' + escapeHtml(btnLabel) + '</a>';
+
+    // Title with subtitle (e.g., "MAYA Crimson Horizon · Mobile")
+    var displayTitle = item.title;
+    if (item.subtitle) displayTitle += ' <span class="card-subtitle">· ' + escapeHtml(item.subtitle) + '</span>';
 
     return (
       '<article class="card card-preview" data-id="' + escapeHtml(item.id) + '">' +
-        '<img class="card-thumb" src="' + escapeHtml(thumb) + '" alt="" loading="lazy" onerror="this.style.background=\'#262626\'; this.alt=\'Preview\'">' +
+        '<img class="card-thumb" src="' + escapeHtml(thumb) + '" alt="" loading="lazy" onerror="this.style.background=\'#1f1f1f\'; this.alt=\'Preview\'">' +
         '<div class="card-body">' +
           '<span class="card-badge">' + escapeHtml(badge) + '</span>' +
-          '<h3 class="card-title">' + escapeHtml(item.title) + '</h3>' +
+          '<h3 class="card-title">' + displayTitle + '</h3>' +
           '<p class="card-desc">' + escapeHtml(item.description || '') + '</p>' +
           '<div class="card-actions">' + actionsHtml + '</div>' +
         '</div>' +
@@ -100,7 +91,7 @@
     if (emptyMsg) emptyMsg.hidden = true;
     if (downloadAllBtn) {
       downloadAllBtn.hidden = false;
-      downloadAllBtn.textContent = 'Download all (' + filtered.length + ')';
+      downloadAllBtn.textContent = 'Download All (' + filtered.length + ')';
     }
 
     if (category === 'wallpapers' && filtersEl) filtersEl.hidden = false;
@@ -109,7 +100,6 @@
   }
 
   function openModal(item) {
-    var variants = getVariants(item);
     var modal = document.getElementById('modal');
     var img = document.getElementById('modal-img');
     var titleEl = document.getElementById('modal-title');
@@ -120,17 +110,24 @@
 
     img.src = thumbUrl(item.thumbnailUrl);
     img.alt = item.title || 'Preview';
-    titleEl.textContent = item.title || '';
+    
+    var modalTitle = item.title;
+    if (item.subtitle) modalTitle += ' · ' + item.subtitle;
+    titleEl.textContent = modalTitle;
     descEl.textContent = item.description || '';
 
-    downloadsEl.innerHTML = variants.map(function (v) {
-      var isPh = isPlaceholderUrl(v.url);
-      var label = v.label + (v.fileSize ? ' · ' + v.fileSize : '');
-      if (isPh) {
-        return '<button type="button" class="no-url">' + escapeHtml(label) + ' (set in Admin)</button>';
-      }
-      return '<a href="' + escapeHtml(v.url) + '" target="_blank" rel="noopener">' + escapeHtml(label) + '</a>';
-    }).join('');
+    // Single download button in modal
+    var isPh = isPlaceholderUrl(item.downloadUrl);
+    var btnLabel = 'Download';
+    if (item.fileSize) btnLabel += ' · ' + item.fileSize;
+    if (item.resolution) btnLabel += ' · ' + item.resolution;
+
+    if (isPh) {
+      downloadsEl.innerHTML = '<button type="button" class="no-url">Coming Soon</button>';
+    } else {
+      var modalHref = '/api/download/' + encodeURIComponent(item.id);
+      downloadsEl.innerHTML = '<a href="' + escapeHtml(modalHref) + '" target="_blank" rel="noopener">' + escapeHtml(btnLabel) + '</a>';
+    }
 
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');
@@ -149,9 +146,9 @@
   function handleDownloadAll() {
     var filtered = filterList(list);
     filtered.forEach(function (item) {
-      var variants = getVariants(item);
-      var v = variants[0];
-      if (v && !isPlaceholderUrl(v.url)) window.open(v.url, '_blank');
+      if (!isPlaceholderUrl(item.downloadUrl)) {
+        window.open('/api/download/' + encodeURIComponent(item.id), '_blank');
+      }
     });
   }
 

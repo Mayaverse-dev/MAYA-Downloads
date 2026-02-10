@@ -1,11 +1,300 @@
 [
-  {"id":"wp-001","title":"MAYA Crimson Horizon","description":"Dark atmospheric wallpaper featuring the iconic MAYA red accents against a cosmic backdrop.","category":"wallpapers","thumbnailUrl":"/images/wallpapers/neon-city.png","variants":[{"label":"Mobile HD","resolution":"1080x1920","type":"mobile","url":"#","fileSize":"1.2 MB"},{"label":"Mobile 4K","resolution":"1440x2560","type":"mobile","url":"#","fileSize":"3.5 MB"},{"label":"Desktop HD","resolution":"1920x1080","type":"desktop","url":"#","fileSize":"2.1 MB"},{"label":"Desktop 4K","resolution":"3840x2160","type":"desktop","url":"#","fileSize":"8.4 MB"}],"tags":["dark","cosmic","red"],"createdAt":"2026-02-10T10:00:00Z"},
-  {"id":"wp-002","title":"The Benevolent Divya","description":"Character artwork from the MAYA Narrative universe - Divya in her iconic pose.","category":"wallpapers","thumbnailUrl":"/images/hero/divya.png","variants":[{"label":"Mobile HD","resolution":"1080x1920","type":"mobile","url":"#","fileSize":"1.5 MB"},{"label":"Desktop HD","resolution":"1920x1080","type":"desktop","url":"#","fileSize":"2.3 MB"},{"label":"Desktop 4K","resolution":"3840x2160","type":"desktop","url":"#","fileSize":"9.1 MB"}],"tags":["character","divya","artwork"],"createdAt":"2026-02-09T14:30:00Z"},
-  {"id":"wp-003","title":"Humble Vaanar","description":"The humble Vaanar - guardian of ancient wisdom in the MAYA universe.","category":"wallpapers","thumbnailUrl":"/images/pledges/humble-vaanar.png","variants":[{"label":"Mobile HD","resolution":"1080x1920","type":"mobile","url":"#","fileSize":"1.1 MB"},{"label":"Desktop HD","resolution":"1920x1080","type":"desktop","url":"#","fileSize":"1.8 MB"}],"tags":["vaanar","character","guardian"],"createdAt":"2026-02-08T09:00:00Z"},
-  {"id":"stl-001","title":"MAYA Logo Stand","description":"3D printable desk stand featuring the MAYA logo. Perfect for your setup.","category":"stl","thumbnailUrl":"/images/addons/maya-enamel-pin.png","variants":[{"label":"STL File","url":"#","fileSize":"4.2 MB"},{"label":"With Supports (Pre-sliced)","url":"#","fileSize":"5.8 MB"}],"tags":["logo","desk","stand"],"createdAt":"2026-02-07T16:00:00Z"},
-  {"id":"stl-002","title":"Divya Figurine","description":"Detailed figurine of Divya from the MAYA universe. 15cm scale recommended.","category":"stl","thumbnailUrl":"/images/pledges/benevolent-divya.png","variants":[{"label":"Full Model STL","url":"#","fileSize":"12.5 MB"},{"label":"Split Parts (Easy Print)","url":"#","fileSize":"14.1 MB"}],"tags":["figurine","divya","character"],"createdAt":"2026-02-06T11:00:00Z"},
-  {"id":"stl-003","title":"Manushya Bust","description":"Detailed bust sculpture of the Industrious Manushya. Display piece.","category":"stl","thumbnailUrl":"/images/addons/manushya.png","variants":[{"label":"Complete STL","url":"#","fileSize":"8.3 MB"}],"tags":["bust","manushya","display"],"createdAt":"2026-02-05T08:30:00Z"},
-  {"id":"ebook-001","title":"Chapter 1: The Awakening","description":"The journey begins. Discover the origins of the MAYA universe.","category":"ebook","chapter":1,"thumbnailUrl":"/images/addons/maya-book.jpeg","variants":[{"label":"PDF Download","url":"#","fileSize":"2.4 MB"},{"label":"EPUB Format","url":"#","fileSize":"1.8 MB"}],"tags":["chapter","story","origins"],"createdAt":"2026-02-04T12:00:00Z"},
-  {"id":"ebook-002","title":"Chapter 2: The Gathering","description":"Forces converge as ancient powers stir. The narrative deepens.","category":"ebook","chapter":2,"thumbnailUrl":"/images/addons/maya-book.jpeg","variants":[{"label":"PDF Download","url":"#","fileSize":"2.8 MB"},{"label":"EPUB Format","url":"#","fileSize":"2.1 MB"}],"tags":["chapter","story","gathering"],"createdAt":"2026-02-03T15:00:00Z"},
-  {"id":"ebook-003","title":"Chapter 3: The Reckoning","description":"Choices are made. Consequences unfold. Nothing will be the same.","category":"ebook","chapter":3,"thumbnailUrl":"/images/addons/maya-book.jpeg","variants":[{"label":"PDF Download","url":"#","fileSize":"3.2 MB"},{"label":"EPUB Format","url":"#","fileSize":"2.4 MB"}],"tags":["chapter","story","reckoning"],"createdAt":"2026-02-02T10:00:00Z"}
+  {
+    "id": "wp-hidamma-desktop",
+    "title": "Hidamma",
+    "subtitle": "Desktop",
+    "description": "Hidamma wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "1920x1080",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/DESKTOP/HIDAMMA%20wallpaper%20DESKTOP.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/DESKTOP/HIDAMMA%20wallpaper%20DESKTOP.png",
+    "fileSize": "9.7 MB",
+    "tags": [
+      "hidamma",
+      "character"
+    ],
+    "createdAt": "2026-02-10T10:00:00Z"
+  },
+  {
+    "id": "wp-kuli-desktop",
+    "title": "Kuli",
+    "subtitle": "Desktop",
+    "description": "Kuli wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "1920x1080",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/DESKTOP/KULI%20wallpaper%20DESKTOP.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/DESKTOP/KULI%20wallpaper%20DESKTOP.png",
+    "fileSize": "8.0 MB",
+    "tags": [
+      "kuli",
+      "character"
+    ],
+    "createdAt": "2026-02-10T09:00:00Z"
+  },
+  {
+    "id": "wp-kulichase-desktop",
+    "title": "Kuli Chase",
+    "subtitle": "Desktop",
+    "description": "Kuli Chase action wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "1920x1080",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/DESKTOP/KULICHASE%20wallpaper%20DESKTOP.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/DESKTOP/KULICHASE%20wallpaper%20DESKTOP.png",
+    "fileSize": "10.5 MB",
+    "tags": [
+      "kuli",
+      "action"
+    ],
+    "createdAt": "2026-02-10T08:00:00Z"
+  },
+  {
+    "id": "wp-moonlight-desktop",
+    "title": "Moonlight",
+    "subtitle": "Desktop",
+    "description": "Moonlight wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "1920x1080",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/DESKTOP/MOONLIGHT%20wallpaper%20DESKTOP.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/DESKTOP/MOONLIGHT%20wallpaper%20DESKTOP.png",
+    "fileSize": "7.2 MB",
+    "tags": [
+      "moonlight",
+      "night"
+    ],
+    "createdAt": "2026-02-10T07:00:00Z"
+  },
+  {
+    "id": "wp-rakshasi-desktop",
+    "title": "Rakshasi",
+    "subtitle": "Desktop",
+    "description": "Rakshasi wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "1920x1080",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/DESKTOP/RAKSHASI%20wallpaper%20DESKTOP.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/DESKTOP/RAKSHASI%20wallpaper%20DESKTOP.png",
+    "fileSize": "6.8 MB",
+    "tags": [
+      "rakshasi",
+      "character"
+    ],
+    "createdAt": "2026-02-10T06:00:00Z"
+  },
+  {
+    "id": "wp-garuda-mobile",
+    "title": "Garuda GA03",
+    "subtitle": "Mobile",
+    "description": "Garuda mobile wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "1080x1920",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/MOBILE/GA03%20wallpaper.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/MOBILE/GA03%20wallpaper.png",
+    "fileSize": "2.5 MB",
+    "tags": [
+      "garuda",
+      "character"
+    ],
+    "createdAt": "2026-02-09T10:00:00Z"
+  },
+  {
+    "id": "wp-kuli-mobile",
+    "title": "Kuli KU02",
+    "subtitle": "Mobile",
+    "description": "Kuli mobile wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "1080x1920",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/MOBILE/KU02%20wallpaper.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/MOBILE/KU02%20wallpaper.png",
+    "fileSize": "2.3 MB",
+    "tags": [
+      "kuli",
+      "character"
+    ],
+    "createdAt": "2026-02-09T09:00:00Z"
+  },
+  {
+    "id": "wp-naag-mobile",
+    "title": "Naag NA06",
+    "subtitle": "Mobile",
+    "description": "Naag mobile wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "1080x1920",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/MOBILE/NA06%20wallpaper.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/MOBILE/NA06%20wallpaper.png",
+    "fileSize": "2.8 MB",
+    "tags": [
+      "naag",
+      "character"
+    ],
+    "createdAt": "2026-02-09T08:00:00Z"
+  },
+  {
+    "id": "wp-rakshasi-mobile-01",
+    "title": "Rakshasi RK01",
+    "subtitle": "Mobile",
+    "description": "Rakshasi mobile wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "1080x1920",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/MOBILE/RK01%20wallpaper.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/MOBILE/RK01%20wallpaper.png",
+    "fileSize": "2.1 MB",
+    "tags": [
+      "rakshasi",
+      "character"
+    ],
+    "createdAt": "2026-02-09T07:00:00Z"
+  },
+  {
+    "id": "wp-rakshasi-mobile-04",
+    "title": "Rakshasi RK04",
+    "subtitle": "Mobile",
+    "description": "Rakshasi mobile wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "1080x1920",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/MOBILE/RK04%20wallpaper.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/MOBILE/RK04%20wallpaper.png",
+    "fileSize": "2.6 MB",
+    "tags": [
+      "rakshasi",
+      "character"
+    ],
+    "createdAt": "2026-02-09T06:00:00Z"
+  },
+  {
+    "id": "wp-vaanar-mobile",
+    "title": "Vaanar ENV05",
+    "subtitle": "Mobile",
+    "description": "Vaanar mobile wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "1080x1920",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/MOBILE/VA%20ENV05wallpaper.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/MOBILE/VA%20ENV05wallpaper.png",
+    "fileSize": "3.2 MB",
+    "tags": [
+      "vaanar",
+      "character"
+    ],
+    "createdAt": "2026-02-09T05:00:00Z"
+  },
+  {
+    "id": "stl-gandharva",
+    "title": "Gandharva Miniature - Tiresia-Sanjay",
+    "description": "3D printable Gandharva miniature figurine from the MAYA universe.",
+    "category": "stl",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/3D%20Files/Image%20Renders/Gandharv%20Image%20.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/3D%20Files/Gandharva%20Miniature%20-%20Tiresia-Sanjay.stl",
+    "fileSize": "65.0 MB",
+    "tags": [
+      "gandharva",
+      "miniature",
+      "figurine"
+    ],
+    "createdAt": "2026-02-08T10:00:00Z",
+    "visible": false
+  },
+  {
+    "id": "stl-garuda",
+    "title": "Garuda Miniature - Nairavi",
+    "description": "3D printable Garuda miniature figurine from the MAYA universe.",
+    "category": "stl",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/3D%20Files/Image%20Renders/Garuda%20Image%20.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/3D%20Files/Garuda%20Miniature%20-%20Nairavi.stl",
+    "fileSize": "85.8 MB",
+    "tags": [
+      "garuda",
+      "miniature",
+      "figurine"
+    ],
+    "createdAt": "2026-02-08T09:00:00Z",
+    "visible": false
+  },
+  {
+    "id": "stl-manushya",
+    "title": "Manushya Miniature - Prabhakar",
+    "description": "3D printable Manushya miniature figurine from the MAYA universe.",
+    "category": "stl",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/3D%20Files/Image%20Renders/Manushya%20Image.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/3D%20Files/Manushya%20Miniature%20-%20Prabhakar.stl",
+    "fileSize": "95.3 MB",
+    "tags": [
+      "manushya",
+      "miniature",
+      "figurine"
+    ],
+    "createdAt": "2026-02-08T08:00:00Z",
+    "visible": false
+  },
+  {
+    "id": "stl-naag",
+    "title": "Naag Miniature - Kshar",
+    "description": "3D printable Naag miniature figurine from the MAYA universe.",
+    "category": "stl",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/3D%20Files/Image%20Renders/Naag%20Image.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/3D%20Files/Naag%20Miniature%20-%20Kshar.stl",
+    "fileSize": "77.8 MB",
+    "tags": [
+      "naag",
+      "miniature",
+      "figurine"
+    ],
+    "createdAt": "2026-02-08T07:00:00Z"
+  },
+  {
+    "id": "stl-rakshasi",
+    "title": "Rakshasi Miniature - Ayn",
+    "description": "3D printable Rakshasi miniature figurine from the MAYA universe.",
+    "category": "stl",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/3D%20Files/Image%20Renders/Rakshasi%20Image.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/3D%20Files/Rakshasi%20Miniature%20-%20Ayn.stl",
+    "fileSize": "75.3 MB",
+    "tags": [
+      "rakshasi",
+      "miniature",
+      "figurine"
+    ],
+    "createdAt": "2026-02-08T06:00:00Z",
+    "visible": false
+  },
+  {
+    "id": "stl-vaanar",
+    "title": "Vaanar Miniature - Dangsa",
+    "description": "3D printable Vaanar miniature figurine from the MAYA universe.",
+    "category": "stl",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/3D%20Files/Image%20Renders/Vanaar%20Image.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/3D%20Files/Vaanar%20Miniature%20-%20Dangsa.stl",
+    "fileSize": "73.5 MB",
+    "tags": [
+      "vaanar",
+      "miniature",
+      "figurine"
+    ],
+    "createdAt": "2026-02-08T05:00:00Z"
+  },
+  {
+    "id": "ebook-chapters-1-6",
+    "title": "MAYA Novel - Chapters 1-6",
+    "description": "Digital chapters 1-6 of the MAYA Novel. The journey begins.",
+    "category": "ebook",
+    "chapter": 1,
+    "thumbnailUrl": "/images/addons/maya-book.jpeg",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Literature/maya-novel-1-digital-chapter-1-6.pdf",
+    "fileSize": "14.1 MB",
+    "format": "PDF",
+    "tags": [
+      "novel",
+      "chapters",
+      "story"
+    ],
+    "createdAt": "2026-02-07T10:00:00Z"
+  }
 ]

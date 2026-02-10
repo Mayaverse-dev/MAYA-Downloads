@@ -3,27 +3,50 @@
 
   var pw = '';
   var STORAGE_KEY = 'maya_admin_pw';
+  var CATEGORY_ORDER = ['wallpapers', 'ebook', 'stl'];
 
   function getPw() {
     return pw || (typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null) || '';
   }
-
   function setPw(value) {
     pw = value;
     try { localStorage.setItem(STORAGE_KEY, value); } catch (e) {}
   }
-
   function clearPw() {
     pw = '';
     try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
   }
 
   function api(method, path, body, usePw) {
-    var opts = { method: method, headers: { 'Content-Type': 'application/json' } };
+    var opts = { method: method, headers: {} };
+    if (body && !(body instanceof FormData)) {
+      opts.headers['Content-Type'] = 'application/json';
+      opts.body = JSON.stringify(body);
+    } else if (body instanceof FormData) {
+      opts.body = body;
+    }
     if (usePw !== false) opts.headers['x-admin-password'] = getPw();
-    if (body) opts.body = JSON.stringify(body);
     return fetch(path, opts).then(function (r) {
       if (r.status === 401) throw new Error('Unauthorized');
+      return r.json();
+    });
+  }
+
+  function apiUpload(file, fieldName) {
+    var fd = new FormData();
+    fd.append(fieldName, file);
+    fd.append('x-admin-password', getPw());
+    return fetch('/api/admin/upload', {
+      method: 'POST',
+      headers: { 'x-admin-password': getPw() },
+      body: (function () {
+        var f = new FormData();
+        f.append('file', file);
+        return f;
+      })()
+    }).then(function (r) {
+      if (r.status === 401) throw new Error('Unauthorized');
+      if (!r.ok) return r.json().then(function (e) { throw new Error(e.error || 'Upload failed'); });
       return r.json();
     });
   }
@@ -32,13 +55,13 @@
   var dashboardEl = document.getElementById('admin-dashboard');
   var listEl = document.getElementById('admin-list');
   var addForm = document.getElementById('add-form');
-  var variantsContainer = document.getElementById('variants-container');
+  var editModal = document.getElementById('edit-modal');
+  var editForm = document.getElementById('edit-form');
 
   function showLogin() {
     loginEl.hidden = false;
     dashboardEl.hidden = true;
   }
-
   function showDashboard() {
     loginEl.hidden = true;
     dashboardEl.hidden = false;
@@ -46,45 +69,117 @@
   }
 
   document.getElementById('admin-login-btn').addEventListener('click', function () {
-    var input = document.getElementById('admin-pw');
-    var value = (input && input.value) || '';
+    var value = (document.getElementById('admin-pw') || {}).value || '';
     if (!value) return alert('Enter password');
     setPw(value);
     api('GET', '/api/admin/downloads?pw=' + encodeURIComponent(value))
       .then(function () { showDashboard(); })
-      .catch(function () {
-        alert('Invalid password');
-        clearPw();
-      });
+      .catch(function () { alert('Invalid password'); clearPw(); });
   });
 
   document.getElementById('logout-btn').addEventListener('click', function () {
     clearPw();
     showLogin();
-    if (document.getElementById('admin-pw')) document.getElementById('admin-pw').value = '';
+    var inp = document.getElementById('admin-pw');
+    if (inp) inp.value = '';
   });
 
+  function escapeHtml(s) {
+    if (!s) return '';
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function sortByHomepageOrder(list) {
+    var order = {};
+    CATEGORY_ORDER.forEach(function (c, i) { order[c] = i; });
+    return list.slice().sort(function (a, b) {
+      var ca = order[a.category] !== undefined ? order[a.category] : 99;
+      var cb = order[b.category] !== undefined ? order[b.category] : 99;
+      if (ca !== cb) return ca - cb;
+      if (a.category === 'ebook' && b.category === 'ebook') return (a.chapter || 0) - (b.chapter || 0);
+      return (a.createdAt || '').localeCompare(b.createdAt || '');
+    });
+  }
+
+  function groupedByCategory(list) {
+    var sorted = sortByHomepageOrder(list);
+    var groups = {};
+    CATEGORY_ORDER.forEach(function (c) { groups[c] = []; });
+    sorted.forEach(function (item) {
+      if (groups[item.category]) groups[item.category].push(item);
+      else { groups.other = groups.other || []; groups.other.push(item); }
+    });
+    if (groups.other && groups.other.length) sorted = CATEGORY_ORDER.concat(['other']);
+    else sorted = CATEGORY_ORDER;
+    return { order: sorted, groups: groups };
+  }
+
+  function renderItem(item) {
+    var thumb = item.thumbnailUrl || '';
+    if (thumb && thumb.startsWith('/')) thumb = window.location.origin + thumb;
+    var meta = item.category;
+    if (item.subtitle) meta += ' · ' + item.subtitle;
+    if (item.type) meta += ' · ' + item.type;
+    var size = item.fileSize ? ' · ' + item.fileSize : '';
+    var visible = item.visible !== false;
+    return (
+      '<div class="admin-item" data-id="' + escapeHtml(item.id) + '">' +
+        '<img class="admin-item-thumb" src="' + escapeHtml(thumb) + '" alt="" onerror="this.style.background=\'#262626\';this.src=\'\'">' +
+        '<div class="admin-item-info">' +
+          '<div class="admin-item-title">' + escapeHtml(item.title) + '</div>' +
+          '<div class="admin-item-meta">' + escapeHtml(meta) + size + '</div>' +
+        '</div>' +
+        '<div class="admin-item-actions">' +
+          '<span class="admin-item-visible">' + (visible ? 'Visible' : 'Hidden') + '</span>' +
+          '<div class="admin-toggle-switch ' + (visible ? 'on' : '') + '" data-id="' + escapeHtml(item.id) + '" data-visible="' + visible + '" aria-label="Toggle visibility"></div>' +
+          '<button type="button" class="btn edit-btn" data-id="' + escapeHtml(item.id) + '">Edit</button>' +
+          '<button type="button" class="btn delete-btn" data-id="' + escapeHtml(item.id) + '">Delete</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  var allAssetsList = [];
   function loadList() {
     api('GET', '/api/admin/downloads')
       .then(function (data) {
         var list = Array.isArray(data) ? data : [];
-        listEl.innerHTML = list.map(function (item) {
-          var thumb = item.thumbnailUrl || '';
-          if (thumb && thumb.startsWith('/')) thumb = window.location.origin + thumb;
-          return (
-            '<div class="admin-item" data-id="' + escapeHtml(item.id) + '">' +
-              '<img class="admin-item-thumb" src="' + escapeHtml(thumb) + '" alt="">' +
-              '<div class="admin-item-info">' +
-                '<div class="admin-item-title">' + escapeHtml(item.title) + '</div>' +
-                '<div class="admin-item-meta">' + escapeHtml(item.category) + '</div>' +
-              '</div>' +
-              '<div class="admin-item-actions">' +
-                '<button type="button" class="btn delete-btn" data-id="' + escapeHtml(item.id) + '">Delete</button>' +
-              '</div>' +
-            '</div>'
-          );
-        }).join('');
+        allAssetsList = list;
+        var g = groupedByCategory(list);
+        var html = '';
+        g.order.forEach(function (cat) {
+          var items = (g.groups[cat] || []).map(renderItem).join('');
+          if (!items) return;
+          var label = cat === 'wallpapers' ? 'Wallpapers' : cat === 'ebook' ? 'E-Book' : cat === 'stl' ? '3D Printables (STL)' : cat;
+          html += '<div class="admin-category-section">';
+          html += '<h4 class="admin-category-title">' + escapeHtml(label) + '</h4>';
+          html += '<div class="admin-list">' + items + '</div></div>';
+        });
+        listEl.innerHTML = html || '<p class="admin-item-meta">No assets yet.</p>';
 
+        listEl.querySelectorAll('.admin-toggle-switch').forEach(function (el) {
+          el.addEventListener('click', function () {
+            var id = this.getAttribute('data-id');
+            var visible = this.getAttribute('data-visible') === 'true';
+            api('PATCH', '/api/admin/downloads/' + encodeURIComponent(id), { visible: !visible })
+              .then(function (updated) {
+                el.classList.toggle('on', updated.visible !== false);
+                el.setAttribute('data-visible', updated.visible !== false ? 'true' : 'false');
+                var meta = el.closest('.admin-item').querySelector('.admin-item-visible');
+                if (meta) meta.textContent = (updated.visible !== false) ? 'Visible' : 'Hidden';
+              })
+              .catch(function (e) { alert('Failed: ' + (e.message || 'Unknown')); });
+          });
+        });
+        listEl.querySelectorAll('.edit-btn').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var id = this.getAttribute('data-id');
+            var item = allAssetsList.find(function (i) { return i.id === id; });
+            if (item) openEditModal(item);
+          });
+        });
         listEl.querySelectorAll('.delete-btn').forEach(function (btn) {
           btn.addEventListener('click', function () {
             var id = this.getAttribute('data-id');
@@ -95,76 +190,189 @@
           });
         });
       })
-      .catch(function () {
-        showLogin();
-      });
+      .catch(function () { showLogin(); });
   }
 
-  function escapeHtml(s) {
-    if (!s) return '';
-    var d = document.createElement('div');
-    d.textContent = s;
-    return d.innerHTML;
+  var currentEditItem = null;
+  function openEditModal(item) {
+    currentEditItem = item;
+    document.getElementById('edit-id').value = item.id;
+    document.getElementById('edit-title').value = item.title || '';
+    document.getElementById('edit-subtitle').value = item.subtitle || '';
+    document.getElementById('edit-desc').value = item.description || '';
+    document.getElementById('edit-category').value = item.category || 'wallpapers';
+    document.getElementById('edit-type').value = item.type || 'desktop';
+    document.getElementById('edit-resolution').value = item.resolution || '';
+    document.getElementById('edit-chapter').value = item.chapter || '';
+    document.getElementById('edit-format').value = item.format || 'PDF';
+    document.getElementById('edit-filesize-display').textContent = item.fileSize || '—';
+    document.getElementById('edit-visible-toggle').classList.toggle('on', item.visible !== false);
+    document.getElementById('edit-file-input').value = '';
+    document.getElementById('edit-thumb-input').value = '';
+    document.getElementById('edit-upload-zone').textContent = 'Click or drop file to replace';
+    document.getElementById('edit-upload-zone').classList.remove('has-file');
+    document.getElementById('edit-thumb-zone').textContent = 'Click or drop image';
+    document.getElementById('edit-thumb-zone').classList.remove('has-file');
+    editModal.classList.add('open');
+    editModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
   }
 
-  function addVariantRow(label, type, url, fileSize) {
-    var row = document.createElement('div');
-    row.className = 'variant-row';
-    row.innerHTML =
-      '<input type="text" placeholder="Label (e.g. Mobile HD)" value="' + escapeHtml(label || '') + '">' +
-      '<input type="text" placeholder="Download URL" value="' + escapeHtml(url || '') + '">' +
-      '<button type="button" class="btn remove-variant">Remove</button>' +
-      '<select class="variant-type">' +
-        '<option value="">—</option>' +
-        '<option value="mobile"' + (type === 'mobile' ? ' selected' : '') + '>Mobile</option>' +
-        '<option value="desktop"' + (type === 'desktop' ? ' selected' : '') + '>Desktop</option>' +
-      '</select>' +
-      '<input type="text" placeholder="File size (optional)" value="' + escapeHtml(fileSize || '') + '" class="variant-filesize">';
-    row.querySelector('.remove-variant').addEventListener('click', function () { row.remove(); });
-    variantsContainer.appendChild(row);
+  function closeEditModal() {
+    editModal.classList.remove('open');
+    editModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
   }
 
-  document.getElementById('add-variant-btn').addEventListener('click', function () {
-    addVariantRow('', '', '', '');
+  document.getElementById('edit-modal-close').addEventListener('click', closeEditModal);
+  editModal.addEventListener('click', function (e) {
+    if (e.target === editModal) closeEditModal();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeEditModal();
   });
 
-  addVariantRow('', '', '', '');
+  editForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var id = document.getElementById('edit-id').value;
+    var payload = {
+      title: document.getElementById('edit-title').value,
+      subtitle: document.getElementById('edit-subtitle').value || undefined,
+      description: document.getElementById('edit-desc').value,
+      category: document.getElementById('edit-category').value,
+      type: document.getElementById('edit-type').value,
+      resolution: document.getElementById('edit-resolution').value || undefined,
+      chapter: document.getElementById('edit-chapter').value ? parseInt(document.getElementById('edit-chapter').value, 10) : undefined,
+      format: document.getElementById('edit-format').value || undefined,
+      visible: document.getElementById('edit-visible-toggle').classList.contains('on')
+    };
+    if (currentEditItem) {
+      payload.downloadUrl = currentEditItem.downloadUrl;
+      payload.fileSize = currentEditItem.fileSize;
+      payload.thumbnailUrl = currentEditItem.thumbnailUrl;
+    }
+    var fileInput = document.getElementById('edit-file-input');
+    var thumbInput = document.getElementById('edit-thumb-input');
+    var p = Promise.resolve();
+    if (fileInput.files && fileInput.files[0]) {
+      p = p.then(function () { return apiUpload(fileInput.files[0]); })
+        .then(function (res) {
+          payload.downloadUrl = res.url;
+          payload.fileSize = res.fileSize;
+          if (res.thumbnailUrl) payload.thumbnailUrl = res.thumbnailUrl;
+        });
+    }
+    if (thumbInput.files && thumbInput.files[0]) {
+      p = p.then(function () { return apiUpload(thumbInput.files[0]); })
+        .then(function (res) {
+          payload.thumbnailUrl = res.url;
+        });
+    }
+    p.then(function () { return api('PATCH', '/api/admin/downloads/' + encodeURIComponent(id), payload); })
+      .then(function () { closeEditModal(); currentEditItem = null; loadList(); })
+      .catch(function (err) { alert('Failed: ' + (err.message || 'Unknown')); });
+  });
+
+  // Add form: file upload zones
+  var addFileInput = document.getElementById('add-file-input');
+  var addThumbInput = document.getElementById('add-thumb-input');
+  var addUploadZone = document.getElementById('add-upload-zone');
+  var addThumbZone = document.getElementById('add-thumb-zone');
+  addUploadZone.addEventListener('click', function () { addFileInput.click(); });
+  addThumbZone.addEventListener('click', function () { addThumbInput.click(); });
+  addFileInput.addEventListener('change', function () {
+    if (this.files && this.files[0]) addUploadZone.textContent = this.files[0].name;
+    addUploadZone.classList.toggle('has-file', !!(this.files && this.files[0]));
+  });
+  addThumbInput.addEventListener('change', function () {
+    if (this.files && this.files[0]) addThumbZone.textContent = this.files[0].name;
+    addThumbZone.classList.toggle('has-file', !!(this.files && this.files[0]));
+  });
+
+  var editFileInput = document.getElementById('edit-file-input');
+  var editThumbInput = document.getElementById('edit-thumb-input');
+  var editUploadZone = document.getElementById('edit-upload-zone');
+  var editThumbZone = document.getElementById('edit-thumb-zone');
+  editUploadZone.addEventListener('click', function () { editFileInput.click(); });
+  editThumbZone.addEventListener('click', function () { editThumbInput.click(); });
+  editFileInput.addEventListener('change', function () {
+    if (this.files && this.files[0]) editUploadZone.textContent = this.files[0].name;
+    editUploadZone.classList.toggle('has-file', !!(this.files && this.files[0]));
+  });
+  editThumbInput.addEventListener('change', function () {
+    if (this.files && this.files[0]) editThumbZone.textContent = this.files[0].name;
+    editThumbZone.classList.toggle('has-file', !!(this.files && this.files[0]));
+  });
+
+  // Add form category visibility
+  var categorySelect = document.getElementById('add-category');
+  var wallpaperFields = document.getElementById('wallpaper-fields');
+  var ebookFields = document.getElementById('ebook-fields');
+  function updateAddVisibility() {
+    var cat = categorySelect.value;
+    if (wallpaperFields) wallpaperFields.hidden = (cat !== 'wallpapers');
+    if (ebookFields) ebookFields.hidden = (cat !== 'ebook');
+  }
+  categorySelect.addEventListener('change', updateAddVisibility);
+  updateAddVisibility();
+
+  var editCategorySelect = document.getElementById('edit-category');
+  var editWallpaperFields = document.getElementById('edit-wallpaper-fields');
+  var editEbookFields = document.getElementById('edit-ebook-fields');
+  function updateEditVisibility() {
+    var cat = editCategorySelect.value;
+    if (editWallpaperFields) editWallpaperFields.hidden = (cat !== 'wallpapers');
+    if (editEbookFields) editEbookFields.hidden = (cat !== 'ebook');
+  }
+  editCategorySelect.addEventListener('change', updateEditVisibility);
 
   addForm.addEventListener('submit', function (e) {
     e.preventDefault();
-    var rows = variantsContainer.querySelectorAll('.variant-row');
-    var variants = [];
-    rows.forEach(function (row) {
-      var labelInp = row.querySelector('input[placeholder*="Label"]');
-      var urlInp = row.querySelector('input[placeholder*="URL"]');
-      var typeSel = row.querySelector('select.variant-type');
-      var sizeInp = row.querySelector('input.variant-filesize');
-      var label = (labelInp && labelInp.value) || '';
-      var url = (urlInp && urlInp.value) || '';
-      var type = (typeSel && typeSel.value) || undefined;
-      var fileSize = (sizeInp && sizeInp.value) || undefined;
-      if (label && url) variants.push({ label: label, url: url, type: type || undefined, fileSize: fileSize || undefined });
-    });
-    if (!variants.length) return alert('Add at least one variant with label and URL.');
-
+    if (!addFileInput.files || !addFileInput.files[0]) {
+      alert('Please upload a download file.');
+      return;
+    }
+    var file = addFileInput.files[0];
+    var thumbFile = addThumbInput.files && addThumbInput.files[0] ? addThumbInput.files[0] : null;
     var category = document.getElementById('add-category').value;
     var payload = {
       title: document.getElementById('add-title').value,
       description: document.getElementById('add-desc').value,
       category: category,
-      thumbnailUrl: document.getElementById('add-thumb').value,
-      variants: variants,
-      tags: [],
+      downloadUrl: '#',
+      tags: []
     };
-    var ch = document.getElementById('add-chapter').value;
-    if (category === 'ebook' && ch) payload.chapter = parseInt(ch, 10);
-
-    api('POST', '/api/admin/downloads', payload)
+    if (category === 'wallpapers') {
+      payload.type = document.getElementById('add-type').value;
+      payload.subtitle = payload.type ? payload.type.charAt(0).toUpperCase() + payload.type.slice(1) : undefined;
+      payload.resolution = document.getElementById('add-resolution').value || undefined;
+    }
+    if (category === 'ebook') {
+      var ch = document.getElementById('add-chapter').value;
+      if (ch) payload.chapter = parseInt(ch, 10);
+      payload.format = document.getElementById('add-format').value || 'PDF';
+    }
+    apiUpload(file)
+      .then(function (res) {
+        payload.downloadUrl = res.url;
+        payload.fileSize = res.fileSize;
+        payload.thumbnailUrl = res.thumbnailUrl || '';
+        if (thumbFile) return apiUpload(thumbFile).then(function (r) {
+          payload.thumbnailUrl = r.url;
+          return payload;
+        });
+        return payload;
+      })
+      .then(function () {
+        return api('POST', '/api/admin/downloads', payload);
+      })
       .then(function () {
         addForm.reset();
-        variantsContainer.innerHTML = '';
-        addVariantRow('', '', '', '');
-        document.getElementById('add-chapter').value = '';
+        addUploadZone.textContent = 'Click or drop file to upload';
+        addThumbZone.textContent = 'Click or drop image for thumbnail';
+        addUploadZone.classList.remove('has-file');
+        addThumbZone.classList.remove('has-file');
+        updateAddVisibility();
         loadList();
       })
       .catch(function (err) { alert('Failed: ' + (err.message || 'Unknown')); });

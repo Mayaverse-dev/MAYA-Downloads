@@ -27,30 +27,100 @@
           <h3 style="margin-bottom: 16px;">Add asset</h3>
           <form id="add-form">
             <label for="add-title">Title</label>
-            <input type="text" id="add-title" required placeholder="e.g. Chapter 1: The Awakening">
+            <input type="text" id="add-title" required placeholder="e.g. MAYA Crimson Horizon">
+
             <label for="add-desc">Description</label>
             <textarea id="add-desc" required placeholder="Short description"></textarea>
+
             <label for="add-category">Category</label>
             <select id="add-category" required>
               <option value="wallpapers">Wallpapers</option>
               <option value="stl">3D Printables (STL)</option>
               <option value="ebook">E-Book</option>
             </select>
-            <label for="add-thumb">Thumbnail URL</label>
-            <input type="text" id="add-thumb" required placeholder="/images/addons/maya-book.jpeg">
-            <label for="add-chapter">Chapter (e-book only)</label>
-            <input type="number" id="add-chapter" min="1" placeholder="1" style="max-width: 120px;">
-            <div class="variants-editor">
-              <label>Download variants</label>
-              <div id="variants-container"></div>
-              <button type="button" id="add-variant-btn" class="btn" style="margin-top: 8px;">+ Add variant</button>
+
+            <div id="wallpaper-fields">
+              <label for="add-type">Type</label>
+              <select id="add-type">
+                <option value="desktop">Desktop</option>
+                <option value="mobile">Mobile</option>
+              </select>
+              <label for="add-resolution">Resolution</label>
+              <input type="text" id="add-resolution" placeholder="e.g. 1920x1080">
             </div>
+
+            <div id="ebook-fields" hidden>
+              <label for="add-chapter">Chapter</label>
+              <input type="number" id="add-chapter" min="1" placeholder="1" style="max-width: 120px;">
+              <label for="add-format">Format</label>
+              <input type="text" id="add-format" placeholder="PDF" value="PDF" style="max-width: 120px;">
+            </div>
+
+            <label>Download file (upload)</label>
+            <div id="add-upload-zone" class="admin-upload-zone">Click or drop file to upload</div>
+            <input type="file" id="add-file-input" accept="*/*" style="display: none;">
+
+            <label>Thumbnail (optional – upload image or leave blank)</label>
+            <div id="add-thumb-zone" class="admin-upload-zone">Click or drop image for thumbnail</div>
+            <input type="file" id="add-thumb-input" accept="image/*" style="display: none;">
+
             <button type="submit" style="margin-top: 16px;">Save</button>
           </form>
         </div>
 
-        <h3 style="margin-bottom: 12px;">Current assets</h3>
-        <div id="admin-list" class="admin-list"></div>
+        <h3 style="margin-bottom: 12px;">Current assets (same order as homepage)</h3>
+        <div id="admin-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="edit-modal" class="admin-edit-modal-overlay" aria-hidden="true">
+    <div class="admin-edit-modal">
+      <button type="button" class="modal-close" id="edit-modal-close" aria-label="Close">×</button>
+      <div class="form-section">
+        <h3 class="admin-title" style="margin-bottom: 16px;">Edit asset</h3>
+        <form id="edit-form">
+          <input type="hidden" id="edit-id">
+          <label for="edit-title">Title</label>
+          <input type="text" id="edit-title" required>
+          <label for="edit-subtitle">Subtitle (e.g. Desktop / Mobile)</label>
+          <input type="text" id="edit-subtitle" placeholder="Optional">
+          <label for="edit-desc">Description</label>
+          <textarea id="edit-desc" required></textarea>
+          <label for="edit-category">Category</label>
+          <select id="edit-category">
+            <option value="wallpapers">Wallpapers</option>
+            <option value="stl">3D Printables (STL)</option>
+            <option value="ebook">E-Book</option>
+          </select>
+          <div id="edit-wallpaper-fields">
+            <label for="edit-type">Type</label>
+            <select id="edit-type">
+              <option value="desktop">Desktop</option>
+              <option value="mobile">Mobile</option>
+            </select>
+            <label for="edit-resolution">Resolution</label>
+            <input type="text" id="edit-resolution" placeholder="e.g. 1920x1080">
+          </div>
+          <div id="edit-ebook-fields" hidden>
+            <label for="edit-chapter">Chapter</label>
+            <input type="number" id="edit-chapter" min="1" style="max-width: 120px;">
+            <label for="edit-format">Format</label>
+            <input type="text" id="edit-format" style="max-width: 120px;">
+          </div>
+          <p class="admin-item-meta" style="margin-bottom: 8px;">Download file size shown on site: <strong id="edit-filesize-display">—</strong></p>
+          <label>Replace download file (upload new file)</label>
+          <div id="edit-upload-zone" class="admin-upload-zone">Click or drop file to replace</div>
+          <input type="file" id="edit-file-input" accept="*/*" style="display: none;">
+          <label>Thumbnail (optional)</label>
+          <div id="edit-thumb-zone" class="admin-upload-zone">Click or drop image</div>
+          <input type="file" id="edit-thumb-input" accept="image/*" style="display: none;">
+          <div style="margin-top: 16px; display: flex; align-items: center; gap: 12px;">
+            <label style="margin: 0;">Show on homepage</label>
+            <div id="edit-visible-toggle" class="admin-toggle-switch on"></div>
+          </div>
+          <button type="submit" style="margin-top: 16px;">Save changes</button>
+        </form>
       </div>
     </div>
   </div>
