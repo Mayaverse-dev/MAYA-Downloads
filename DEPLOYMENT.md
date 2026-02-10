@@ -49,8 +49,8 @@ Replace `YOUR_USERNAME` and `YOUR_REPO_NAME` with your GitHub repo URL.
 | `ADMIN_PASSWORD`         | Your chosen admin password         |
 | `S3_ACCESS_KEY_ID`       | Tigris access key (for downloads)  |
 | `S3_SECRET_ACCESS_KEY`   | Tigris secret key                  |
-| `S3_BUCKET`              | e.g. `embedded-drop-iunbltzf2y1`   |
-| `S3_ENDPOINT`            | `https://t3.storageapi.dev`        |
+| `S3_BUCKET`              | Your Tigris bucket name            |
+| `S3_ENDPOINT`            | Your Tigris endpoint URL           |
 
 - No quotes in values.
 - `ADMIN_PASSWORD` is for the `/admin` page. S3 vars are **required for downloads** to work (presigned URLs); without them, download links will fail.
