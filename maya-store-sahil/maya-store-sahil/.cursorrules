@@ -1,0 +1,65 @@
+# MAYA Pledge Manager - Design & Development Rules
+
+## UI/UX Design Rules
+
+### Homepage / Store
+- Add to cart button should be full width, matching the container above
+- No upgrade badges or "YOUR PLEDGE" badges on pledge tier cards
+- Remove all upgrade-related UI on the homepage
+- Founders of Neh card should NOT have red/accent border - use standard border
+- If backer is logged in, show their owned pledge in hero section with "PURCHASED" tag
+- Hero section shows "YOUR PLEDGE" label instead of "FEATURED PLEDGE" for logged-in backers
+
+### Add-ons Section
+- Grid should be 3 columns (3x2 layout for 6 items)
+- Cards should have large 1:1 aspect ratio images
+- Use uniform dark background (var(--void)) for image containers - NOT white
+- Image should use object-fit: contain with padding inside the container
+- Price and name should be stacked vertically, not side by side
+
+### Cards & Components
+- All cards use var(--matter) background with var(--border) border
+- Hover state: border-color changes to var(--border-hover), subtle translateY(-2px)
+- No colored borders unless explicitly required for specific state
+- Consistent border-radius: 16px for cards, 12px for inner elements
+
+### Colors
+- Background: var(--void) for deepest background
+- Cards: var(--matter) 
+- Borders: var(--border), hover: var(--border-hover)
+- Text: var(--text-main) for primary, var(--text-dim) for secondary
+- Accent: var(--accent) - use sparingly, only for CTAs and important actions
+- Success states: #22C55E (green)
+
+### Typography
+- Mono font (IBM Plex Mono) for: prices, labels, badges, technical text
+- Inter font for: headings, body text, descriptions
+- All caps + letter-spacing for small labels and badges
+
+### Buttons
+- .btn-add: Full width, transparent bg, border, uppercase mono text
+- Hover: invert colors (white bg, dark text)
+- Primary buttons (.btn-primary): accent color background
+
+## Development Rules
+
+### Database
+- Primary identifier: identity_id (UUID) for backers
+- Don't store sensitive data in plain text
+- Use proper foreign key relationships
+
+### Session
+- Store identityId in session after authentication
+- Session data: identityId, email, backerNumber, etc.
+
+### API Responses
+- Always return JSON
+- Include success/error status
+- Log errors server-side, return user-friendly messages
+
+### File Organization
+- Views in /views
+- API routes in /routes
+- Database models in /db/models
+- Services in /services
+- Static assets in /public

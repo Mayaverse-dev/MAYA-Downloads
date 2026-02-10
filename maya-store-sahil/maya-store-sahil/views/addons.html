@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart - MAYA Pledge Manager</title>
+    <meta name="description" content="Review your MAYA cart. Add pledge upgrades, add-ons, and complete your order.">
+    <meta name="theme-color" content="#0A0A0A">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://store.entermaya.com/addons">
+    <meta property="og:title" content="Cart - MAYA Store">
+    <meta property="og:description" content="Review your MAYA cart and complete your order.">
+    <meta property="og:image" content="https://store.entermaya.com/images/hero/divya.png">
+    <meta property="og:site_name" content="MAYA Store">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Cart - MAYA Store">
+    <meta name="twitter:image" content="https://store.entermaya.com/images/hero/divya.png">
+    <meta name="twitter:site" content="@maya_lore_">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+    
+    <!-- Fonts - Preconnect for faster loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/app.js"></script>
+    <style>
+        /* ===== CHECKOUT FLOW SHARED STYLES ===== */
+        .checkout-wrapper {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 var(--space-5) var(--space-9);
+        }
+        
+        /* Progress Steps */
+        .checkout-progress {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--space-7);
+            padding: var(--space-5) 0;
+        }
+        
+        .checkout-step {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .checkout-step-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--matter);
+            border: 2px solid var(--border);
+            color: var(--text-dim);
+        }
+        
+        .checkout-step-num.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+        
+        .checkout-step-num.done {
+            background: var(--text-main);
+            border-color: var(--text-main);
+            color: var(--void);
+        }
+        
+        .checkout-step-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+        
+        .checkout-step-text.active { color: var(--accent); }
+        .checkout-step-text.done { color: var(--text-main); }
+        
+        .checkout-step-line {
+            width: 60px;
+            height: 2px;
+            background: var(--border);
+            margin: 0 16px;
+        }
+        
+        .checkout-step-line.done {
+            background: var(--text-main);
+        }
+        
+        /* Two Column Layout */
+        .checkout-grid {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: var(--space-6);
+            align-items: start;
+        }
+        
+        /* Main Panel */
+        .checkout-main {
+            background: var(--matter);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        .checkout-main-header {
+            padding: var(--space-5) var(--space-5);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .checkout-main-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+        
+        .checkout-main-title .count {
+            background: var(--accent);
+            color: white;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 10px;
+        }
+        
+        .checkout-main-body {
+            padding: var(--space-4);
+        }
+        
+        /* Summary Panel */
+        .checkout-summary {
+            background: var(--matter);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            position: sticky;
+            top: 100px;
+        }
+        
+        .checkout-summary-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: var(--space-5);
+        }
+        
+        .checkout-summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-3) 0;
+        }
+        
+        .checkout-summary-row + .checkout-summary-row {
+            border-top: 1px dashed var(--border);
+        }
+        
+        .checkout-summary-label {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+        }
+        
+        .checkout-summary-value {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+        
+        .checkout-summary-row.total {
+            border-top: 2px solid var(--border);
+            padding-top: var(--space-4);
+            margin-top: var(--space-2);
+        }
+        
+        .checkout-summary-row.total .checkout-summary-label {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        
+        .checkout-summary-row.total .checkout-summary-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .order-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .order-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 0.85rem;
+        }
+        
+        .order-item-row + .order-item-row {
+            border-top: 1px dashed rgba(255, 255, 255, 0.06);
+        }
+        
+        .order-item-name {
+            color: var(--text-dim);
+            flex: 1;
+            padding-right: 12px;
+        }
+        
+        .order-item-name.upgrade {
+            color: var(--accent);
+        }
+        
+        .order-item-name.paid {
+            color: #22C55E;
+        }
+        
+        .order-item-price {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 500;
+            color: var(--text-main);
+            white-space: nowrap;
+        }
+        
+        .order-item-price.upgrade {
+            color: var(--accent);
+        }
+        
+        .order-item-price.paid {
+            color: #22C55E;
+        }
+        
+        .checkout-summary-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 12px 0;
+        }
+        
+        .checkout-summary-note {
+            background: var(--void);
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            line-height: 1.5;
+        }
+        
+        .checkout-summary-note svg {
+            flex-shrink: 0;
+            margin-top: 2px;
+            color: var(--text-dim);
+        }
+        
+        .checkout-btn {
+            width: 100%;
+            height: 52px;
+            border: none;
+            background: var(--accent);
+            color: white;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .checkout-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(230, 30, 37, 0.25);
+        }
+        
+        .checkout-btn:disabled {
+            background: var(--border);
+            color: var(--text-dim);
+            cursor: not-allowed;
+        }
+        
+        /* Green variant removed - use accent color for all primary buttons */
+        
+        .checkout-back-link {
+            text-align: center;
+            margin-top: 16px;
+        }
+        
+        .checkout-back-link a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.03em;
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+        
+        .checkout-back-link a:hover {
+            color: var(--text-main);
+        }
+        
+        /* ===== CART SPECIFIC STYLES ===== */
+        
+        /* Cart Item */
+        .cart-item {
+            display: grid;
+            grid-template-columns: 64px 1fr auto;
+            gap: 16px;
+            align-items: center;
+            padding: 16px;
+            border-radius: 12px;
+            transition: background 0.15s ease;
+        }
+        
+        .cart-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        .cart-item + .cart-item {
+            border-top: 1px solid var(--border);
+        }
+        
+        .cart-item-img {
+            width: 64px;
+            height: 64px;
+            background: var(--void);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        
+        .cart-item-img img {
+            width: 90%;
+            height: 90%;
+            object-fit: contain;
+            margin: 5%;
+        }
+        
+        .cart-item-info h4 {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+        
+        .cart-item-price {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+        
+        .cart-item-actions {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        
+        .qty-control {
+            display: flex;
+            align-items: center;
+            background: var(--void);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 3px;
+        }
+        
+        .qty-control button {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: var(--matter);
+            color: var(--text-main);
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+        
+        .qty-control button:hover {
+            background: var(--border);
+        }
+        
+        .qty-control span {
+            width: 32px;
+            text-align: center;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        
+        .cart-item-subtotal {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            min-width: 60px;
+            text-align: right;
+        }
+        
+        .cart-item-remove {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            color: var(--text-dim);
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .cart-item-remove:hover {
+            background: rgba(230, 30, 37, 0.1);
+            color: var(--accent);
+        }
+        
+        /* Paid Section */
+        .paid-section {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 8px;
+        }
+        
+        .paid-section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        
+        .paid-section-icon {
+            width: 22px;
+            height: 22px;
+            background: var(--text-main);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .paid-section-icon svg {
+            width: 12px;
+            height: 12px;
+            color: var(--void);
+        }
+        
+        .paid-section-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-main);
+        }
+        
+        .paid-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+        }
+        
+        .paid-item-img {
+            width: 44px;
+            height: 44px;
+            background: var(--void);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .paid-item-img img {
+            max-width: 85%;
+            max-height: 85%;
+            object-fit: contain;
+        }
+        
+        .paid-item-name {
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+        
+        .paid-item-meta {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            margin-top: 2px;
+        }
+        
+        /* Empty State */
+        .cart-empty {
+            text-align: center;
+            padding: 60px 30px;
+        }
+        
+        .cart-empty-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            background: var(--void);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .cart-empty-icon svg {
+            width: 32px;
+            height: 32px;
+            color: var(--text-dim);
+        }
+        
+        .cart-empty h3 {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+        
+        .cart-empty p {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-bottom: 24px;
+            font-style: italic;
+        }
+        
+        /* Shipping Banner */
+        .shipping-banner {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .shipping-banner-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--text-main);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .shipping-banner-icon svg {
+            width: 18px;
+            height: 18px;
+            color: var(--void);
+        }
+        
+        .shipping-banner h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+        
+        .shipping-banner p {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin: 0;
+        }
+        
+        /* Clear Button */
+        .clear-btn {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 4px;
+        }
+        
+        .clear-btn:hover {
+            background: rgba(230, 30, 37, 0.1);
+            color: var(--accent);
+        }
+        
+        /* Mobile */
+        @media (max-width: 800px) {
+            .checkout-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            
+            .checkout-summary {
+                position: static;
+            }
+            
+            .checkout-step-line {
+                width: 40px;
+                margin: 0 10px;
+            }
+            
+            .checkout-step-text {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .checkout-wrapper {
+                padding: 0 16px 60px;
+            }
+            
+            .checkout-progress {
+                margin-bottom: 24px;
+                padding: 12px 0;
+            }
+            
+            .checkout-step-number {
+                width: 28px;
+                height: 28px;
+                font-size: 11px;
+            }
+        }
+        
+        @media (max-width: 500px) {
+            .checkout-wrapper {
+                padding: 0 12px 60px;
+            }
+            
+            .cart-item {
+                grid-template-columns: 52px 1fr;
+                gap: 12px;
+                padding: 12px;
+            }
+            
+            .cart-item-actions {
+                grid-column: span 2;
+                justify-content: space-between;
+                padding-top: 10px;
+                border-top: 1px dashed var(--border);
+                margin-top: 8px;
+            }
+            
+            .cart-item-img {
+                width: 52px;
+                height: 52px;
+            }
+            
+            .cart-item-name {
+                font-size: 13px;
+            }
+            
+            .checkout-summary {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="beta-tag">BETA v0.9</div>
+    <div id="navbar">
+        <a href="/" class="logo-container">
+            <img src="/images/maya-logo.png" alt="MAYA">
+        </a>
+        <div class="flex items-center gap-4">
+            <a href="/" class="nav-btn">STORE</a>
+        </div>
+    </div>
+
+    <div class="checkout-wrapper">
+        <!-- Progress Steps -->
+        <div class="checkout-progress">
+            <div class="checkout-step">
+                <div class="checkout-step-num active">1</div>
+                <span class="checkout-step-text active">Cart</span>
+            </div>
+            <div class="checkout-step-line"></div>
+            <div class="checkout-step">
+                <div class="checkout-step-num">2</div>
+                <span class="checkout-step-text">Shipping</span>
+            </div>
+            <div class="checkout-step-line"></div>
+            <div class="checkout-step">
+                <div class="checkout-step-num">3</div>
+                <span class="checkout-step-text">Payment</span>
+            </div>
+        </div>
+
+        <div class="checkout-grid">
+            <!-- Main Panel -->
+            <div class="checkout-main">
+                <div class="checkout-main-header">
+                    <div class="checkout-main-title">
+                        Your Cart
+                        <span class="count" id="cart-count">0</span>
+                    </div>
+                    <button class="clear-btn" onclick="clearCart()" id="clear-btn">Clear All</button>
+                </div>
+                
+                <div class="checkout-main-body" id="cart-content">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+            
+            <!-- Summary Panel -->
+            <div class="checkout-summary">
+                <div class="checkout-summary-title">/// Order Summary</div>
+                
+                <div id="shipping-banner" class="shipping-banner" style="display: none;">
+                    <div class="shipping-banner-icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4>Shipping Confirmation</h4>
+                        <p>Proceed to pay delivery costs.</p>
+                    </div>
+                </div>
+                
+                <!-- Order Items List -->
+                <div id="order-items-list" class="order-items-list"></div>
+                
+                <div class="checkout-summary-divider"></div>
+                
+                <div>
+                    <div class="checkout-summary-row" id="paid-row" style="display: none;">
+                        <span class="checkout-summary-label">Kickstarter Pledge</span>
+                        <span class="checkout-summary-value" style="color: var(--text-main);">Paid</span>
+                    </div>
+                    <div class="checkout-summary-row">
+                        <span class="checkout-summary-label">Subtotal</span>
+                        <span class="checkout-summary-value" id="subtotal">$0.00</span>
+                    </div>
+                    <div class="checkout-summary-row">
+                        <span class="checkout-summary-label">Shipping</span>
+                        <span class="checkout-summary-value" id="shipping">At checkout</span>
+                    </div>
+                    <div class="checkout-summary-row total">
+                        <span class="checkout-summary-label">Total Due</span>
+                        <span class="checkout-summary-value" id="total">$0.00</span>
+                    </div>
+                </div>
+                
+                <div class="checkout-summary-note">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span>Shipping calculated based on location and order weight.</span>
+                </div>
+                
+                <button class="checkout-btn" id="checkout-btn" onclick="proceedToCheckout()">
+                    CONTINUE TO SHIPPING
+                </button>
+                
+                <div class="checkout-back-link">
+                    <a href="/">← Continue Shopping</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userData = null;
+        let alreadyPaidItems = [];
+        let allowZeroCartCheckout = false;
+
+        const pledgeImages = {
+            'divya': '/images/upgrade pledges/divya.png',
+            'garuda': '/images/upgrade pledges/garuda.png',
+            'manushya': '/images/upgrade pledges/manushya.png',
+            'vaanar': '/images/upgrade pledges/vaanar.png',
+            'founders': '/images/upgrade pledges/founders.png'
+        };
+
+        function getProductImage(name, image) {
+            const lower = (name || '').toLowerCase();
+            for (const [key, img] of Object.entries(pledgeImages)) {
+                if (lower.includes(key)) return img;
+            }
+            if (image) {
+                return image.startsWith('/') ? image : `/images/addons/${image}`;
+            }
+            return null;
+        }
+
+        let isDroppedBacker = false;
+        
+        async function loadUserData() {
+            try {
+                const response = await fetch('/api/user/data');
+                if (response.ok) {
+                    userData = await response.json();
+                    console.log('User data loaded:', userData.profileType, userData.pledgedStatus);
+                    
+                    // Check if user has a paid pledge (collected or pot backers)
+                    const isPaidBacker = userData.rewardTitle && 
+                        (userData.pledgedStatus === 'collected' || userData.profileType === 'collected' || userData.profileType === 'pot');
+                    
+                    // Check if dropped or canceled backer (both need to pay for their pledge)
+                    isDroppedBacker = ['dropped', 'canceled'].includes(userData.pledgedStatus) || 
+                                      ['dropped', 'canceled'].includes(userData.profileType);
+                    
+                    // Auto-add pledge to cart for dropped/canceled backers
+                    if (isDroppedBacker && userData.pledgeAmount && userData.rewardTitle) {
+                        const pledgeId = 'pledge-' + userData.backerNumber;
+                        const alreadyInCart = App.Cart.items.some(item => item.id === pledgeId);
+                        
+                        if (!alreadyInCart) {
+                            App.Cart.add({
+                                id: pledgeId,
+                                name: userData.rewardTitle,
+                                price: parseFloat(userData.pledgeAmount) || 0,
+                                quantity: 1,
+                                isOriginalPledge: true,
+                                weight: 0
+                            });
+                            console.log('✓ Auto-added pledge to cart for', userData.profileType, 'backer:', userData.rewardTitle);
+                        }
+                    }
+                    
+                    if (isPaidBacker) {
+                        alreadyPaidItems = [{
+                            name: userData.rewardTitle,
+                            price: parseFloat(userData.pledgeAmount) || 0,
+                            image: getProductImage(userData.rewardTitle, null)
+                        }];
+                        // Collected and PoT backers can checkout with $0 cart (shipping only)
+                        allowZeroCartCheckout = true;
+                    }
+                }
+            } catch (err) {
+                console.log('User not logged in');
+            }
+        }
+
+        function renderCart() {
+            const items = App.Cart.items;
+            const container = document.getElementById('cart-content');
+            
+            // For dropped backers, include the original pledge as a cart item (they need to pay for it)
+            // For collected/pot backers, filter out original pledge (already paid)
+            const newAdditions = isDroppedBacker 
+                ? items  // Include everything for dropped backers
+                : items.filter(item => !item.isOriginalPledge);
+            
+            const hasAlreadyPaid = alreadyPaidItems.length > 0;
+            const itemCount = newAdditions.reduce((sum, item) => sum + item.quantity, 0);
+            
+            document.getElementById('cart-count').textContent = itemCount;
+            document.getElementById('clear-btn').style.display = newAdditions.length > 0 ? 'block' : 'none';
+
+            if (items.length === 0 && !hasAlreadyPaid) {
+                container.innerHTML = `
+                    <div class="cart-empty">
+                        <div class="cart-empty-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                            </svg>
+                        </div>
+                        <h3>Your cart is empty</h3>
+                        <p>"The void awaits. Fill it with narrative."</p>
+                        <a href="/" class="btn btn-primary">BROWSE STORE</a>
+                    </div>`;
+                updateSummary(0, hasAlreadyPaid);
+                return;
+            }
+
+            let html = '';
+
+            if (hasAlreadyPaid) {
+                html += `
+                    <div class="paid-section">
+                        <div class="paid-section-header">
+                            <div class="paid-section-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            <span class="paid-section-title">Kickstarter Pledge - Paid</span>
+                        </div>
+                        ${alreadyPaidItems.map(item => `
+                            <div class="paid-item">
+                                <div class="paid-item-img">
+                                    ${item.image ? `<img src="${item.image}" alt="${item.name}">` : '📦'}
+                                </div>
+                                <div>
+                                    <div class="paid-item-name">${item.name}</div>
+                                    <div class="paid-item-meta">Paid • $${item.price.toFixed(2)}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            // Show pledge upgrade items with special styling
+            const upgradeItem = newAdditions.find(item => item.isPledgeUpgrade);
+            if (upgradeItem) {
+                const imageSrc = getProductImage(upgradeItem.name.replace(' (Upgrade)', ''), upgradeItem.image);
+                const originalPrice = parseFloat(upgradeItem.originalPrice) || 0;
+                const upgradePrice = parseFloat(upgradeItem.price) || 0;
+                const currentPledgeName = upgradeItem.currentPledgeName || 'Current Pledge';
+                
+                html += `
+                    <div class="paid-section" style="background: linear-gradient(135deg, rgba(230, 30, 37, 0.08) 0%, rgba(230, 30, 37, 0.02) 100%); border-color: rgba(230, 30, 37, 0.3);">
+                        <div class="paid-section-header">
+                            <div class="paid-section-icon" style="background: var(--accent);">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+                                </svg>
+                            </div>
+                            <span class="paid-section-title" style="color: var(--accent);">Pledge Upgrade</span>
+                        </div>
+                        <div class="paid-item">
+                            <div class="paid-item-img">
+                                ${imageSrc ? `<img src="${imageSrc}" alt="${upgradeItem.name}">` : '📦'}
+                            </div>
+                            <div style="flex: 1;">
+                                <div class="paid-item-name">${upgradeItem.name.replace(' (Upgrade)', '')}</div>
+                                <div class="paid-item-meta" style="color: var(--text-dim);">
+                                    Upgrading from ${currentPledgeName}
+                                </div>
+                                <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">
+                                    Full price: <span style="text-decoration: line-through;">$${originalPrice.toFixed(0)}</span>
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--accent); font-size: 1.2em;">+$${upgradePrice.toFixed(2)}</div>
+                                <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">UPGRADE COST</div>
+                            </div>
+                            <button class="cart-item-remove" onclick="removeItem(${upgradeItem.id})" style="margin-left: 12px;">×</button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Show dropped backer's original pledge with "Payment Pending" styling
+            const droppedPledgeItem = isDroppedBacker ? newAdditions.find(item => item.isOriginalPledge) : null;
+            const regularItems = newAdditions.filter(item => !item.isOriginalPledge && !item.isPledgeUpgrade);
+            
+            if (droppedPledgeItem) {
+                const imageSrc = getProductImage(droppedPledgeItem.name, droppedPledgeItem.image);
+                html += `
+                    <div class="paid-section" style="background: linear-gradient(135deg, rgba(234, 179, 8, 0.08) 0%, rgba(234, 179, 8, 0.02) 100%); border-color: rgba(234, 179, 8, 0.3);">
+                        <div class="paid-section-header">
+                            <div class="paid-section-icon" style="background: #EAB308;">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <span class="paid-section-title" style="color: #EAB308;">Kickstarter Pledge - Payment Pending</span>
+                        </div>
+                        <div class="paid-item">
+                            <div class="paid-item-img">
+                                ${imageSrc ? `<img src="${imageSrc}" alt="${droppedPledgeItem.name}">` : '📦'}
+                            </div>
+                            <div style="flex: 1;">
+                                <div class="paid-item-name">${droppedPledgeItem.name}</div>
+                                <div class="paid-item-meta" style="color: #EAB308;">Payment Required</div>
+                            </div>
+                            <div style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--text-main);">$${parseFloat(droppedPledgeItem.price).toFixed(2)}</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (regularItems.length > 0) {
+                regularItems.forEach(item => {
+                    const imageSrc = getProductImage(item.name, item.image);
+                    html += `
+                        <div class="cart-item">
+                            <div class="cart-item-img">
+                                ${imageSrc ? `<img src="${imageSrc}" alt="${item.name}">` : '<span style="font-size: 20px;">📦</span>'}
+                            </div>
+                            <div class="cart-item-info">
+                                <h4>${item.name}</h4>
+                                <div class="cart-item-price">$${parseFloat(item.price).toFixed(2)} each</div>
+                            </div>
+                            <div class="cart-item-actions">
+                                <div class="qty-control">
+                                    <button onclick="updateQty(${item.id}, -1)">−</button>
+                                    <span>${item.quantity}</span>
+                                    <button onclick="updateQty(${item.id}, 1)">+</button>
+                                </div>
+                                <div class="cart-item-subtotal">$${(parseFloat(item.price) * item.quantity).toFixed(2)}</div>
+                                <button class="cart-item-remove" onclick="removeItem(${item.id})">×</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            container.innerHTML = html;
+            
+            const subtotal = newAdditions.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * item.quantity, 0);
+            updateSummary(subtotal, hasAlreadyPaid, newAdditions);
+        }
+        
+        function updateSummary(subtotal, hasPaidPledge, cartItems = []) {
+            document.getElementById('subtotal').textContent = '$' + subtotal.toFixed(2);
+            document.getElementById('total').textContent = '$' + subtotal.toFixed(2);
+            
+            const checkoutBtn = document.getElementById('checkout-btn');
+            const paidRow = document.getElementById('paid-row');
+            const shippingBanner = document.getElementById('shipping-banner');
+            const orderItemsList = document.getElementById('order-items-list');
+            
+            // Build order items list HTML
+            let orderItemsHtml = '';
+            
+            // Show paid pledge first if applicable
+            if (hasPaidPledge && alreadyPaidItems.length > 0) {
+                alreadyPaidItems.forEach(item => {
+                    orderItemsHtml += `
+                        <div class="order-item-row">
+                            <span class="order-item-name paid">✓ ${item.name}</span>
+                            <span class="order-item-price paid">Paid</span>
+                        </div>
+                    `;
+                });
+            }
+            
+            // Show cart items
+            cartItems.forEach(item => {
+                const itemPrice = (parseFloat(item.price) || 0) * item.quantity;
+                const isUpgrade = item.isPledgeUpgrade;
+                const isOriginalPledge = item.isOriginalPledge;
+                
+                if (isUpgrade) {
+                    orderItemsHtml += `
+                        <div class="order-item-row">
+                            <span class="order-item-name upgrade">↑ ${item.name.replace(' (Upgrade)', '')}</span>
+                            <span class="order-item-price upgrade">+$${itemPrice.toFixed(2)}</span>
+                        </div>
+                    `;
+                } else if (isOriginalPledge) {
+                    orderItemsHtml += `
+                        <div class="order-item-row">
+                            <span class="order-item-name" style="color: #EAB308;">⚠ ${item.name}</span>
+                            <span class="order-item-price" style="color: #EAB308;">$${itemPrice.toFixed(2)}</span>
+                        </div>
+                    `;
+                } else {
+                    const qtyText = item.quantity > 1 ? ` ×${item.quantity}` : '';
+                    orderItemsHtml += `
+                        <div class="order-item-row">
+                            <span class="order-item-name">${item.name}${qtyText}</span>
+                            <span class="order-item-price">$${itemPrice.toFixed(2)}</span>
+                        </div>
+                    `;
+                }
+            });
+            
+            orderItemsList.innerHTML = orderItemsHtml;
+            
+            if (hasPaidPledge) {
+                paidRow.style.display = 'flex';
+            } else {
+                paidRow.style.display = 'none';
+            }
+            
+            const hasNewItems = subtotal > 0;
+            const canCheckout = hasNewItems || (allowZeroCartCheckout && hasPaidPledge);
+            
+            if (canCheckout) {
+                checkoutBtn.disabled = false;
+                if (!hasNewItems && allowZeroCartCheckout && hasPaidPledge) {
+                    shippingBanner.style.display = 'flex';
+                    checkoutBtn.textContent = 'PAY SHIPPING';
+                } else if (isDroppedBacker) {
+                    // Special messaging for dropped backers completing their pledge
+                    shippingBanner.style.display = 'none';
+                    checkoutBtn.textContent = 'COMPLETE YOUR PLEDGE';
+                } else {
+                    shippingBanner.style.display = 'none';
+                    checkoutBtn.textContent = 'CONTINUE TO SHIPPING';
+                }
+            } else {
+                checkoutBtn.disabled = true;
+                checkoutBtn.textContent = 'ADD ITEMS TO CONTINUE';
+                shippingBanner.style.display = 'none';
+            }
+        }
+
+        function updateQty(id, change) { 
+            App.Cart.updateQuantity(id, change); 
+            renderCart(); 
+        }
+        
+        function removeItem(id) { 
+            App.Cart.remove(id); 
+            renderCart(); 
+        }
+        
+        function clearCart() {
+            if (confirm('Clear all items from your cart?')) {
+                App.Cart.clear();
+                renderCart();
+            }
+        }
+        
+        function proceedToCheckout() {
+            window.location.href = '/checkout';
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            App.Cart.init();  // Initialize cart first
+            await loadUserData();  // Then load user data (may auto-add pledge)
+            renderCart();  // Then render
+        });
+    </script>
+</body>
+
+</html>

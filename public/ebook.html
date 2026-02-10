@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Book | MAYA Downloads</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body data-category="ebook" data-title="E-Book" data-desc="Free chapters from MAYA Book 1.">
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">
+        <img src="/images/maya-logo.png" alt="MAYA" class="logo-img">
+      </a>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="https://store.entermaya.com" target="_blank" rel="noopener">Store</a>
+        <a href="https://entermaya.com" target="_blank" rel="noopener">Main Site</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+      <a href="/" class="back-link">← Back to Home</a>
+      <div class="section-header">
+        <div>
+          <h1 class="section-title" id="page-title">E-Book</h1>
+          <p class="section-desc" id="page-desc">Free chapters from MAYA Book 1.</p>
+        </div>
+        <button type="button" class="btn btn-primary" id="download-all-btn" hidden>Download all</button>
+      </div>
+      <div id="card-grid" class="card-grid"></div>
+      <p id="empty-msg" class="empty-state" hidden>No chapters yet.</p>
+    </div>
+  </main>
+
+  <div id="modal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-content">
+      <button type="button" class="modal-close" id="modal-close" aria-label="Close">×</button>
+      <img id="modal-img" class="modal-preview-img" alt="" src="">
+      <div class="modal-body">
+        <h2 id="modal-title" class="modal-title"></h2>
+        <p id="modal-desc" class="modal-desc"></p>
+        <div id="modal-downloads" class="modal-downloads"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p class="footer-credits">Department of Lore Inc. · MAYA Narrative Universe</p>
+      <p class="footer-disclaimer">All assets are for personal, non-commercial use only.</p>
+    </div>
+  </footer>
+  <script src="/js/category.js"></script>
+</body>
+</html>

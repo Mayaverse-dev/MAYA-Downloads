@@ -1,0 +1,55 @@
+{
+  "name": "maya-pledge-manager",
+  "version": "1.0.0",
+  "description": "Simple pledge manager for MAYA Kickstarter backers",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "jest",
+    "test:unit": "jest tests/unit",
+    "test:integration": "jest tests/integration",
+    "test:e2e": "jest tests/e2e",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "import-csv": "node scripts/import-csv.js",
+    "seed-addons": "node scripts/seed-addons.js",
+    "create-test-user": "node scripts/create-test-user.js",
+    "update-backer-prices": "node scripts/update-backer-prices.js",
+    "cleanup-products": "node scripts/cleanup-products.js",
+    "add-book-addons": "node scripts/add-book-addons.js",
+    "seed-dropped-backer": "node scripts/seed-dropped-backer.js"
+  },
+  "keywords": [
+    "pledge-manager",
+    "kickstarter"
+  ],
+  "author": "Mehul",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.700.0",
+    "@aws-sdk/s3-request-presigner": "^3.700.0",
+    "bcrypt": "^5.1.1",
+    "compression": "^1.8.1",
+    "connect-pg-simple": "^10.0.0",
+    "csv-parser": "^3.0.0",
+    "dotenv": "^16.6.1",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "multer": "^2.0.2",
+    "newrelic": "^13.10.0",
+    "nodemailer": "^6.9.7",
+    "pg": "^8.17.1",
+    "pg-copy-streams": "^7.0.0",
+    "resend": "^3.5.0",
+    "sharp": "^0.34.5",
+    "sqlite3": "^5.1.7",
+    "stripe": "^14.5.0",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "axios": "^1.13.2",
+    "jest": "^30.2.0",
+    "supertest": "^7.2.2"
+  }
+}

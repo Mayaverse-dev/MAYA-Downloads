@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAYA | Scheduled Maintenance</title>
+    <link rel="icon" type="image/png" href="/images/maya-favicon.png">
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --void: #0a0a0b;
+            --matter: #141416;
+            --surface: #1a1a1d;
+            --border: #2a2a2d;
+            --text-main: #f5f5f5;
+            --text-dim: #888;
+            --accent: #ff3d3d;
+            --accent-glow: rgba(255, 61, 61, 0.3);
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--void);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Animated background */
+        .bg-grid {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(255,61,61,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,61,61,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        }
+        
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+        
+        .glow-orb {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: pulse 8s ease-in-out infinite;
+        }
+        
+        .glow-orb.top { top: -300px; right: -200px; }
+        .glow-orb.bottom { bottom: -300px; left: -200px; animation-delay: -4s; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.1); }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        .logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 2rem;
+            filter: drop-shadow(0 0 30px var(--accent-glow));
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            margin-bottom: 2rem;
+        }
+        
+        .status-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+        
+        .highlight {
+            color: var(--accent);
+        }
+        
+        p {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 2rem;
+        }
+        
+        .date-card {
+            background: var(--matter);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .date-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-dim);
+            margin-bottom: 0.75rem;
+        }
+        
+        .date-value {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .countdown-item {
+            text-align: center;
+        }
+        
+        .countdown-value {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--accent);
+            background: var(--surface);
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            min-width: 50px;
+            display: block;
+        }
+        
+        .countdown-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+            margin-top: 0.5rem;
+        }
+        
+        .footer-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+        
+        .footer-text a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 480px) {
+            .countdown {
+                gap: 0.5rem;
+            }
+            .countdown-value {
+                font-size: 1.2rem;
+                padding: 0.4rem 0.5rem;
+                min-width: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="glow-orb top"></div>
+    <div class="glow-orb bottom"></div>
+    
+    <div class="container">
+        <img src="/images/maya-logo.png" alt="MAYA" class="logo">
+        
+        <div class="status-badge">Scheduled Maintenance</div>
+        
+        <h1>We're <span class="highlight">upgrading</span> our systems</h1>
+        
+        <p>
+            We're migrating our database infrastructure to serve you better. 
+            The MAYA Pledge Manager will be back online soon with improved performance and reliability.
+        </p>
+        
+        <div class="date-card">
+            <div class="date-label">Expected Return</div>
+            <div class="date-value">January 31st, 2026</div>
+            
+            <div class="countdown" id="countdown">
+                <div class="countdown-item">
+                    <span class="countdown-value" id="days">--</span>
+                    <div class="countdown-label">Days</div>
+                </div>
+                <div class="countdown-item">
+                    <span class="countdown-value" id="hours">--</span>
+                    <div class="countdown-label">Hours</div>
+                </div>
+                <div class="countdown-item">
+                    <span class="countdown-value" id="minutes">--</span>
+                    <div class="countdown-label">Mins</div>
+                </div>
+                <div class="countdown-item">
+                    <span class="countdown-value" id="seconds">--</span>
+                    <div class="countdown-label">Secs</div>
+                </div>
+            </div>
+        </div>
+        
+        <p class="footer-text">
+            Questions? Contact us at <a href="mailto:support@entermaya.com">support@entermaya.com</a>
+        </p>
+    </div>
+    
+    <script>
+        // Countdown to January 31st, 2026 00:00:00
+        const targetDate = new Date('2026-01-31T00:00:00').getTime();
+        
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+            
+            if (distance < 0) {
+                document.getElementById('days').textContent = '00';
+                document.getElementById('hours').textContent = '00';
+                document.getElementById('minutes').textContent = '00';
+                document.getElementById('seconds').textContent = '00';
+                return;
+            }
+            
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            document.getElementById('days').textContent = String(days).padStart(2, '0');
+            document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+            document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+        }
+        
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - MAYA</title>
+    <meta name="description" content="MAYA Admin Login - Authorized personnel only.">
+    <meta name="theme-color" content="#0A0A0A">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/images/maya-logo.png">
+    <link rel="apple-touch-icon" href="/images/maya-logo.png">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/app.js"></script>
+</head>
+<body>
+    <div class="beta-tag">BETA v0.9</div>
+    <div id="navbar">
+        <a href="/" class="logo-container"><img src="/images/maya-logo.png" alt="MAYA"></a>
+        <div class="tech-decoration hidden" style="display: none; md:display: block;">/// SECURE ACCESS</div>
+        <div class="flex items-center gap-4">
+            <a href="/" class="nav-btn">STORE</a>
+        </div>
+    </div>
+
+    <div class="container" style="min-height: 80vh; align-items: center;">
+        <div class="card col-span-12 md:col-start-4 md:col-span-6 artifact-frame p-40">
+            <div class="corner-accent corner-tl"></div>
+            <div class="corner-accent corner-br"></div>
+            
+            <div class="text-center mb-40">
+                <span class="tech-decoration">/// SYSTEM</span>
+                <h1 style="font-size: 32px; margin-top: 16px;">ADMIN CONSOLE</h1>
+                <p class="text-red mt-8 font-mono text-xs">RESTRICTED ACCESS AUTHORIZED PERSONNEL ONLY</p>
+            </div>
+
+            <div id="error-message" class="hidden badge bg-red-dim text-red mb-20 w-full justify-center" style="border-color: var(--accent);"></div>
+
+            <form id="admin-login-form">
+                <div class="mb-40">
+                    <label class="stat-label mb-10">OPERATOR ID</label>
+                    <input type="email" id="email" name="email" class="form-input" placeholder="admin@entermaya.com" required>
+                </div>
+
+                <div class="mb-40">
+                    <label class="stat-label mb-10">PASSCODE</label>
+                    <input type="password" id="password" name="password" class="form-input" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-full" id="login-btn">
+                    INITIATE SESSION
+                </button>
+            </form>
+        </div>
+
+        <div class="col-span-12 department-footer">
+            <p style="margin-bottom: 8px;">DEPARTMENT OF LORE INC.</p>
+            <p class="text-dim" style="font-size: 10px;">ANAND GANDHI & ZAIN MEMON /// MAYA NARRATIVE UNIVERSE</p>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('admin-login-form');
+        const errorDiv = document.getElementById('error-message');
+        const loginBtn = document.getElementById('login-btn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorDiv.classList.add('hidden');
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'AUTHENTICATING...';
+
+            const data = {
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+
+            try {
+                const res = await fetch('/admin/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+
+                if (res.ok && result.success) {
+                    window.location.href = result.redirect;
+                } else {
+                    throw new Error(result.error || 'Access Denied');
+                }
+            } catch (err) {
+                errorDiv.textContent = err.message;
+                errorDiv.classList.remove('hidden');
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'INITIATE SESSION';
+            }
+        });
+    </script>
+</body>
+</html>

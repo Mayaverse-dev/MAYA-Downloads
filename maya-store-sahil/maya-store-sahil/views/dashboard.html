@@ -1,0 +1,2397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - MAYA Pledge Manager</title>
+    <meta name="description" content="Manage your MAYA Kickstarter pledge. View your rewards, update shipping, and add extras to your order.">
+    <meta name="theme-color" content="#0A0A0A">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://store.entermaya.com/dashboard">
+    <meta property="og:title" content="Dashboard - MAYA Store">
+    <meta property="og:description" content="Manage your MAYA Kickstarter pledge. View your rewards and update shipping.">
+    <meta property="og:image" content="https://store.entermaya.com/images/hero/divya.png">
+    <meta property="og:site_name" content="MAYA Store">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Dashboard - MAYA Store">
+    <meta name="twitter:description" content="Manage your MAYA Kickstarter pledge.">
+    <meta name="twitter:image" content="https://store.entermaya.com/images/hero/divya.png">
+    <meta name="twitter:site" content="@maya_lore_">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+    
+    <!-- Fonts - Preconnect for faster loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/app.js"></script>
+    <style>
+        .dashboard-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: var(--space-7) var(--space-5) 120px;
+        }
+
+        /* 1. Name Section */
+        .user-greeting {
+            margin-bottom: var(--space-8);
+        }
+
+        .user-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            color: var(--text-dim);
+            margin-bottom: var(--space-2);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .user-name {
+            font-size: 42px;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        /* 2. Your Orders Block */
+        .section-title {
+            font-size: 24px;
+            font-weight: 400;
+            margin-bottom: var(--space-5);
+            color: var(--text-main);
+        }
+
+        .order-summary-block {
+            background: var(--matter);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            min-height: 300px;
+            position: relative;
+            margin-bottom: var(--space-9);
+            transition: border-color 0.3s ease;
+        }
+
+        .order-summary-block:hover {
+            border-color: var(--text-dim);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--space-6);
+            padding-bottom: var(--space-5);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .order-header-left {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .backer-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            color: var(--accent);
+            text-transform: uppercase;
+        }
+
+        .backer-number {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: var(--text-dim);
+            letter-spacing: 0.1em;
+        }
+
+        .pledge-title {
+            font-size: 28px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            line-height: 1.2;
+            color: var(--text-main);
+        }
+
+        .pledge-date {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+            letter-spacing: 0.05em;
+        }
+
+        .pledge-meta {
+            color: var(--text-dim);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+        }
+        
+        /* Manifest Section */
+        .manifest-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            margin-bottom: var(--space-4);
+            padding-bottom: var(--space-3);
+            border-bottom: 1px dashed var(--border);
+        }
+        
+        .manifest-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(230, 30, 37, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .manifest-icon svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--accent);
+        }
+        
+        .manifest-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .order-content {
+            display: flex;
+            gap: var(--space-7);
+            flex-wrap: wrap;
+        }
+
+        .manifest-list {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .manifest-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-3) 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .manifest-item:last-child {
+            border-bottom: none;
+        }
+        
+        .manifest-item-name {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: var(--text-main);
+            text-transform: capitalize;
+        }
+        
+        .manifest-item-qty {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: var(--text-dim);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        .total-row {
+            margin-top: var(--space-5);
+            padding-top: var(--space-5);
+            border-top: 2px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .total-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+        
+        .total-amount {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* 3. Get More Section */
+        .get-more-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-5);
+        }
+
+        @media (max-width: 900px) {
+            .get-more-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .get-more-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .product-card-large {
+            background: var(--matter);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        .product-card-large:hover {
+            border-color: var(--border-hover);
+        }
+
+        .card-image-area {
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--void);
+        }
+
+        .card-image-area img {
+            width: 90%;
+            height: 90%;
+            object-fit: contain;
+            transition: transform 0.4s ease;
+            margin: 5%;
+        }
+
+        .product-card-large:hover .card-image-area img {
+            transform: scale(1.05);
+        }
+
+        .card-footer {
+            padding: var(--space-4);
+            background: var(--matter);
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .card-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            line-height: 1.3;
+            color: var(--text-main);
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .card-price {
+            color: var(--text-dim);
+            font-size: 13px;
+            font-family: 'IBM Plex Mono', monospace;
+            white-space: nowrap;
+        }
+
+        .card-footer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        /* Quantity Controls */
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+            background: var(--void);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 4px;
+        }
+
+        .qty-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            border: none;
+            background: var(--matter);
+            color: var(--text-main);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        .qty-btn:hover {
+            background: var(--border);
+        }
+
+        .qty-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .qty-value {
+            min-width: 28px;
+            text-align: center;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .add-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            font-size: 11px;
+            text-transform: uppercase;
+            font-family: 'IBM Plex Mono', monospace;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            letter-spacing: 0.05em;
+        }
+
+        .add-btn:hover {
+            background: var(--text-main);
+            color: var(--void);
+            border-color: var(--text-main);
+        }
+
+        .add-btn.in-cart {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+        
+        /* Pledge info button for cards */
+        .card-info-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-dim);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .card-info-btn:hover {
+            border-color: var(--text-main);
+            color: var(--text-main);
+        }
+        
+        .card-items-tooltip {
+            position: absolute;
+            bottom: 100%;
+            right: 0;
+            margin-bottom: 8px;
+            background: var(--void);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: var(--space-3);
+            min-width: 180px;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(8px);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .card-info-btn:hover .card-items-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .card-items-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: var(--space-2);
+        }
+        
+        .card-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            padding: 3px 0;
+            color: var(--text-main);
+        }
+        
+        .card-item-qty {
+            color: var(--text-dim);
+        }
+
+        .status-badge {
+            padding: 6px var(--space-3);
+            border-radius: 100px;
+            background: var(--border);
+            font-size: 12px;
+            text-transform: uppercase;
+            font-family: 'IBM Plex Mono', monospace;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .status-badge.paid {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .status-badge.failed {
+            background: rgba(230, 30, 37, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(230, 30, 37, 0.3);
+        }
+
+        .status-badge.pending {
+            background: rgba(234, 179, 8, 0.1);
+            color: #eab308;
+            border: 1px solid rgba(234, 179, 8, 0.3);
+        }
+
+        /* Info Cards Grid */
+        .info-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-5);
+            margin-bottom: var(--space-6);
+        }
+
+        @media (max-width: 768px) {
+            .info-cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .info-card {
+            background: var(--matter);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-5);
+            transition: border-color 0.3s ease;
+        }
+
+        .info-card:hover {
+            border-color: var(--text-dim);
+        }
+
+        .info-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-3);
+            margin-bottom: var(--space-5);
+            padding-bottom: var(--space-4);
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .info-card-header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .info-card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .info-card-icon svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--text-main);
+        }
+
+        .info-card-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-dim);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-2) 0;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-dim);
+        }
+
+        .info-value {
+            color: var(--text-main);
+            text-align: right;
+        }
+
+        /* Status Timeline */
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) 0;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--border);
+            flex-shrink: 0;
+        }
+
+        .status-dot.active {
+            background: var(--accent);
+            box-shadow: 0 0 10px rgba(230, 30, 37, 0.5);
+        }
+
+        .status-dot.pending {
+            background: var(--accent);
+            opacity: 0.5;
+        }
+
+        .status-line {
+            width: 2px;
+            height: 20px;
+            background: var(--border);
+            margin-left: 4px;
+        }
+
+        .status-line.active {
+            background: rgba(230, 30, 37, 0.3);
+        }
+
+        .status-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13px;
+        }
+
+        .status-text.active {
+            color: var(--text-main);
+        }
+
+        .status-text.pending {
+            color: var(--text-dim);
+        }
+
+        /* Sub-items for nested milestones */
+        .status-sub-items {
+            margin-left: 22px;
+            padding-left: var(--space-3);
+            border-left: 2px solid rgba(230, 30, 37, 0.2);
+            margin-top: var(--space-2);
+            margin-bottom: var(--space-2);
+        }
+
+        .status-sub-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: 6px 0;
+        }
+
+        .status-dot-small {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--border);
+            flex-shrink: 0;
+        }
+
+        .status-dot-small.active {
+            background: var(--accent);
+        }
+
+        .status-dot-small.pending {
+            background: var(--text-dim);
+            opacity: 0.5;
+        }
+
+        .status-text-small {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+        }
+
+        .status-text-small.active {
+            color: var(--text-main);
+        }
+
+        .status-text-small.pending {
+            color: var(--text-dim);
+        }
+
+        /* Payment Card Display */
+        .payment-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-3) var(--space-4);
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-3);
+        }
+
+        .payment-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .payment-card-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .card-brand-icon {
+            font-size: 24px;
+        }
+
+        .card-number {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+        }
+
+        .card-expiry {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .remove-card-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 6px var(--space-3);
+            border-radius: 6px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .remove-card-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .remove-card-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .add-card-btn {
+            width: 100%;
+            padding: var(--space-3);
+            background: transparent;
+            border: 1px dashed var(--border);
+            color: var(--text-dim);
+            border-radius: var(--radius-md);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: var(--space-3);
+        }
+
+        .add-card-btn:hover {
+            border-color: var(--text-dim);
+            color: var(--text-main);
+        }
+        
+        /* Saved Card Display - New Design */
+        .saved-card-display {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .saved-card-main {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px;
+        }
+        
+        .saved-card-icon {
+            font-size: 28px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        
+        .saved-card-details {
+            flex: 1;
+        }
+        
+        .saved-card-number {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+        
+        .saved-card-expiry {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+        
+        .saved-card-badge {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 0.08em;
+            padding: 4px 10px;
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            border-radius: 6px;
+        }
+        
+        .saved-card-actions {
+            display: flex;
+            border-top: 1px solid var(--border);
+        }
+        
+        .saved-card-btn {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.06em;
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        
+        .saved-card-btn:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-main);
+        }
+        
+        .no-card-display {
+            text-align: center;
+            padding: 24px 16px;
+        }
+        
+        .no-card-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+        
+        .no-card-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+        }
+        
+        .add-card-link {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: var(--accent);
+            text-decoration: underline;
+        }
+        
+        .order-payment-status {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .retry-payment-btn {
+            display: block;
+            margin-top: 16px;
+            padding: 12px;
+            text-align: center;
+            background: var(--accent);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            text-decoration: none;
+        }
+        
+        .retry-payment-btn:hover {
+            opacity: 0.9;
+        }
+        
+        /* Pending Verification Display */
+        .pending-verification-display {
+            text-align: center;
+            padding: 24px 16px;
+            background: rgba(234, 179, 8, 0.05);
+            border: 1px dashed rgba(234, 179, 8, 0.3);
+            border-radius: 12px;
+        }
+        
+        .pending-icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .pending-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: #eab308;
+            margin-bottom: 4px;
+        }
+        
+        .pending-subtext {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            color: var(--text-dim);
+        }
+        
+        .retry-verify-btn {
+            margin-top: 14px;
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid rgba(234, 179, 8, 0.4);
+            border-radius: 8px;
+            color: #eab308;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .retry-verify-btn:hover {
+            background: rgba(234, 179, 8, 0.1);
+            border-color: #eab308;
+        }
+        
+        .retry-verify-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Edit Link */
+        .edit-link {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .edit-link:hover {
+            color: var(--text-main);
+        }
+
+        /* Cart Button Styles */
+        .cart-btn {
+            position: relative;
+            background: transparent;
+            border: none;
+            padding: var(--space-2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s ease;
+        }
+
+        .cart-btn:hover {
+            opacity: 0.8;
+        }
+
+        .cart-btn svg {
+            width: 22px;
+            height: 22px;
+            stroke: var(--text-main);
+            fill: none;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--accent);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 600;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        .cart-badge.hidden {
+            display: none;
+        }
+        
+        /* ═══════════════════════════════════════════════════════════
+           DASHBOARD MOBILE RESPONSIVENESS
+        ═══════════════════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: var(--space-5) var(--space-4) 100px;
+            }
+            
+            .user-name {
+                font-size: 28px;
+            }
+            
+            .user-greeting {
+                margin-bottom: var(--space-6);
+            }
+            
+            .section-title {
+                font-size: 20px;
+            }
+            
+            .order-summary-block {
+                padding: var(--space-4);
+                margin-bottom: var(--space-6);
+            }
+            
+            .order-header-grid {
+                gap: var(--space-3);
+            }
+            
+            .get-more-grid {
+                gap: 12px;
+            }
+            
+            .product-card-large {
+                border-radius: 12px;
+            }
+            
+            .card-image-area {
+                aspect-ratio: 4/3;
+            }
+            
+            .card-footer {
+                padding: 12px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .dashboard-container {
+                padding: var(--space-4) 12px 80px;
+            }
+            
+            .user-name {
+                font-size: 24px;
+            }
+            
+            .order-summary-block {
+                padding: 12px;
+            }
+            
+            .info-card {
+                padding: var(--space-4);
+            }
+            
+            .info-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-2);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="beta-tag">BETA v0.9</div>
+    <!-- Header -->
+    <div id="navbar">
+        <a href="/" class="logo-container">
+            <img src="/images/maya-logo.png" alt="MAYA">
+        </a>
+        <div class="flex items-center gap-20">
+            <button onclick="window.location.href='/addons'" class="cart-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                </svg>
+                <span id="cart-badge" class="cart-badge hidden">0</span>
+            </button>
+            <a href="/assets" class="nav-btn">ASSETS</a>
+            <a href="#" onclick="App.Auth.logout()" class="nav-btn">LOGOUT</a>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="dashboard-container">
+
+        <!-- 1. NAME -->
+        <div class="user-greeting">
+            <div class="user-label">OPERATOR</div>
+            <div class="user-name" id="user-name-display">Loading...</div>
+        </div>
+
+        <!-- 2. Info Cards: Shipping & Payment -->
+        <div class="info-cards-grid">
+            <!-- Shipping Details Card -->
+            <div class="info-card" id="shipping-card">
+                <div class="info-card-header">
+                    <div class="info-card-header-left">
+                        <div class="info-card-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                            </svg>
+                        </div>
+                        <div class="info-card-title">Shipping Details</div>
+                    </div>
+                    <a href="/checkout" class="edit-link">EDIT</a>
+                </div>
+                <div id="shipping-content">
+                    <div class="text-dim text-14 font-mono">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Payment Details Card -->
+            <div class="info-card" id="payment-card">
+                <div class="info-card-header">
+                    <div class="info-card-header-left">
+                        <div class="info-card-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                            </svg>
+                        </div>
+                        <div class="info-card-title">Payment Methods</div>
+                    </div>
+                </div>
+                <div id="payment-content">
+                    <div class="text-dim text-14 font-mono">Loading...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Your Orders -->
+        <div>
+            <div class="section-title">Your Orders</div>
+
+            <div id="order-summary-block" class="order-summary-block">
+                <div class="flex items-center justify-center h-full min-h-200">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="department-footer"
+            style="padding-bottom: 80px; margin-top: 80px; border-top: 1px solid var(--border);">
+            <div class="social-links mb-8">
+                <a href="https://www.instagram.com/maya_lore_/" target="_blank" class="social-icon"
+                    aria-label="Instagram">
+                    <img src="https://cdn.jsdelivr.net/npm/remixicon@4.8.0/icons/Logos/instagram-line.svg"
+                        alt="Instagram">
+                </a>
+                <a href="https://x.com/maya_lore_" target="_blank" class="social-icon" aria-label="X (Twitter)">
+                    <img src="https://cdn.jsdelivr.net/npm/remixicon@4.8.0/icons/Logos/twitter-x-line.svg" alt="X">
+                </a>
+                <a href="https://discord.gg/7HwhQaN6" target="_blank" class="social-icon" aria-label="Discord">
+                    <img src="https://cdn.jsdelivr.net/npm/remixicon@4.8.0/icons/Logos/discord-line.svg" alt="Discord">
+                </a>
+            </div>
+            <p class="mb-8">DEPARTMENT OF LORE INC.</p>
+            <p class="text-dim text-10">ANAND GANDHI & ZAIN MEMON /// MAYA NARRATIVE UNIVERSE</p>
+            <div class="footer-links">
+                <a href="/terms">Terms of Service</a>
+                <a href="/privacy">Privacy Policy</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assets Modal -->
+    <div id="assets-modal" class="assets-modal-overlay" onclick="if(event.target === this) toggleAssetsModal()">
+        <div class="assets-modal">
+            <div class="assets-modal-header">
+                <h2 class="assets-modal-title">DIGITAL ASSETS</h2>
+                <button onclick="toggleAssetsModal()" class="assets-modal-close">&times;</button>
+            </div>
+            
+            <!-- Category Tabs -->
+            <div class="assets-tabs">
+                <button class="assets-tab active" data-category="wallpaper" onclick="switchAssetCategory('wallpaper')">
+                    🖼️ Wallpapers
+                </button>
+                <button class="assets-tab" data-category="literature" onclick="switchAssetCategory('literature')">
+                    📄 Literature
+                </button>
+                <button class="assets-tab" data-category="3d" onclick="switchAssetCategory('3d')">
+                    🧊 3D Files
+                </button>
+            </div>
+            
+            <!-- Assets Grid -->
+            <div class="assets-modal-body">
+                <div id="assets-grid" class="assets-grid">
+                    <!-- Populated by JS -->
+                </div>
+                <div id="assets-loading" class="text-center py-40">
+                    <div class="spinner mx-auto"></div>
+                </div>
+                <div id="assets-empty" class="empty-state hidden">
+                    <div class="empty-state-icon">📁</div>
+                    <p>No assets available yet</p>
+                    <span class="text-dim">Digital assets will appear here once they are ready.</span>
+                </div>
+            </div>
+            
+            <!-- Download Bar -->
+            <div id="assets-download-bar" class="assets-download-bar hidden">
+                <span class="font-mono text-white text-xs" id="assets-selection-count">0 selected</span>
+                <button class="btn btn-primary" onclick="downloadSelectedAssets()">DOWNLOAD</button>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        /* Assets Modal Styles */
+        .assets-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .assets-modal-overlay.active {
+            display: flex;
+        }
+        
+        .assets-modal {
+            width: 90%;
+            max-width: 1200px;
+            max-height: 90vh;
+            background: var(--void);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .assets-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .assets-modal-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            letter-spacing: 0.1em;
+            color: var(--text-main);
+        }
+        
+        .assets-modal-close {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-size: 28px;
+            cursor: pointer;
+            line-height: 1;
+        }
+        
+        .assets-modal-close:hover {
+            color: var(--text-main);
+        }
+        
+        .assets-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 16px 32px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        .assets-tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            color: var(--text-dim);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .assets-tab:hover {
+            border-color: var(--text-dim);
+            color: var(--text-main);
+        }
+        
+        .assets-tab.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+        
+        .assets-modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px;
+        }
+        
+        .assets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: var(--space-4);
+        }
+        
+        .asset-card {
+            background: var(--matter);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .asset-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+        
+        .asset-card.selected {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(230, 30, 37, 0.2);
+        }
+        
+        .asset-card-image {
+            width: 90%;
+            height: 90%;
+            aspect-ratio: 16/9;
+            object-fit: contain;
+            background: var(--void);
+            margin: 5%;
+        }
+        
+        .asset-card-info {
+            padding: var(--space-3) var(--space-4);
+            border-top: 1px solid var(--border);
+            background: var(--matter);
+        }
+        
+        .asset-card-name {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .asset-card-type {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .asset-card-check {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        .asset-card:hover .asset-card-check,
+        .asset-card.selected .asset-card-check {
+            opacity: 1;
+        }
+        
+        .asset-card.selected .asset-card-check {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        
+        .asset-card-check svg {
+            width: 14px;
+            height: 14px;
+            fill: #fff;
+        }
+        
+        .assets-download-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 32px;
+            border-top: 1px solid var(--border);
+            background: var(--matter);
+        }
+        
+        .assets-download-bar.hidden {
+            display: none;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .empty-state p {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+    </style>
+
+    <script>
+        let currentPledgeAmount = 0;
+        let currentPledgeId = null;
+        let isDroppedBacker = false;
+        let products = [];
+        let userData = null;
+        let paymentMethods = [];
+
+        // Card brand icons
+        const CARD_BRANDS = {
+            'visa': '💳 Visa',
+            'mastercard': '💳 Mastercard',
+            'amex': '💳 Amex',
+            'discover': '💳 Discover',
+            'diners': '💳 Diners',
+            'jcb': '💳 JCB',
+            'unionpay': '💳 UnionPay',
+            'unknown': '💳'
+        };
+
+        // Image Mapping for fallbacks
+        const IMAGE_MAP = {
+            'vaanar': 'vaanar.png',
+            'manushya': 'manushya.png',
+            'garuda': 'garuda.png',
+            'divya': 'divya.png',
+            'founders': 'founders.png',
+            'notebook': 'maya-notebook.png',
+            'bookmark': 'maya-bookmark.png',
+            'patches': 'maya-patches.png',
+            'pin': 'maya-enamel-pin.png',
+            'enamel': 'maya-enamel-pin.png',
+            'poster': 'maya-poster.png',
+            'lore': 'maya-lorebook.png',
+            'audio': 'maya-audiobook.webp',
+            'book': 'maya-book.jpeg',
+            'built': 'built-environments.png',
+            'flitt': 'flitt-locust-pendant.png',
+            'sticker': 'maya-sticker.png'
+        };
+
+        function getAssetImage(name) {
+            const lower = name.toLowerCase();
+            for (const [key, img] of Object.entries(IMAGE_MAP)) {
+                if (lower.includes(key)) {
+                    if (['vaanar', 'manushya', 'garuda', 'divya', 'founders'].includes(key)) {
+                        return `/images/upgrade pledges/${img}`;
+                    }
+                    return `/images/addons/${img}`;
+                }
+            }
+            return '/images/addons/maya-book.jpeg';
+        }
+
+        function getProductImage(product) {
+            if (product.s3_key) {
+                return `/api/assets/thumbnail?key=${encodeURIComponent(product.s3_key)}`;
+            }
+            if (product.image && product.image.startsWith('/')) {
+                return product.image;
+            }
+            if (product.type === 'pledge') {
+                const lower = product.name.toLowerCase();
+                const pledgeImages = { 'vaanar': 'vaanar.png', 'manushya': 'manushya.png', 'garuda': 'garuda.png', 'divya': 'divya.png', 'founders': 'founders.png' };
+                for (const [key, img] of Object.entries(pledgeImages)) {
+                    if (lower.includes(key)) return `/images/upgrade pledges/${img}`;
+                }
+            }
+            if (product.image) return `/images/addons/${product.image}`;
+            return getAssetImage(product.name);
+        }
+
+        async function loadUserData() {
+            try {
+                const user = await App.Auth.checkStatus();
+                if (!user) return;
+
+                const response = await fetch('/api/user/data');
+                userData = await response.json();
+
+                // Set name
+                const name = userData.backerName || userData.email.split('@')[0];
+                document.getElementById('user-name-display').textContent = name;
+
+                currentPledgeAmount = parseFloat(userData.pledgeAmount) || 0;
+                
+                // Get current pledge ID from items
+                if (userData.items?.pledge?.length > 0) {
+                    currentPledgeId = userData.items.pledge[0].id;
+                }
+
+                // Status - treat canceled same as dropped
+                if (userData.pledgedStatus === 'dropped' || userData.pledgedStatus === 'canceled') {
+                    isDroppedBacker = true;
+                    handleDroppedBacker(userData);
+                }
+
+                // Render all sections
+                renderOrderBlock(userData);
+                renderShippingCard(userData);
+                loadPaymentMethods();
+                loadProducts();
+                renderDownloads(userData);
+
+            } catch (err) {
+                console.error("Dashboard Load Error:", err);
+            }
+        }
+
+        async function renderShippingCard(userData) {
+            const container = document.getElementById('shipping-content');
+            
+            // Try to load saved addresses from API
+            let addresses = [];
+            try {
+                const res = await fetch('/api/user/saved-addresses');
+                const data = await res.json();
+                addresses = data.addresses || [];
+            } catch (err) {
+                console.error('Error loading addresses:', err);
+            }
+            
+            // Fallback to userData.shippingAddress if no saved addresses
+            if (addresses.length === 0 && userData.shippingAddress) {
+                const addr = userData.shippingAddress;
+                if (addr.street || addr.address1 || addr.city) {
+                    addresses.push({
+                        fullName: addr.name,
+                        addressLine1: addr.street || addr.address1,
+                        addressLine2: addr.address2,
+                        city: addr.city,
+                        state: addr.state,
+                        postalCode: addr.postal,
+                        country: addr.country || userData.shippingCountry,
+                        phone: addr.phone
+                    });
+                }
+            }
+            
+            if (addresses.length > 0) {
+                // Show primary address
+                const addr = addresses[0];
+                const name = addr.fullName || addr.full_name || addr.name || '';
+                const line1 = addr.addressLine1 || addr.address_line1 || '';
+                const line2 = addr.addressLine2 || addr.address_line2 || '';
+                const city = addr.city || '';
+                const state = addr.state || '';
+                const postal = addr.postalCode || addr.postal_code || '';
+                const country = addr.country || '';
+                const phone = addr.phone || '';
+                
+                let addressLines = [];
+                if (name) addressLines.push(`<strong>${name}</strong>`);
+                if (line1) addressLines.push(line1);
+                if (line2) addressLines.push(line2);
+                if (city || state || postal) {
+                    addressLines.push([city, state, postal].filter(Boolean).join(', '));
+                }
+                if (country) addressLines.push(country);
+                if (phone) addressLines.push(`📞 ${phone}`);
+                
+                const moreAddresses = addresses.length > 1 ? `
+                    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border);">
+                        <span style="font-size: 10px; color: var(--text-dim);">+${addresses.length - 1} more saved</span>
+                    </div>
+                ` : '';
+                
+                container.innerHTML = `
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; line-height: 1.8; color: var(--text-main);">
+                        ${addressLines.join('<br>')}
+                    </div>
+                    ${moreAddresses}
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="text-dim text-14 font-mono" style="padding: 20px 0;">
+                        No shipping address on file.
+                        <br><br>
+                        <a href="/shipping" class="edit-link" style="text-decoration: underline;">Add shipping address →</a>
+                    </div>
+                `;
+            }
+        }
+
+        function renderProjectStatus(userData) {
+            const container = document.getElementById('project-status-content');
+            
+            // Project milestones with nested structure
+            container.innerHTML = `
+                <!-- Kickstarter Funded -->
+                <div class="status-item">
+                    <div class="status-dot active"></div>
+                    <span class="status-text active">✓ Kickstarter Funded</span>
+                </div>
+                <div class="status-line active"></div>
+                
+                <!-- Ebook Launch Section -->
+                <div class="status-item">
+                    <div class="status-dot active"></div>
+                    <span class="status-text active">Ebook Launch</span>
+                </div>
+                
+                <!-- Ebook Sub-items -->
+                <div class="status-sub-items">
+                    <div class="status-sub-item">
+                        <div class="status-dot-small active"></div>
+                        <span class="status-text-small active">✓ Book Review & Completion</span>
+                    </div>
+                    <div class="status-sub-item">
+                        <div class="status-dot-small active"></div>
+                        <span class="status-text-small active">✓ Typesetting & Production</span>
+                    </div>
+                    <div class="status-sub-item">
+                        <div class="status-dot-small pending"></div>
+                        <span class="status-text-small pending">Ebook Launch — Coming Soon</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function loadPaymentMethods() {
+            const container = document.getElementById('payment-content');
+            let savedCard = null;
+            let stripeVerified = false;
+            let paymentStatus = null; // From Stripe only
+            
+            // Stripe is the ONLY source of truth
+            try {
+                const res = await fetch('/api/user/payment-status');
+                const data = await res.json();
+                
+                if (data.verified) {
+                    stripeVerified = true;
+                    paymentStatus = data.paymentStatus; // 'paid', 'pending', 'failed', null
+                    
+                    if (data.card) {
+                        savedCard = data.card;
+                    }
+                }
+            } catch (err) {
+                console.error('Error verifying payment with Stripe:', err);
+                stripeVerified = false;
+            }
+            
+            let html = '';
+            
+            if (stripeVerified && savedCard) {
+                // Card verified from Stripe
+                const brandDisplay = CARD_BRANDS[savedCard.brand?.toLowerCase()] || CARD_BRANDS.unknown;
+                const expiry = savedCard.expMonth && savedCard.expYear 
+                    ? `Expires ${savedCard.expMonth}/${savedCard.expYear}` 
+                    : '';
+                
+                html = `
+                    <div class="saved-card-display">
+                        <div class="saved-card-main">
+                            <div class="saved-card-icon">${brandDisplay.split(' ')[0]}</div>
+                            <div class="saved-card-details">
+                                <div class="saved-card-number">${savedCard.brand?.charAt(0).toUpperCase() + savedCard.brand?.slice(1) || 'Card'} •••• ${savedCard.last4}</div>
+                                ${expiry ? `<div class="saved-card-expiry">${expiry}</div>` : ''}
+                            </div>
+                            <span class="saved-card-badge">VERIFIED</span>
+                        </div>
+                        <div class="saved-card-actions">
+                            <a href="/payment?replace=true" class="saved-card-btn">REPLACE CARD</a>
+                        </div>
+                    </div>
+                `;
+                
+                // Show payment status from Stripe
+                if (paymentStatus) {
+                    const isPaid = paymentStatus === 'paid' || paymentStatus === 'succeeded';
+                    const isFailed = paymentStatus === 'failed' || paymentStatus === 'requires_payment_method';
+                    const statusColor = isPaid ? '#22c55e' : (isFailed ? 'var(--accent)' : '#eab308');
+                    const statusText = isPaid ? 'PAID' : paymentStatus.toUpperCase();
+                    
+                    html += `
+                        <div class="order-payment-status">
+                            <div class="info-row">
+                                <span class="info-label">Payment Status</span>
+                                <span class="info-value" style="color: ${statusColor};">${statusText}</span>
+                            </div>
+                            ${isFailed ? `
+                                <a href="/payment?retry=true" class="retry-payment-btn">
+                                    RETRY PAYMENT
+                                </a>
+                            ` : ''}
+                        </div>
+                    `;
+                }
+            } else if (stripeVerified && !savedCard) {
+                // Connected to Stripe, no card = no payment
+                html = `
+                    <div class="no-card-display">
+                        <div class="no-card-icon">💳</div>
+                        <div class="no-card-text">No payment method on file</div>
+                        <a href="/payment" class="add-card-link">Add payment card →</a>
+                    </div>
+                `;
+            } else {
+                // Cannot verify with Stripe
+                html = `
+                    <div class="pending-verification-display">
+                        <div class="pending-icon">⏳</div>
+                        <div class="pending-text">Payment verification pending</div>
+                        <div class="pending-subtext">Unable to connect to payment provider</div>
+                        <button onclick="retryPaymentVerification()" class="retry-verify-btn">RETRY VERIFICATION</button>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+        
+        async function retryPaymentVerification() {
+            const btn = document.querySelector('.retry-verify-btn');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'VERIFYING...';
+            }
+            
+            // Retry loading payment methods from Stripe
+            await loadPaymentMethods();
+            
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = 'RETRY VERIFICATION';
+            }
+        }
+
+        async function removePaymentMethod(pmId, customerId) {
+            if (paymentMethods.length <= 1) {
+                alert('You must have at least one payment method. Please add a new card before removing this one.');
+                return;
+            }
+
+            if (!confirm('Remove this payment method?')) return;
+
+            try {
+                const res = await fetch(`/api/user/payment-methods/${pmId}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ customerId })
+                });
+
+                if (res.ok) {
+                    loadPaymentMethods(); // Refresh list
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to remove payment method');
+                }
+            } catch (err) {
+                console.error('Error removing payment method:', err);
+                alert('Error removing payment method');
+            }
+        }
+
+        function renderOrderBlock(userData) {
+            const container = document.getElementById('order-summary-block');
+
+            // Gather items for manifest with full product names
+            const rawItems = { ...userData.kickstarterItems, ...userData.kickstarterAddons };
+            let manifestHtml = '';
+            let itemCount = 0;
+
+            // Map short keys to full product names
+            const itemNameMap = {
+                'paperback': 'MAYA: Seed Takes Root (Paperback)',
+                'hardcover': 'MAYA: Seed Takes Root (Hardcover)',
+                'ebook': 'MAYA: Seed Takes Root (Ebook)',
+                'audiobook': 'MAYA: Seed Takes Root (Audiobook)',
+                'book2_hc': 'MAYA: Whispers In The Soil (Book 2)',
+                'book3_hc': 'MAYA: It Becomes The Forest (Book 3)',
+                'book2_live': 'MAYA: Book 2 Live Access',
+                'book3_live': 'MAYA: Book 3 Live Access',
+                'built_env': 'Built Environments of MAYA',
+                'lorebook': 'MAYA Lore: Species & Cultures',
+                'pendant': 'Flitt Locust Pendant',
+                'art_book': 'Limited Edition Art Book',
+                'character_naming': 'Character Named After You',
+                'wallpaper': 'Digital Wallpaper Pack',
+                'humble_vaanar': 'The Humble Vaanar',
+                'industrious_manushya': 'The Industrious Manushya',
+                'resplendent_garuda': 'The Resplendent Garuda',
+                'benevolent_divya': 'The Benevolent Divya',
+                'founders_neh': 'Founders of Neh'
+            };
+
+            for (const [key, val] of Object.entries(rawItems)) {
+                const qty = typeof val === 'object' ? val.quantity : val;
+                if (qty > 0) {
+                    itemCount++;
+                    // Use full name from map, or format the key as fallback
+                    const formattedName = itemNameMap[key] || key
+                        .replace(/_/g, ' ')
+                        .split(' ')
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                        .join(' ');
+                    
+                    manifestHtml += `
+                        <div class="manifest-item">
+                            <span class="manifest-item-name">${formattedName}</span>
+                            <span class="manifest-item-qty">×${qty}</span>
+                        </div>
+                    `;
+                }
+            }
+
+            // Also add items from userData.items if available
+            if (userData.items?.pledge?.length > 0) {
+                userData.items.pledge.forEach(item => {
+                    if (!manifestHtml.includes(item.name)) {
+                        itemCount++;
+                        manifestHtml += `
+                            <div class="manifest-item">
+                                <span class="manifest-item-name">${item.name}</span>
+                                <span class="manifest-item-qty">×${item.quantity || 1}</span>
+                            </div>
+                        `;
+                    }
+                });
+            }
+            
+            if (userData.items?.addons?.length > 0) {
+                userData.items.addons.forEach(item => {
+                    if (!manifestHtml.includes(item.name)) {
+                        itemCount++;
+                        manifestHtml += `
+                            <div class="manifest-item">
+                                <span class="manifest-item-name">${item.name}</span>
+                                <span class="manifest-item-qty">×${item.quantity || 1}</span>
+                            </div>
+                        `;
+                    }
+                });
+            }
+
+            // Check if this is a KS backer or a guest/late pledge
+            const isKSBacker = !!userData.backerNumber;
+            // Only show order total if we have items or if it's a paid order with items
+            const hasOrder = !!userData.orderTotal && itemCount > 0;
+            
+            const rewardTitle = userData.rewardTitle || (itemCount > 0 ? "Store Order" : "No Active Order");
+            const pledgeAmount = parseFloat(userData.pledgeAmount) || (itemCount > 0 ? parseFloat(userData.orderTotal) : 0) || 0;
+            
+            // Determine status
+            let statusClass, statusText;
+            if (userData.orderStatus === 'failed' || userData.orderStatus === 'requires_payment_method') {
+                statusClass = 'failed';
+                statusText = 'PAYMENT FAILED';
+            } else if (userData.pledgedStatus === 'dropped' || userData.pledgedStatus === 'canceled') {
+                statusClass = 'failed';
+                statusText = 'PAYMENT REQUIRED';
+            } else if (userData.orderPaid || userData.orderStatus === 'succeeded') {
+                statusClass = 'paid';
+                statusText = 'PAID';
+            } else if (userData.orderStatus === 'card_saved' || userData.orderStatus === 'requires_capture') {
+                statusClass = 'paid';
+                statusText = 'CARD SAVED';
+            } else if (hasOrder) {
+                statusClass = 'pending';
+                statusText = 'PENDING';
+            } else {
+                statusClass = isKSBacker ? 'paid' : '';
+                statusText = isKSBacker ? 'COLLECTED' : 'NO ORDER';
+            }
+            
+            const backerNumber = userData.backerNumber || null;
+            
+            // Format the date nicely
+            const pledgeDate = new Date(userData.pledgeDate || Date.now());
+            const formattedDate = pledgeDate.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+
+            if (!manifestHtml) {
+                manifestHtml = '<div class="text-dim text-14 py-10 font-mono" style="text-align: center;">No items yet</div>';
+            }
+            
+            // Header content based on user type
+            const headerHtml = isKSBacker ? `
+                <div class="backer-label">Kickstarter Backer</div>
+                <div class="backer-number">#${backerNumber}</div>
+                <div class="pledge-title">${rewardTitle}</div>
+                <div class="pledge-date">Pledged on ${formattedDate}</div>
+            ` : `
+                <div class="backer-label">Customer</div>
+                <div class="pledge-title">${userData.name || userData.email}</div>
+                ${hasOrder ? `<div class="pledge-date">Order Total: $${userData.orderTotal}</div>` : ''}
+            `;
+
+            container.innerHTML = `
+                <div class="order-header">
+                    <div class="order-header-left">
+                        ${headerHtml}
+                    </div>
+                    <div class="status-badge ${statusClass}">${statusText}</div>
+                </div>
+                
+                <div class="order-content">
+                    <div class="manifest-list">
+                        <div class="manifest-header">
+                            <div class="manifest-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+                                </svg>
+                            </div>
+                            <div class="manifest-title">Your Collection · ${itemCount} Items</div>
+                        </div>
+                        ${manifestHtml}
+                        
+                        <div class="total-row">
+                            <span class="total-label">Total Contribution</span>
+                            <span class="total-amount">$${pledgeAmount.toFixed(2)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function loadProducts() {
+            const loading = document.getElementById('products-loading');
+            loading.classList.remove('hidden');
+
+            try {
+                // Load pledge items data first
+                await loadPledgeItemsData();
+                
+                const res = await fetch('/api/products');
+                const productsData = await res.json();
+                products = productsData;
+
+                const container = document.getElementById('get-more-grid');
+                container.innerHTML = '';
+
+                // 1. Upgradable Pledges: type === 'pledge' AND price > current AND NOT current pledge
+                // For dropped/canceled backers, show ALL pledges (they need to pick one)
+                const upgrades = products
+                    .filter(p => {
+                        if (p.type !== 'pledge') return false;
+                        // Exclude current pledge (by ID or by matching price/name)
+                        if (p.id === currentPledgeId) return false;
+                        // For dropped backers, show all pledges
+                        if (isDroppedBacker) return true;
+                        // For others, only show upgrades
+                        return p.price > currentPledgeAmount;
+                    })
+                    .sort((a, b) => a.price - b.price);
+
+                // 2. Add-ons (non-pledges)
+                const addons = products
+                    .filter(p => p.type !== 'pledge')
+                    .sort((a, b) => a.price - b.price);
+
+                // Render Upgrades First
+                upgrades.forEach(p => {
+                    const diff = p.price - currentPledgeAmount;
+                    let priceText;
+                    if (isDroppedBacker) {
+                        priceText = `$${p.price.toFixed(0)}`;
+                    } else if (currentPledgeAmount > 0) {
+                        priceText = `UPGRADE +$${diff.toFixed(0)}`;
+                    } else {
+                        priceText = `$${p.price.toFixed(0)}`;
+                    }
+                    renderProductCard(container, p, priceText, true);
+                });
+
+                // Render Addons with quantity controls
+                addons.forEach(p => {
+                    renderProductCard(container, p, `$${p.price.toFixed(0)}`, false);
+                });
+
+                if (upgrades.length === 0 && addons.length === 0) {
+                    container.innerHTML = '<p class="text-dim text-center py-40">No products available</p>';
+                }
+
+            } catch (err) {
+                console.error('Error loading products:', err);
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+
+        // Cache for pledge items fetched from API
+        let pledgeItemsCache = {};
+
+        async function loadPledgeItemsData() {
+            try {
+                const res = await fetch('/api/products/pledges/with-items');
+                const pledges = await res.json();
+                
+                // Build cache keyed by pledge ID
+                pledges.forEach(pledge => {
+                    pledgeItemsCache[pledge.id] = pledge.includedItems || [];
+                });
+                
+                console.log('✓ Pledge items loaded:', Object.keys(pledgeItemsCache).length, 'pledges');
+            } catch (err) {
+                console.error('Error loading pledge items:', err);
+            }
+        }
+
+        function getPledgeItemsTooltip(productId) {
+            const items = pledgeItemsCache[productId] || [];
+            
+            if (items.length === 0) {
+                return '<div class="card-item-row"><span>Loading...</span></div>';
+            }
+            
+            return items.map(item => `
+                <div class="card-item-row">
+                    <span>${item.name}</span>
+                    <span class="card-item-qty">×${item.quantity || 1}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderProductCard(container, product, priceText, isUpgrade) {
+            const cartItem = App.Cart.items.find(i => i.id === product.id);
+            const inCart = !!cartItem;
+            const quantity = cartItem?.quantity || 0;
+            const imgSrc = getProductImage(product);
+
+            const div = document.createElement('div');
+            div.className = 'product-card-large';
+            div.id = `product-${product.id}`;
+
+            // Info button for pledges
+            const infoButton = isUpgrade ? `
+                <button class="card-info-btn" onclick="event.stopPropagation()">
+                    i
+                    <div class="card-items-tooltip">
+                        <div class="card-items-title">Includes</div>
+                        ${getPledgeItemsTooltip(product.id)}
+                    </div>
+                </button>
+            ` : '';
+
+            div.innerHTML = `
+                <div class="card-image-area" onclick="${isUpgrade ? `upgradeToPledge(${product.id}, ${product.price})` : ''}" style="cursor: ${isUpgrade ? 'pointer' : 'default'}">
+                    <img src="${imgSrc}" alt="${product.name}" onerror="this.src='/images/addons/maya-book.jpeg'">
+                </div>
+                <div class="card-footer">
+                    <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;">
+                        <div class="card-title">${product.name}</div>
+                        ${infoButton}
+                    </div>
+                    <div class="card-footer-row">
+                        <div class="card-price">${priceText}</div>
+                        ${isUpgrade ? `
+                            <button class="add-btn ${inCart ? 'in-cart' : ''}" onclick="upgradeToPledge(${product.id}, ${product.price})">
+                                ${inCart ? 'SELECTED' : 'SELECT'}
+                            </button>
+                        ` : `
+                            <div id="controls-${product.id}">
+                                ${inCart ? `
+                                    <div class="quantity-controls">
+                                        <button class="qty-btn" onclick="updateQuantity(${product.id}, -1)">−</button>
+                                        <span class="qty-value">${quantity}</span>
+                                        <button class="qty-btn" onclick="updateQuantity(${product.id}, 1)">+</button>
+                                    </div>
+                                ` : `
+                                    <button class="add-btn" onclick="addProduct(${product.id})">ADD +</button>
+                                `}
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        function updateQuantity(productId, delta) {
+            const cartItem = App.Cart.items.find(i => i.id === productId);
+            if (!cartItem) return;
+
+            const newQty = (cartItem.quantity || 1) + delta;
+
+            if (newQty <= 0) {
+                // Remove from cart
+                App.Cart.remove(productId);
+            } else {
+                // Update quantity
+                cartItem.quantity = newQty;
+                App.Cart.save();
+            }
+
+            // Update UI without reload
+            updateProductCardUI(productId);
+            updateCartBadge();
+        }
+
+        function updateProductCardUI(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const cartItem = App.Cart.items.find(i => i.id === productId);
+            const inCart = !!cartItem;
+            const quantity = cartItem?.quantity || 0;
+            const controlsContainer = document.getElementById(`controls-${productId}`);
+
+            if (controlsContainer) {
+                if (inCart) {
+                    controlsContainer.innerHTML = `
+                        <div class="quantity-controls">
+                            <button class="qty-btn" onclick="updateQuantity(${productId}, -1)">−</button>
+                            <span class="qty-value">${quantity}</span>
+                            <button class="qty-btn" onclick="updateQuantity(${productId}, 1)">+</button>
+                        </div>
+                    `;
+                } else {
+                    controlsContainer.innerHTML = `
+                        <button class="add-btn" onclick="addProduct(${productId})">ADD +</button>
+                    `;
+                }
+            }
+        }
+
+        function addProduct(id) {
+            const p = products.find(i => i.id === id);
+            if (p) {
+                App.Cart.add(p);
+                updateProductCardUI(id);
+                updateCartBadge();
+            }
+        }
+
+        function handleDroppedBacker(userData) {
+            const originalPledgeInfo = {
+                id: 'original-pledge-' + userData.backerNumber,
+                name: userData.rewardTitle,
+                price: userData.pledgeAmount,
+                isOriginalPledge: true,
+                isDroppedBackerPledge: true,
+                quantity: 1
+            };
+            localStorage.setItem('originalPledgeInfo', JSON.stringify(originalPledgeInfo));
+            const cartItems = App.Cart.items || [];
+            if (!cartItems.find(item => item.isOriginalPledge)) {
+                App.Cart.add(originalPledgeInfo);
+            }
+        }
+
+        function upgradeToPledge(id, price) {
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+
+            // Remove existing pledge upgrades and save immediately
+            App.Cart.items = App.Cart.items.filter(i => !i.isPledgeUpgrade && !i.isDroppedBackerPledge && !i.isOriginalPledge);
+            App.Cart.save(); // Important: save after filtering
+
+            const diff = price - currentPledgeAmount;
+            const cost = isDroppedBacker ? price : diff;
+
+            // Add new pledge upgrade
+            const upgradeItem = {
+                id: product.id,
+                name: `${product.name}${!isDroppedBacker ? ' (Upgrade)' : ''}`,
+                price: cost,
+                quantity: 1,
+                isPledgeUpgrade: true,
+                originalPrice: price,
+                currentPledgeAmount: currentPledgeAmount,
+                type: 'pledge'
+            };
+
+            App.Cart.items.push(upgradeItem);
+            App.Cart.save();
+            App.Cart.updateUI();
+
+            console.log('✓ Pledge upgrade added to cart:', upgradeItem.name, '$' + cost);
+
+            // Refresh products to show updated selection
+            loadProducts();
+            updateCartBadge();
+        }
+
+        function updateCartBadge() {
+            const cartBadge = document.getElementById('cart-badge');
+            const itemCount = App.Cart.items ? App.Cart.items.reduce((sum, i) => sum + (i.quantity || 1), 0) : 0;
+            if (cartBadge) {
+                if (itemCount > 0) {
+                    cartBadge.textContent = itemCount;
+                    cartBadge.classList.remove('hidden');
+                } else {
+                    cartBadge.classList.add('hidden');
+                }
+            }
+        }
+
+        // ===== ASSETS MODAL =====
+        let assetsData = { wallpaper: [], literature: [], '3d': [] };
+        let currentAssetCategory = 'wallpaper';
+        let selectedAssets = new Set();
+        
+        function toggleAssetsModal() {
+            const modal = document.getElementById('assets-modal');
+            modal.classList.toggle('active');
+            document.body.style.overflow = modal.classList.contains('active') ? 'hidden' : 'auto';
+            
+            if (modal.classList.contains('active')) {
+                loadAssets();
+            }
+        }
+        
+        // Alias for backward compatibility
+        function toggleDownloadSidebar() {
+            toggleAssetsModal();
+        }
+        
+        async function loadAssets() {
+            const grid = document.getElementById('assets-grid');
+            const loading = document.getElementById('assets-loading');
+            const empty = document.getElementById('assets-empty');
+            
+            loading.classList.remove('hidden');
+            grid.innerHTML = '';
+            empty.classList.add('hidden');
+            
+            try {
+                // Fetch all categories in parallel
+                const [wp, lit, threeD] = await Promise.all([
+                    fetch('/api/assets/wallpaper').then(r => r.json()).catch(() => []),
+                    fetch('/api/assets/literature').then(r => r.json()).catch(() => []),
+                    fetch('/api/assets/3d').then(r => r.json()).catch(() => [])
+                ]);
+                
+                assetsData.wallpaper = wp;
+                assetsData.literature = lit;
+                assetsData['3d'] = threeD;
+                
+                renderAssets();
+            } catch (err) {
+                console.error('Error loading assets:', err);
+                empty.classList.remove('hidden');
+                empty.querySelector('p').textContent = 'Error loading assets';
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+        
+        function switchAssetCategory(category) {
+            currentAssetCategory = category;
+            selectedAssets.clear();
+            updateAssetSelection();
+            
+            // Update tabs
+            document.querySelectorAll('.assets-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.category === category);
+            });
+            
+            renderAssets();
+        }
+        
+        function renderAssets() {
+            const grid = document.getElementById('assets-grid');
+            const empty = document.getElementById('assets-empty');
+            const assets = assetsData[currentAssetCategory] || [];
+            
+            grid.innerHTML = '';
+            
+            if (assets.length === 0) {
+                empty.classList.remove('hidden');
+                const categoryNames = { wallpaper: 'Wallpapers', literature: 'Literature', '3d': '3D Files' };
+                empty.querySelector('p').textContent = `No ${categoryNames[currentAssetCategory]} available yet`;
+                return;
+            }
+            
+            empty.classList.add('hidden');
+            
+            assets.forEach(asset => {
+                const isSelected = selectedAssets.has(asset.id);
+                const card = document.createElement('div');
+                card.className = `asset-card ${isSelected ? 'selected' : ''}`;
+                card.onclick = () => toggleAssetSelection(asset.id);
+                
+                const thumbUrl = asset.thumbUrl || asset.url || '/images/addons/maya-book.jpeg';
+                const fileType = (asset.type || asset.key?.split('.').pop() || 'FILE').toUpperCase();
+                
+                card.innerHTML = `
+                    <img src="${thumbUrl}" class="asset-card-image" onerror="this.src='/images/addons/maya-book.jpeg'" loading="lazy">
+                    <div class="asset-card-info">
+                        <div class="asset-card-name">${asset.name || asset.key?.split('/').pop() || 'Untitled'}</div>
+                        <div class="asset-card-type">${fileType}</div>
+                    </div>
+                    <div class="asset-card-check">
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+        
+        function toggleAssetSelection(id) {
+            if (selectedAssets.has(id)) {
+                selectedAssets.delete(id);
+            } else {
+                selectedAssets.add(id);
+            }
+            updateAssetSelection();
+            renderAssets();
+        }
+        
+        function updateAssetSelection() {
+            const downloadBar = document.getElementById('assets-download-bar');
+            const countEl = document.getElementById('assets-selection-count');
+            
+            if (selectedAssets.size > 0) {
+                downloadBar.classList.remove('hidden');
+                countEl.textContent = `${selectedAssets.size} selected`;
+            } else {
+                downloadBar.classList.add('hidden');
+            }
+        }
+        
+        async function downloadSelectedAssets() {
+            const assets = assetsData[currentAssetCategory];
+            const toDownload = assets.filter(a => selectedAssets.has(a.id));
+            
+            if (toDownload.length === 0) return;
+            
+            // For single file, download directly
+            if (toDownload.length === 1) {
+                const asset = toDownload[0];
+                const link = document.createElement('a');
+                link.href = asset.url;
+                link.download = asset.name || 'download';
+                link.click();
+                return;
+            }
+            
+            // For multiple files, notify user (zip would require JSZip library)
+            alert(`Downloading ${toDownload.length} files. Each will open in a new tab.`);
+            toDownload.forEach((asset, i) => {
+                setTimeout(() => {
+                    window.open(asset.url, '_blank');
+                }, i * 500);
+            });
+        }
+        
+        function renderDownloads(userData) {
+            // This function now just initializes assets data based on user entitlements
+            // The actual rendering is done by the assets modal
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            App.Cart.init();
+            loadUserData();
+            setTimeout(updateCartBadge, 100);
+        });
+    </script>
+</body>
+
+</html>

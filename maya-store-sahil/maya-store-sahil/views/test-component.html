@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAYA - Test Component</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body {
+            background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Product Card Component from Figma -->
+    <div style="position: relative; padding: 23px 14px; width: 372px;">
+        <!-- Background Card -->
+        <div style="position: absolute; left: 0; top: 0; padding: 10px;">
+            <div style="background: #eeeeee; border-radius: 11px; width: 352px; height: 647px;"></div>
+        </div>
+
+        <!-- Content -->
+        <div style="position: relative; width: 334px; height: 620px;">
+            <!-- Image Placeholder -->
+            <div style="position: absolute; left: 0; top: 0; padding: 10px; width: 334px; height: 397px; display: flex; align-items: center; justify-content: center;">
+                <div style="background: #d9d9d9; width: 305px; height: 377px; border-radius: 8px;">
+                    <!-- Image would go here -->
+                </div>
+            </div>
+
+            <!-- Product Info Section -->
+            <div style="position: absolute; left: 0; top: 397px; width: 334px; display: flex; flex-direction: column; gap: 6px;">
+                <!-- Product Description -->
+                <div style="padding: 10px; display: flex; align-items: center; justify-content: flex-end;">
+                    <p style="font-family: 'Inter', sans-serif; font-weight: 400; font-size: 24px; line-height: 1.4; color: #363636; width: 317px; margin: 0;">
+                        Body text for whatever you'd like to say.
+                    </p>
+                </div>
+
+                <!-- Price and Controls -->
+                <div style="display: flex; flex-direction: column; gap: 6px; align-items: center; width: 100%;">
+                    <!-- Price & Quantity Row -->
+                    <div style="display: flex; gap: 34px; align-items: center; width: 100%;">
+                        <!-- Price -->
+                        <div style="padding: 10px; height: 62px; width: 108px;">
+                            <p style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 30px; line-height: 1.4; letter-spacing: 0.9px; color: black; margin: 0;">
+                                $10.0
+                            </p>
+                        </div>
+
+                        <!-- Quantity Controls -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 10px; width: 197px;">
+                            <!-- Plus Button -->
+                            <div style="padding: 10px; height: 68px; width: 59px;">
+                                <div style="display: flex; align-items: center; height: 48px;">
+                                    <button onclick="increaseQty()" style="background: #828282; color: white; border: none; border-radius: 4px; padding: 4px 9px; width: 39px; height: 48px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                        <span style="font-family: 'Inter', sans-serif; font-weight: 700; font-size: 28px; line-height: 1.4;">+</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Quantity Display -->
+                            <div style="padding: 10px; height: 68px; width: 79px;">
+                                <div style="display: flex; flex-direction: column; align-items: flex-start; height: 48px; width: 100%;">
+                                    <div style="background: #828282; color: white; border-radius: 4px; padding: 4px 21px; height: 48px; width: 100%; display: flex; align-items: center; justify-content: center;">
+                                        <span id="quantity" style="font-family: 'Inter', sans-serif; font-weight: 700; font-size: 28px; line-height: 1.4;">1</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Minus Button -->
+                            <div style="padding: 10px; height: 68px; width: 59px;">
+                                <div style="display: flex; align-items: center; height: 48px;">
+                                    <button onclick="decreaseQty()" style="background: #828282; color: white; border: none; border-radius: 4px; padding: 4px 9px; width: 39px; height: 48px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                        <span style="font-family: 'Inter', sans-serif; font-weight: 700; font-size: 28px; line-height: 1.4;">-</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add to Cart Button -->
+                    <div style="background: #2c2c2c; border-radius: 4px; padding: 8px 90px; height: 55px; width: 305px; display: flex; align-items: center; justify-content: center; cursor: pointer;" onclick="addToCart()">
+                        <p style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 21px; line-height: 1.4; color: white; margin: 0; white-space: nowrap;">
+                            Add to Cart
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let quantity = 1;
+
+        function increaseQty() {
+            quantity++;
+            updateQuantity();
+        }
+
+        function decreaseQty() {
+            if (quantity > 1) {
+                quantity--;
+                updateQuantity();
+            }
+        }
+
+        function updateQuantity() {
+            document.getElementById('quantity').textContent = quantity;
+        }
+
+        function addToCart() {
+            alert(`Added ${quantity} item(s) to cart!`);
+        }
+    </script>
+</body>
+</html>
+
+

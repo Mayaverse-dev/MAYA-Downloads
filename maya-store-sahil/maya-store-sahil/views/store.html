@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MAYA Store - Pre-Order Now</title>
+    <meta name="description" content="Pre-order MAYA: Seed Takes Root - an epic illustrated novel exploring six species and one planet. Backed by 4,157 supporters on Kickstarter.">
+    <meta name="keywords" content="MAYA, illustrated novel, science fiction, fantasy, Kickstarter, pre-order, Anand Gandhi">
+    <meta name="author" content="Department of Lore Inc.">
+    <meta name="theme-color" content="#0A0A0A">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://store.entermaya.com/">
+    <meta property="og:title" content="MAYA Store - Pre-Order Now">
+    <meta property="og:description" content="Pre-order MAYA: Seed Takes Root - an epic illustrated novel exploring six species and one planet. Backed by 4,157 supporters on Kickstarter.">
+    <meta property="og:image" content="https://store.entermaya.com/images/hero/divya.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="MAYA Store">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://store.entermaya.com/">
+    <meta name="twitter:title" content="MAYA Store - Pre-Order Now">
+    <meta name="twitter:description" content="Pre-order MAYA: Seed Takes Root - an epic illustrated novel exploring six species and one planet.">
+    <meta name="twitter:image" content="https://store.entermaya.com/images/hero/divya.png">
+    <meta name="twitter:site" content="@maya_lore_">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+    
+    <!-- Canonical -->
+    <link rel="canonical" href="https://store.entermaya.com/">
+    
+    <!-- Fonts - Preconnect for faster loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="/js/app.js"></script>
+    <style>
+        /* ════════════════════════════════════════════════════════
+           MAYA STORE — Premium Refined Design
+           Soft contrasts, subtle depth, elegant interactions
+        ════════════════════════════════════════════════════════ */
+        
+        /* Stats - Elegant glass effect */
+        .store-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 80px;
+            box-shadow: 
+                0 1px 0 rgba(255, 255, 255, 0.05) inset,
+                0 -1px 0 rgba(0, 0, 0, 0.2) inset,
+                0 20px 40px -20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .store-stat {
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 28px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .store-stat:hover {
+            background: rgba(20, 20, 20, 0.9);
+        }
+        
+        .store-stat-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .store-stat-value {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            letter-spacing: -0.02em;
+        }
+        
+        .store-stat-value.success { color: #4ade80; }
+        
+        /* Pledge Grid - Elegant 4-column */
+        .pledge-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+        
+        .pledge-card {
+            background: linear-gradient(
+                165deg,
+                rgba(255, 255, 255, 0.03) 0%,
+                rgba(255, 255, 255, 0.01) 100%
+            );
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.2),
+                0 1px 0 rgba(255, 255, 255, 0.03) inset;
+        }
+        
+        .pledge-card:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            transform: translateY(-4px);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.4),
+                0 1px 0 rgba(255, 255, 255, 0.05) inset;
+        }
+        
+        .pledge-card.featured {
+            grid-column: span 4;
+            flex-direction: row;
+            align-items: center;
+            gap: 40px;
+            padding: 32px 40px;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.04) 0%,
+                rgba(255, 255, 255, 0.02) 50%,
+                rgba(255, 255, 255, 0.01) 100%
+            );
+            margin-top: 12px;
+        }
+        
+        .pledge-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            gap: 8px;
+        }
+        
+        .pledge-card-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.4;
+        }
+        
+        .pledge-card-price {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .pledge-card-image {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(
+                ellipse at 50% 30%,
+                rgba(30, 30, 30, 1) 0%,
+                rgba(15, 15, 15, 1) 70%,
+                rgba(10, 10, 10, 1) 100%
+            );
+            border-radius: 16px;
+            margin-bottom: 16px;
+            aspect-ratio: 1/1;
+            padding: 28px;
+            box-shadow: 
+                0 2px 12px rgba(0, 0, 0, 0.3) inset,
+                0 -1px 0 rgba(255, 255, 255, 0.03);
+        }
+        
+        .pledge-card-image img {
+            max-width: 85%;
+            max-height: 85%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .pledge-card:hover .pledge-card-image img {
+            transform: scale(1.05);
+        }
+        
+        .pledge-card.featured .pledge-card-image {
+            width: 200px;
+            height: 200px;
+            aspect-ratio: 1/1;
+            margin-bottom: 0;
+            flex-shrink: 0;
+            padding: 24px;
+        }
+        
+        .pledge-card.featured .pledge-card-image img {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        
+        .pledge-card.featured .pledge-card-info {
+            flex: 1;
+        }
+        
+        .pledge-card.featured .pledge-card-name {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.95);
+        }
+        
+        .pledge-card.featured .pledge-card-desc {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 24px;
+            line-height: 1.7;
+            max-width: 500px;
+        }
+        
+        .pledge-card-badge {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            padding: 5px 12px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border-radius: 8px;
+            background: var(--accent);
+            color: white;
+            z-index: 2;
+            box-shadow: 0 2px 8px rgba(230, 30, 37, 0.3);
+        }
+        
+        .pledge-card-badge.owned { 
+            background: rgba(255, 255, 255, 0.95); 
+            color: #0A0A0A; 
+            box-shadow: 0 2px 8px rgba(255, 255, 255, 0.2);
+        }
+        .pledge-card-badge.disabled { 
+            background: rgba(255, 255, 255, 0.08); 
+            color: rgba(255, 255, 255, 0.4);
+            box-shadow: none;
+        }
+        
+        /* Pledge State Styles */
+        .pledge-card.pledge-owned {
+            border-color: #22C55E;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.15);
+        }
+        
+        .pledge-card.pledge-downgrade {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .pledge-card.pledge-downgrade .btn-add {
+            pointer-events: auto;
+        }
+        
+        .pledge-owned-badge {
+            background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-align: center;
+            text-transform: uppercase;
+        }
+        
+        .btn-upgrade {
+            background: linear-gradient(135deg, var(--accent) 0%, #c41820 100%) !important;
+            color: white !important;
+            border: none !important;
+        }
+        .btn-upgrade:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(230, 30, 37, 0.4);
+        }
+        
+        .btn-upgrade-added {
+            background: rgba(34, 197, 94, 0.2) !important;
+            color: #22C55E !important;
+            border: 1px solid #22C55E !important;
+            cursor: default !important;
+        }
+        
+        .btn-disabled {
+            background: rgba(255, 255, 255, 0.05) !important;
+            color: rgba(255, 255, 255, 0.3) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            cursor: not-allowed !important;
+        }
+        
+        .btn-selected {
+            background: rgba(34, 197, 94, 0.15) !important;
+            color: #22C55E !important;
+            border: 1px solid rgba(34, 197, 94, 0.4) !important;
+            cursor: default !important;
+        }
+        
+        .addon-disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        
+        .addon-disabled .btn-disabled {
+            pointer-events: auto;
+        }
+        
+        /* Addons Grid - Elegant 3-column */
+        .addon-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        
+        .addon-card {
+            background: linear-gradient(
+                165deg,
+                rgba(255, 255, 255, 0.025) 0%,
+                rgba(255, 255, 255, 0.01) 100%
+            );
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.2),
+                0 1px 0 rgba(255, 255, 255, 0.03) inset;
+        }
+        
+        .addon-card:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            transform: translateY(-4px);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.4),
+                0 1px 0 rgba(255, 255, 255, 0.05) inset;
+        }
+        
+        .addon-card-image {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(
+                ellipse at 50% 30%,
+                rgba(28, 28, 28, 1) 0%,
+                rgba(14, 14, 14, 1) 70%,
+                rgba(10, 10, 10, 1) 100%
+            );
+            border-radius: 14px;
+            margin-bottom: 16px;
+            aspect-ratio: 1/1;
+            padding: 24px;
+            box-shadow: 
+                0 2px 12px rgba(0, 0, 0, 0.3) inset,
+                0 -1px 0 rgba(255, 255, 255, 0.03);
+        }
+        
+        .addon-card-image img {
+            max-width: 80%;
+            max-height: 80%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .addon-card:hover .addon-card-image img {
+            transform: scale(1.05);
+        }
+        
+        .addon-card-info {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+        
+        .addon-card-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.4;
+        }
+        
+        .addon-card-price {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.45);
+        }
+        
+        /* Hero purchased tag */
+        .hero-purchased-tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.95);
+            color: #0A0A0A;
+            padding: 5px 14px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border-radius: 6px;
+            margin-left: 14px;
+            vertical-align: middle;
+            box-shadow: 0 2px 8px rgba(255, 255, 255, 0.15);
+        }
+        
+        /* Quantity Controls - Refined */
+        .qty-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            height: 38px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .qty-row button {
+            width: 38px;
+            height: 100%;
+            border: none;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .qty-row button:hover {
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .qty-row span {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+            min-width: 24px;
+            text-align: center;
+        }
+        
+        /* Add to cart button - Refined */
+        .btn-add {
+            width: 100%;
+            height: 38px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.6);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.25s ease;
+        }
+        
+        .btn-add:hover {
+            border-color: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.95);
+        }
+        
+        /* Hero button styles */
+        .hero-add-btn {
+            height: 54px;
+            width: 100%;
+            font-size: 13px;
+        }
+        
+        .hero-qty-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 6px;
+            height: 54px;
+            width: 100%;
+        }
+        
+        .hero-qty-btn {
+            width: 42px;
+            height: 42px;
+            border: none;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+        
+        .hero-qty-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .hero-qty-value {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.95);
+            flex: 1;
+            text-align: center;
+        }
+        
+        .hero-owned-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            height: 54px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+        }
+        
+        /* Pledge info button */
+        .pledge-info-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.4);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+        
+        .pledge-info-btn:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.06);
+        }
+        
+        .pledge-items-tooltip {
+            position: absolute;
+            bottom: 100%;
+            right: 0;
+            margin-bottom: 10px;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 16px;
+            min-width: 220px;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(8px);
+            transition: all 0.25s ease;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+        }
+        
+        .pledge-info-btn:hover .pledge-items-tooltip,
+        .pledge-items-tooltip:hover {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .pledge-items-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 0.12em;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            opacity: 0.9;
+        }
+        
+        .pledge-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .pledge-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .pledge-item-row:last-child {
+            border-bottom: none;
+        }
+        
+        .pledge-item-name {
+            color: rgba(255, 255, 255, 0.85);
+            text-transform: capitalize;
+        }
+        
+        .pledge-item-qty {
+            color: rgba(255, 255, 255, 0.4);
+        }
+        
+        /* Section headers - Elegant */
+        .section-header {
+            margin-bottom: 36px;
+            margin-top: 100px;
+        }
+        
+        .section-header-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            color: rgba(255, 255, 255, 0.35);
+            text-transform: uppercase;
+        }
+        
+        .section-header-line {
+            display: none;
+        }
+        
+        /* Tablet */
+        @media (max-width: 1024px) {
+            .pledge-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+            
+            .pledge-card.featured {
+                grid-column: span 2;
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .addon-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+        }
+        
+        /* Mobile */
+        @media (max-width: 768px) {
+            .store-stats {
+                border-radius: 16px;
+            }
+            
+            .store-stat {
+                padding: 20px 14px;
+            }
+            
+            .store-stat-value {
+                font-size: 1.3rem;
+            }
+            
+            .section-header {
+                margin-top: 60px;
+                margin-bottom: 28px;
+            }
+            
+            .pledge-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 14px;
+            }
+            
+            .pledge-card {
+                padding: 16px;
+                border-radius: 16px;
+            }
+            
+            .pledge-card-image {
+                padding: 20px;
+                border-radius: 12px;
+            }
+            
+            .pledge-card.featured {
+                flex-direction: column;
+                padding: 20px;
+                gap: 20px;
+            }
+            
+            .pledge-card.featured .pledge-card-image {
+                width: 100%;
+                height: auto;
+            }
+            
+            .addon-grid {
+                gap: 14px;
+            }
+            
+            .addon-card {
+                padding: 16px;
+                border-radius: 16px;
+            }
+            
+            .addon-card-image {
+                padding: 20px;
+                border-radius: 12px;
+            }
+        }
+        
+        /* Small Mobile */
+        @media (max-width: 480px) {
+            .pledge-grid,
+            .addon-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pledge-card.featured {
+                grid-column: span 1;
+            }
+            
+            .store-stats {
+                border-radius: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="beta-tag">BETA v0.9</div>
+    <div id="navbar">
+        <a href="/" class="logo-container">
+            <img src="/images/maya-logo.png" alt="MAYA">
+        </a>
+        <div class="flex items-center gap-4">
+            <a href="/assets" class="nav-btn">ASSETS</a>
+            <a href="/login" class="nav-btn">LOG IN</a>
+            <button id="cart-nav-btn" onclick="window.location.href='/addons'" class="nav-btn cart-glow">
+                CART <span id="cart-badge" class="badge ml-2 hidden" style="margin-left: 8px;">0</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero-grid">
+            <div class="hero-image-container">
+                <img id="hero-image" src="/images/hero/divya.png" alt="The Benevolent Divya">
+            </div>
+
+            <div class="hero-content">
+                <div>
+                    <span class="tech-decoration">/// FEATURED PLEDGE</span>
+                    <h1 id="hero-title">The Benevolent Divya</h1>
+                </div>
+                <p id="hero-description" class="text-dim"
+                    style="max-width: 420px; margin-bottom: var(--space-5); font-size: 1rem; line-height: 1.7;">
+                    Deluxe pledge tier containing the complete trilogy, exclusive lorebook, and the Flitt Locust
+                    pendant. Experience the saga of six species and one planet.
+                </p>
+                <div id="hero-specs" style="margin-bottom: var(--space-6); border-top: 1px dashed var(--border);">
+                    <div class="spec-row"><span>EDITION</span><span id="spec-edition">HARDCOVER + DIGITAL</span></div>
+                    <div class="spec-row"><span>PAGE COUNT</span><span id="spec-pages">342</span></div>
+                    <div class="spec-row"><span>PAPER</span><span id="spec-paper">MUNKEN 80GSM</span></div>
+                    <div class="spec-row"><span>EXTRAS</span><span id="spec-extras">PENDANT, LOREBOOK</span></div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <span class="font-mono text-white" style="font-size: 28px;">$<span id="hero-book-price">190</span></span>
+                    </div>
+                    <div id="hero-btn-container" style="width: 100%;">
+                        <button id="hero-add-btn" onclick="handleHeroAction()" class="btn btn-primary btn-large" style="width: 100%;">
+                            ADD TO CART
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="col-span-12">
+            <div class="store-stats">
+                <a href="https://www.kickstarter.com/projects/741743042/maya-1" target="_blank" class="store-stat" style="text-decoration: none;">
+                    <div class="store-stat-label">STATUS</div>
+                    <div class="store-stat-value success">FUNDED</div>
+                </a>
+                <div class="store-stat">
+                    <div class="store-stat-label">RAISED</div>
+                    <div class="store-stat-value">$423K</div>
+                </div>
+                <div class="store-stat">
+                    <div class="store-stat-label">BACKERS</div>
+                    <div class="store-stat-value">4,157</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pledges Section -->
+        <div class="col-span-12">
+            <div class="section-header">
+                <span class="section-header-label">/// Pledge Tiers</span>
+                <div class="section-header-line"></div>
+            </div>
+            <div id="pledge-grid" class="pledge-grid">
+                <div class="pledge-card" style="height: 200px; display: flex; align-items: center; justify-content: center;">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add-ons Section -->
+        <div class="col-span-12">
+            <div class="section-header">
+                <span class="section-header-label">/// Add-ons</span>
+                <div class="section-header-line"></div>
+            </div>
+            <div id="addon-grid" class="addon-grid">
+                <div class="addon-card" style="height: 200px; display: flex; align-items: center; justify-content: center;">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="col-span-12 department-footer" style="padding-bottom: 80px;">
+            <div class="social-links mb-8">
+                <a href="https://www.instagram.com/maya_lore_/" target="_blank" class="social-icon" aria-label="Instagram">
+                    <img src="https://cdn.jsdelivr.net/npm/remixicon@4.8.0/icons/Logos/instagram-line.svg" alt="Instagram">
+                </a>
+                <a href="https://x.com/maya_lore_" target="_blank" class="social-icon" aria-label="X (Twitter)">
+                    <img src="https://cdn.jsdelivr.net/npm/remixicon@4.8.0/icons/Logos/twitter-x-line.svg" alt="X">
+                </a>
+                <a href="https://discord.gg/7HwhQaN6" target="_blank" class="social-icon" aria-label="Discord">
+                    <img src="https://cdn.jsdelivr.net/npm/remixicon@4.8.0/icons/Logos/discord-line.svg" alt="Discord">
+                </a>
+            </div>
+            <p style="margin-bottom: 8px;">DEPARTMENT OF LORE INC.</p>
+            <p class="text-dim" style="font-size: 10px;">ANAND GANDHI & ZAIN MEMON /// MAYA NARRATIVE UNIVERSE</p>
+            <div class="footer-links">
+                <a href="/terms">Terms of Service</a>
+                <a href="/privacy">Privacy Policy</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let products = [];
+        let heroBook = null;
+        let userPledgeContext = null;
+
+        // Helper to get display price based on user type (backer vs guest)
+        function getDisplayPrice(item) {
+            const isBacker = userPledgeContext?.hasPledge;
+            if (isBacker) {
+                return parseFloat(item.backer_price) || parseFloat(item.price) || 0;
+            }
+            return parseFloat(item.price) || 0;
+        }
+
+        // Get image URL - prefer S3 if available
+        function getImageUrl(item) {
+            if (item.s3_key) {
+                return `/api/assets/thumbnail?key=${encodeURIComponent(item.s3_key)}`;
+            }
+            // Fallback to local images
+            if (item.type === 'pledge') {
+                const pledgeFallback = {
+                    'humble vaanar': 'vaanar.png',
+                    'industrious manushya': 'manushya.png',
+                    'resplendent garuda': 'garuda.png',
+                    'benevolent divya': 'divya.png',
+                    'founders': 'founders.png'
+                };
+                const lower = item.name.toLowerCase();
+                for (const [key, img] of Object.entries(pledgeFallback)) {
+                    if (lower.includes(key)) return `/images/upgrade pledges/${img}`;
+                }
+                return '/images/upgrade pledges/divya.png';
+            }
+            // Addon fallback
+            return item.image ? `/images/addons/${item.image}` : '/images/addons/maya-book.jpeg';
+        }
+
+        async function loadProducts() {
+            try {
+                // Load pledge items data first
+                await loadPledgeItems();
+                
+                // Load user pledge context if logged in
+                try {
+                    const userRes = await fetch('/api/user/pledge-context');
+                    if (userRes.ok) {
+                        userPledgeContext = await userRes.json();
+                    }
+                } catch (err) {
+                    console.log('User not logged in');
+                }
+
+                const response = await fetch('/api/products');
+                if (!response.ok) throw new Error('API Error');
+                products = await response.json();
+
+                // Set hero - show backer's owned pledge if logged in, otherwise Benevolent Divya
+                let heroProduct = products.find(p => p.name.toLowerCase().includes('benevolent divya'));
+                
+                if (userPledgeContext?.ownedTier) {
+                    // Find backer's owned pledge
+                    const ownedName = userPledgeContext.ownedTier.toLowerCase();
+                    const ownedPledge = products.find(p => 
+                        p.type === 'pledge' && p.name.toLowerCase().includes(ownedName.split(' ').pop())
+                    );
+                    if (ownedPledge) {
+                        heroProduct = ownedPledge;
+                    }
+                }
+                
+                if (heroProduct) {
+                    updateHero(heroProduct, userPledgeContext?.ownedTier ? true : false);
+                }
+
+                // Separate pledges and addons
+                const pledges = products.filter(p => p.type === 'pledge').sort((a, b) => a.price - b.price);
+                const addons = products.filter(p => p.type === 'addon' || p.type !== 'pledge');
+
+                renderPledges(pledges);
+                renderAddons(addons);
+            } catch (error) {
+                console.error('Error loading products:', error);
+            }
+        }
+
+        function updateHero(pledge, isPurchased = false) {
+            if (!pledge) return;
+            heroBook = pledge;
+            
+            // Update title with PURCHASED tag if owned
+            const titleEl = document.getElementById('hero-title');
+            if (isPurchased) {
+                titleEl.innerHTML = pledge.name + '<span class="hero-purchased-tag">PURCHASED</span>';
+            } else {
+                titleEl.textContent = pledge.name;
+            }
+            
+            document.getElementById('hero-description').textContent = pledge.description || "Premium pledge tier with exclusive rewards.";
+            document.getElementById('hero-book-price').textContent = Math.round(pledge.price);
+            document.getElementById('hero-image').src = getImageUrl(pledge);
+            
+            // Update the tech decoration label
+            const techLabel = document.querySelector('.tech-decoration');
+            if (techLabel) {
+                techLabel.textContent = isPurchased ? '/// YOUR PLEDGE' : '/// FEATURED PLEDGE';
+            }
+            
+            // Update specs based on pledge
+            const lower = pledge.name.toLowerCase();
+            const specs = {
+                'vaanar': { edition: "PAPERBACK + DIGITAL", pages: "280", paper: "OFFSET 70GSM", extras: "EBOOK, WALLPAPER" },
+                'manushya': { edition: "HARDCOVER + DIGITAL", pages: "310", paper: "MUNKEN 80GSM", extras: "EBOOK, WALLPAPER" },
+                'garuda': { edition: "DELUXE HARDCOVER", pages: "342", paper: "MUNKEN 100GSM", extras: "LOREBOOK" },
+                'divya': { edition: "HARDCOVER + DIGITAL", pages: "342", paper: "MUNKEN 80GSM", extras: "PENDANT, LOREBOOK" },
+                'founders': { edition: "ULTIMATE EDITION", pages: "342+", paper: "PREMIUM", extras: "ALL REWARDS" }
+            };
+            
+            for (const [key, data] of Object.entries(specs)) {
+                if (lower.includes(key)) {
+                    document.getElementById('spec-edition').textContent = data.edition;
+                    document.getElementById('spec-pages').textContent = data.pages;
+                    document.getElementById('spec-paper').textContent = data.paper;
+                    document.getElementById('spec-extras').textContent = data.extras;
+                    break;
+                }
+            }
+            
+            updateHeroButton(isPurchased);
+        }
+
+        function handleHeroAction() {
+            if (!heroBook) return;
+            // Use addToCart which handles single pledge logic
+            addToCart(heroBook.id);
+        }
+
+        function updateHeroButton(isPurchased = false) {
+            if (!heroBook) return;
+            const container = document.getElementById('hero-btn-container');
+            const isThisPledgeInCart = App.Cart.items.some(item => item.id === heroBook.id);
+            const isAnyPledgeInCart = App.Cart.items.some(item => item.type === 'pledge');
+
+            // If this is the user's purchased pledge, show owned state
+            if (isPurchased) {
+                container.innerHTML = `
+                    <div class="hero-owned-badge" style="width: 100%;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 6L9 17l-5-5"/>
+                        </svg>
+                        <span>IN YOUR COLLECTION</span>
+                    </div>
+                `;
+                return;
+            }
+
+            // No quantity selector for pledges - only one allowed
+            if (isThisPledgeInCart) {
+                container.innerHTML = `
+                    <button class="btn btn-primary hero-add-btn btn-selected" style="width: 100%;" disabled>✓ SELECTED</button>
+                `;
+            } else {
+                container.innerHTML = `
+                    <button onclick="handleHeroAction()" class="btn btn-primary hero-add-btn" style="width: 100%;">ADD TO CART</button>
+                `;
+            }
+        }
+
+        // Cache for pledge items fetched from API
+        let pledgeItemsCache = {};
+
+        async function loadPledgeItems() {
+            try {
+                const res = await fetch('/api/products/pledges/with-items');
+                const pledges = await res.json();
+                
+                // Build cache keyed by pledge ID
+                pledges.forEach(pledge => {
+                    pledgeItemsCache[pledge.id] = pledge.includedItems || [];
+                });
+                
+                console.log('✓ Pledge items loaded:', Object.keys(pledgeItemsCache).length, 'pledges');
+            } catch (err) {
+                console.error('Error loading pledge items:', err);
+            }
+        }
+
+        function getPledgeItemsHtml(pledgeId) {
+            const items = pledgeItemsCache[pledgeId] || [];
+            
+            if (items.length === 0) {
+                return '<div class="pledge-item-row"><span class="pledge-item-name">Loading...</span></div>';
+            }
+            
+            return items.map(item => `
+                <div class="pledge-item-row">
+                    <span class="pledge-item-name">${item.name}</span>
+                    <span class="pledge-item-qty">×${item.quantity || 1}</span>
+                </div>
+            `).join('');
+        }
+
+        // Determine pledge state based on userPledgeContext
+        function getPledgeState(pledge) {
+            if (!userPledgeContext?.hasPledge) {
+                return { state: 'available', upgradePrice: null };
+            }
+            
+            // Check if this is the owned pledge by ID (most reliable)
+            if (pledge.id === userPledgeContext.ownedPledgeId) {
+                return { state: 'owned', upgradePrice: null };
+            }
+            
+            // Check if upgrade (backend already calculated this)
+            const upgradeInfo = userPledgeContext.canUpgradeTo?.find(u => u.id === pledge.id);
+            if (upgradeInfo) {
+                return { state: 'upgrade', upgradePrice: upgradeInfo.upgradePrice };
+            }
+            
+            // Check if downgrade (backend already calculated this)
+            const isDowngrade = userPledgeContext.cannotDowngrade?.some(d => d.id === pledge.id);
+            if (isDowngrade) {
+                return { state: 'downgrade', upgradePrice: null };
+            }
+            
+            return { state: 'available', upgradePrice: null };
+        }
+        
+        // Generate button HTML based on pledge state
+        function getPledgeButtonHtml(pledge, pledgeState) {
+            const { state, upgradePrice } = pledgeState;
+            const isThisPledgeInCart = App.Cart.items.some(item => item.id === pledge.id);
+            const isUpgradeInCart = App.Cart.items.some(item => item.isPledgeUpgrade && item.id === pledge.id);
+            
+            switch (state) {
+                case 'owned':
+                    return `<div class="pledge-owned-badge">YOUR PLEDGE</div>`;
+                case 'upgrade':
+                    if (isUpgradeInCart) {
+                        return `<button class="btn-add btn-selected" disabled>✓ SELECTED</button>`;
+                    }
+                    return `<button class="btn-add btn-upgrade" onclick="addToCart(${pledge.id})">UPGRADE +$${Math.round(upgradePrice)}</button>`;
+                case 'downgrade':
+                    return `<button class="btn-add btn-disabled" disabled>CANNOT DOWNGRADE</button>`;
+                default: // available (for guests/non-backers) - only ONE pledge allowed
+                    if (isThisPledgeInCart) {
+                        return `<button class="btn-add btn-selected" disabled>✓ SELECTED</button>`;
+                    }
+                    return `<button class="btn-add" onclick="addToCart(${pledge.id})">ADD TO CART</button>`;
+            }
+        }
+        
+        function renderPledges(pledges) {
+            const grid = document.getElementById('pledge-grid');
+            
+            // Separate regular pledges and Founders
+            const regularPledges = pledges.filter(p => !p.name.toLowerCase().includes('founders'));
+            const founders = pledges.find(p => p.name.toLowerCase().includes('founders'));
+            
+            let html = regularPledges.map(pledge => {
+                const pledgeState = getPledgeState(pledge);
+                const { state, upgradePrice } = pledgeState;
+                
+                // Card styling based on state
+                const cardClass = state === 'owned' ? 'pledge-card pledge-owned' : 
+                                  state === 'downgrade' ? 'pledge-card pledge-downgrade' : 'pledge-card';
+                
+                // Get display price based on user type (backer vs guest)
+                const displayPrice = getDisplayPrice(pledge);
+                
+                // Price display - show upgrade price for upgrades
+                const priceDisplay = state === 'upgrade' 
+                    ? `<span style="text-decoration: line-through; opacity: 0.5; font-size: 0.8em;">$${Math.round(displayPrice)}</span> <span style="color: var(--accent);">+$${Math.round(upgradePrice)}</span>`
+                    : `$${Math.round(displayPrice)}`;
+                
+                return `
+                    <div class="${cardClass}">
+                        <div class="pledge-card-header">
+                            <div class="pledge-card-name">${pledge.name}</div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="pledge-card-price">${priceDisplay}</div>
+                                <button class="pledge-info-btn">
+                                    i
+                                    <div class="pledge-items-tooltip">
+                                        <div class="pledge-items-title">Includes</div>
+                                        <div class="pledge-items-list">
+                                            ${getPledgeItemsHtml(pledge.id)}
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="pledge-card-image">
+                            <img src="${getImageUrl(pledge)}" alt="${pledge.name}">
+                        </div>
+                        <div id="pledge-btn-${pledge.id}">
+                            ${getPledgeButtonHtml(pledge, pledgeState)}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Add Founders as featured card
+            if (founders) {
+                const pledgeState = getPledgeState(founders);
+                const { state, upgradePrice } = pledgeState;
+                
+                // Card styling based on state
+                const cardClass = state === 'owned' ? 'pledge-card featured pledge-owned' : 
+                                  state === 'downgrade' ? 'pledge-card featured pledge-downgrade' : 'pledge-card featured';
+                
+                // Get display price based on user type (backer vs guest)
+                const foundersDisplayPrice = getDisplayPrice(founders);
+                
+                // Price display - show upgrade price for upgrades
+                const priceDisplay = state === 'upgrade' 
+                    ? `<span style="text-decoration: line-through; opacity: 0.5; font-size: 0.8em;">$${Math.round(foundersDisplayPrice)}</span> <span style="color: var(--accent);">+$${Math.round(upgradePrice)}</span>`
+                    : `$${Math.round(foundersDisplayPrice)}`;
+                
+                html += `
+                    <div class="${cardClass}">
+                        <div class="pledge-card-image">
+                            <img src="${getImageUrl(founders)}" alt="Founders of Neh">
+                        </div>
+                        <div class="pledge-card-info">
+                            <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px;">
+                                <div class="pledge-card-name">${founders.name}</div>
+                                <button class="pledge-info-btn">
+                                    i
+                                    <div class="pledge-items-tooltip">
+                                        <div class="pledge-items-title">Includes</div>
+                                        <div class="pledge-items-list">
+                                            ${getPledgeItemsHtml(founders.id)}
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+                            <div class="pledge-card-desc">The ultimate collector's edition. Includes all rewards, signed artbook, and a character in the MAYA universe named after you.</div>
+                            <div class="flex items-center gap-4">
+                                <div class="pledge-card-price" style="font-size: 1.5rem;">${priceDisplay}</div>
+                                <div style="flex: 1;" id="pledge-btn-${founders.id}">
+                                    ${getPledgeButtonHtml(founders, pledgeState)}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            grid.innerHTML = html;
+        }
+
+        function renderAddons(addons) {
+            const grid = document.getElementById('addon-grid');
+            const hasPledge = userHasPledge();
+            
+            grid.innerHTML = addons.filter(a => a.type === 'addon').map(addon => {
+                const isInCart = App.Cart.items.some(item => item.id === addon.id);
+                const cartItem = App.Cart.items.find(item => item.id === addon.id);
+                const displayPrice = getDisplayPrice(addon);
+                
+                // Determine button state
+                let buttonHtml;
+                if (isInCart) {
+                    buttonHtml = `
+                        <div class="qty-row">
+                            <button onclick="updateQty(${addon.id}, -1)">−</button>
+                            <span>${cartItem.quantity}</span>
+                            <button onclick="updateQty(${addon.id}, 1)">+</button>
+                        </div>
+                    `;
+                } else if (!hasPledge) {
+                    // Disabled state - no pledge selected
+                    buttonHtml = `<button class="btn-add btn-disabled" disabled title="Select a pledge first">SELECT PLEDGE FIRST</button>`;
+                } else {
+                    buttonHtml = `<button class="btn-add" onclick="addToCart(${addon.id})">ADD TO CART</button>`;
+                }
+                
+                return `
+                    <div class="addon-card${!hasPledge ? ' addon-disabled' : ''}">
+                        <div class="addon-card-image">
+                            <img src="${getImageUrl(addon)}" alt="${addon.name}" onerror="this.style.display='none'">
+                        </div>
+                        <div class="addon-card-info">
+                            <div class="addon-card-name">${addon.name}</div>
+                            <div class="addon-card-price">$${Math.round(displayPrice)}</div>
+                        </div>
+                        <div id="addon-btn-${addon.id}">
+                            ${buttonHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Helper to check if user has a pledge (owned or in cart)
+        function userHasPledge() {
+            return userPledgeContext?.hasPledge || App.Cart.hasPledge();
+        }
+        
+        // Show toast notification
+        function showToast(message) {
+            // Create toast element if it doesn't exist
+            let toast = document.getElementById('toast-notification');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast-notification';
+                toast.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: var(--matter);
+                    border: 1px solid var(--accent);
+                    color: var(--text-main);
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    font-family: 'IBM Plex Mono', monospace;
+                    font-size: 14px;
+                    z-index: 10000;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                `;
+                document.body.appendChild(toast);
+            }
+            
+            toast.textContent = message;
+            toast.style.opacity = '1';
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+            }, 3000);
+        }
+
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+            
+            // Check if adding add-on without pledge
+            if (product.type === 'addon') {
+                if (!userHasPledge()) {
+                    showToast('Please select a pledge tier first before adding add-ons');
+                    return;
+                }
+            }
+            
+            // If it's a pledge and user has pledge context (existing backer)
+            if (product.type === 'pledge' && userPledgeContext?.hasPledge) {
+                // Check if this is an upgrade
+                const upgradeInfo = userPledgeContext.canUpgradeTo?.find(u => u.id === id);
+                if (upgradeInfo) {
+                    // Remove any existing pledge/upgrade from cart
+                    App.Cart.items = App.Cart.items.filter(i => 
+                        i.type !== 'pledge' && !i.isPledgeUpgrade
+                    );
+                    App.Cart.save();
+                    
+                    // Add as upgrade with price difference
+                    App.Cart.add({
+                        id: product.id,
+                        name: product.name + ' (Upgrade)',
+                        price: upgradeInfo.upgradePrice,
+                        weight: product.weight || 0,
+                        isPledgeUpgrade: true,
+                        originalPrice: upgradeInfo.price,
+                        currentPledgeAmount: userPledgeContext.ownedPrice,
+                        currentPledgeName: userPledgeContext.ownedTier,
+                        type: 'pledge'
+                    });
+                    
+                    console.log('✓ Pledge upgrade added:', product.name, '+$' + upgradeInfo.upgradePrice);
+                    refreshUI();
+                    return;
+                }
+                
+                // Check if downgrade - prevent it
+                const isDowngrade = userPledgeContext.cannotDowngrade?.some(d => d.id === id);
+                if (isDowngrade) {
+                    console.warn('Cannot downgrade pledge');
+                    return;
+                }
+                
+                // Same pledge - ignore
+                return;
+            }
+            
+            // For guests adding pledges - ensure only one pledge at a time
+            if (product.type === 'pledge') {
+                // Remove any existing pledge from cart
+                const existingPledge = App.Cart.items.find(i => i.type === 'pledge');
+                if (existingPledge) {
+                    App.Cart.items = App.Cart.items.filter(i => i.type !== 'pledge');
+                    App.Cart.save();
+                }
+            }
+            
+            // Normal add for add-ons or guest pledges - use correct price based on user type
+            const displayPrice = getDisplayPrice(product);
+            App.Cart.add({...product, price: displayPrice, type: product.type});
+            refreshUI();
+        }
+
+        function updateQty(id, change) {
+            const item = App.Cart.items.find(i => i.id === id);
+            if (!item) return;
+            
+            const newQty = item.quantity + change;
+            if (newQty <= 0) {
+                App.Cart.remove(id);
+            } else {
+                item.quantity = newQty;
+                App.Cart.save();
+                App.Cart.updateUI();
+            }
+            refreshUI();
+        }
+
+        function refreshUI() {
+            const pledges = products.filter(p => p.type === 'pledge').sort((a, b) => a.price - b.price);
+            const addons = products.filter(p => p.type === 'addon');
+            renderPledges(pledges);
+            renderAddons(addons);
+            updateHeroButton();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => { 
+            loadProducts(); 
+        });
+    </script>
+</body>
+
+</html>

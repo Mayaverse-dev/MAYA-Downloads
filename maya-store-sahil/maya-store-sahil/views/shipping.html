@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipping Address - MAYA Pledge Manager</title>
+    <meta name="theme-color" content="#0A0A0A">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png">
+    
+    <!-- Fonts - Preconnect for faster loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/app.js"></script>
+    <style>
+        .shipping-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+        
+        .page-header {
+            margin-bottom: 40px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        .page-subtitle {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+        
+        .addresses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .address-card {
+            background: var(--matter);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        
+        .address-card:hover {
+            border-color: var(--border-hover);
+        }
+        
+        .address-card.primary {
+            border-color: var(--accent);
+        }
+        
+        .address-card-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: rgba(230, 30, 37, 0.1);
+            color: var(--accent);
+        }
+        
+        .address-card-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 8px;
+            padding-right: 60px;
+        }
+        
+        .address-card-detail {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: var(--text-dim);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        
+        .address-card-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .address-card-btn {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.05em;
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .address-card-btn:hover {
+            border-color: var(--text-main);
+            color: var(--text-main);
+        }
+        
+        .address-card-btn.delete:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        
+        .add-address-card {
+            background: transparent;
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 180px;
+        }
+        
+        .add-address-card:hover {
+            border-color: var(--accent);
+            background: rgba(230, 30, 37, 0.03);
+        }
+        
+        .add-address-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+            color: var(--text-dim);
+        }
+        
+        .add-address-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+        
+        /* Form Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--matter);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+        
+        .modal-close:hover {
+            color: var(--text-main);
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+        
+        .form-input, .form-select {
+            width: 100%;
+            height: 44px;
+            padding: 0 14px;
+            background: var(--void);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 14px;
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .form-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        
+        .form-checkbox input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+        }
+        
+        .form-checkbox label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+        
+        .modal-footer {
+            padding: 16px 24px 24px;
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn-cancel {
+            flex: 1;
+            height: 44px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .btn-cancel:hover {
+            border-color: var(--text-main);
+            color: var(--text-main);
+        }
+        
+        .btn-save {
+            flex: 2;
+            height: 44px;
+            background: var(--accent);
+            border: none;
+            color: white;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .btn-save:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-save:disabled {
+            background: var(--border);
+            cursor: not-allowed;
+        }
+        
+        @media (max-width: 600px) {
+            .addresses-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="beta-tag">BETA v0.9</div>
+    <div id="navbar">
+        <a href="/" class="logo-container"><img src="/images/maya-logo.png" alt="MAYA"></a>
+        <div class="flex items-center gap-4">
+            <a href="/dashboard" class="nav-btn">BACK</a>
+        </div>
+    </div>
+
+    <div class="shipping-container" style="padding-top: 100px;">
+        <div class="page-header">
+            <h1 class="page-title">Shipping Addresses</h1>
+            <p class="page-subtitle">Manage your saved shipping addresses</p>
+        </div>
+        
+        <div id="addresses-grid" class="addresses-grid">
+            <div class="text-center py-40">
+                <div class="spinner mx-auto"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Address Form Modal -->
+    <div id="address-modal" class="modal-overlay" onclick="if(event.target === this) closeModal()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">Add Address</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="address-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="addr-name" class="form-input" placeholder="First & Last Name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Address Line 1</label>
+                        <input type="text" id="addr-line1" class="form-input" placeholder="Street address" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Address Line 2</label>
+                        <input type="text" id="addr-line2" class="form-input" placeholder="Apartment, suite, etc.">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">City</label>
+                            <input type="text" id="addr-city" class="form-input" placeholder="City" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">State / Province</label>
+                            <input type="text" id="addr-state" class="form-input" placeholder="State">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Postal Code</label>
+                            <input type="text" id="addr-postal" class="form-input" placeholder="Postal code" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Country</label>
+                            <select id="addr-country" class="form-select" required>
+                                <option value="">Select country</option>
+                                <option value="US">United States</option>
+                                <option value="CA">Canada</option>
+                                <option value="GB">United Kingdom</option>
+                                <option value="AU">Australia</option>
+                                <option value="IN">India</option>
+                                <option value="DE">Germany</option>
+                                <option value="FR">France</option>
+                                <option value="JP">Japan</option>
+                                <option value="OTHER">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" id="addr-phone" class="form-input" placeholder="+1 (555) 123-4567">
+                    </div>
+                    
+                    <div class="form-checkbox">
+                        <input type="checkbox" id="addr-default">
+                        <label for="addr-default">Set as default address</label>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">CANCEL</button>
+                    <button type="submit" class="btn-save" id="save-btn">SAVE ADDRESS</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let addresses = [];
+        let editingId = null;
+        
+        async function loadAddresses() {
+            const grid = document.getElementById('addresses-grid');
+            
+            try {
+                const res = await fetch('/api/user/saved-addresses');
+                const data = await res.json();
+                addresses = data.addresses || [];
+                
+                renderAddresses();
+            } catch (err) {
+                console.error('Error loading addresses:', err);
+                grid.innerHTML = '<p class="text-dim text-center">Error loading addresses</p>';
+            }
+        }
+        
+        function renderAddresses() {
+            const grid = document.getElementById('addresses-grid');
+            
+            let html = addresses.map((addr, index) => {
+                const name = addr.fullName || addr.full_name || addr.name || '';
+                const line1 = addr.addressLine1 || addr.address_line1 || '';
+                const line2 = addr.addressLine2 || addr.address_line2 || '';
+                const city = addr.city || '';
+                const state = addr.state || '';
+                const postal = addr.postalCode || addr.postal_code || '';
+                const country = addr.country || '';
+                const phone = addr.phone || '';
+                const isPrimary = index === 0 || addr.is_default || addr.fromBacker;
+                const isFromBacker = addr.fromBacker;
+                
+                return `
+                    <div class="address-card ${isPrimary ? 'primary' : ''}" data-id="${addr.id}">
+                        ${isPrimary ? '<span class="address-card-badge">PRIMARY</span>' : ''}
+                        <div class="address-card-name">${name}</div>
+                        <div class="address-card-detail">
+                            ${line1}${line2 ? '<br>' + line2 : ''}<br>
+                            ${city}${state ? ', ' + state : ''} ${postal}<br>
+                            ${country}${phone ? '<br>📞 ' + phone : ''}
+                        </div>
+                        <div class="address-card-actions">
+                            <button class="address-card-btn" onclick="editAddress(${index})">EDIT</button>
+                            ${!isPrimary ? `<button class="address-card-btn" onclick="setDefault(${index})">SET DEFAULT</button>` : ''}
+                            ${!isFromBacker && addresses.length > 1 ? `<button class="address-card-btn delete" onclick="deleteAddress('${addr.id}')">DELETE</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Add "Add New" card
+            html += `
+                <div class="add-address-card" onclick="openModal()">
+                    <div class="add-address-icon">+</div>
+                    <div class="add-address-text">ADD NEW ADDRESS</div>
+                </div>
+            `;
+            
+            grid.innerHTML = html;
+        }
+        
+        function openModal(addr = null) {
+            const modal = document.getElementById('address-modal');
+            const title = document.getElementById('modal-title');
+            
+            if (addr) {
+                title.textContent = 'Edit Address';
+                document.getElementById('addr-name').value = addr.fullName || addr.full_name || addr.name || '';
+                document.getElementById('addr-line1').value = addr.addressLine1 || addr.address_line1 || '';
+                document.getElementById('addr-line2').value = addr.addressLine2 || addr.address_line2 || '';
+                document.getElementById('addr-city').value = addr.city || '';
+                document.getElementById('addr-state').value = addr.state || '';
+                document.getElementById('addr-postal').value = addr.postalCode || addr.postal_code || '';
+                document.getElementById('addr-country').value = addr.country || '';
+                document.getElementById('addr-phone').value = addr.phone || '';
+                document.getElementById('addr-default').checked = addr.is_default || false;
+                editingId = addr.id;
+            } else {
+                title.textContent = 'Add Address';
+                document.getElementById('address-form').reset();
+                editingId = null;
+            }
+            
+            modal.classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('address-modal').classList.remove('active');
+            editingId = null;
+        }
+        
+        function editAddress(index) {
+            const addr = addresses[index];
+            openModal(addr);
+        }
+        
+        async function setDefault(index) {
+            const addr = addresses[index];
+            try {
+                // For addresses in user_addresses table
+                if (addr.id && !addr.fromBacker && !addr.fromOrder) {
+                    await fetch(`/api/user/addresses/${addr.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ...addr, isDefault: true })
+                    });
+                }
+                loadAddresses();
+            } catch (err) {
+                console.error('Error setting default:', err);
+                alert('Failed to set default address');
+            }
+        }
+        
+        async function deleteAddress(id) {
+            if (!confirm('Delete this address?')) return;
+            
+            try {
+                await fetch(`/api/user/addresses/${id}`, { method: 'DELETE' });
+                loadAddresses();
+            } catch (err) {
+                console.error('Error deleting address:', err);
+                alert('Failed to delete address');
+            }
+        }
+        
+        document.getElementById('address-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('save-btn');
+            btn.disabled = true;
+            btn.textContent = 'SAVING...';
+            
+            const addressData = {
+                fullName: document.getElementById('addr-name').value,
+                addressLine1: document.getElementById('addr-line1').value,
+                addressLine2: document.getElementById('addr-line2').value,
+                city: document.getElementById('addr-city').value,
+                state: document.getElementById('addr-state').value,
+                postalCode: document.getElementById('addr-postal').value,
+                country: document.getElementById('addr-country').value,
+                phone: document.getElementById('addr-phone').value,
+                isDefault: document.getElementById('addr-default').checked
+            };
+            
+            try {
+                let res;
+                if (editingId && !editingId.startsWith('backer-') && !editingId.startsWith('order-')) {
+                    // Update existing address
+                    res = await fetch(`/api/user/addresses/${editingId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(addressData)
+                    });
+                } else {
+                    // Create new address (or update backer address by creating new)
+                    res = await fetch('/api/user/addresses', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(addressData)
+                    });
+                }
+                
+                if (res.ok) {
+                    closeModal();
+                    loadAddresses();
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to save address');
+                }
+            } catch (err) {
+                console.error('Error saving address:', err);
+                alert('Failed to save address');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'SAVE ADDRESS';
+            }
+        });
+        
+        // Check auth and load
+        App.Auth.checkStatus().then(user => {
+            if (!user) {
+                window.location.href = '/login';
+                return;
+            }
+            loadAddresses();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Manager - MAYA Admin</title>
+    <meta name="description" content="MAYA Admin Asset Manager - Upload and manage digital assets.">
+    <meta name="theme-color" content="#0A0A0A">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/images/maya-logo.png">
+    <link rel="apple-touch-icon" href="/images/maya-logo.png">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        :root {
+            --card-bg: rgba(26, 26, 26, 0.8);
+            --card-border: rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            padding: 10px 24px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            background: rgba(255, 60, 60, 0.05);
+        }
+
+        .manager-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .item-row {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .item-row:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(30, 30, 30, 0.9);
+        }
+
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .item-thumb {
+            width: 80px;
+            height: 80px;
+            background: var(--void);
+            border: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .item-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .item-name {
+            font-family: var(--font-inter);
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text-main);
+        }
+
+        .item-meta {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        /* Wallpaper Grid */
+        .wallpaper-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .wallpaper-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 12px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .wallpaper-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+        }
+
+        .wallpaper-preview {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: var(--void);
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .wallpaper-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* S3 Picker Modal */
+        #s3-picker-modal .modal-content {
+            max-width: 900px;
+            width: 95%;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .s3-explorer {
+            flex: 1;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 16px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--card-border);
+        }
+
+        .s3-item {
+            cursor: pointer;
+            padding: 8px;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .s3-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--text-dim);
+        }
+
+        .s3-item.selected {
+            background: rgba(255, 60, 60, 0.1);
+            border-color: var(--accent);
+        }
+
+        .s3-thumb {
+            width: 100%;
+            aspect-ratio: 1/1;
+            background: var(--void);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .s3-thumb img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .s3-name {
+            font-size: 10px;
+            font-family: var(--font-mono);
+            word-break: break-all;
+            color: var(--text-dim);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--void);
+            border: 1px solid var(--border);
+            padding: 32px;
+            position: relative;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="beta-tag">BETA v0.9</div>
+    <div id="navbar">
+        <a href="/admin/dashboard" class="logo-container"><img src="/images/maya-logo.png" alt="MAYA"></a>
+        <div class="tech-decoration">/// ASSET_CONTROL_SYSTEM</div>
+        <div class="flex items-center gap-4">
+            <a href="/admin/dashboard" class="nav-btn">DASHBOARD</a>
+        </div>
+    </div>
+
+    <div class="manager-container">
+        <div class="flex items-center justify-between mb-40">
+            <div>
+                <h1 class="text-4xl mb-8">ASSET MANAGER</h1>
+                <p class="text-dim font-mono text-sm">Managing the digital fabric of Neh.</p>
+            </div>
+            <div class="flex gap-2 bg-matter p-4 border border-white/5">
+                <button class="tab-btn active" onclick="switchTab('products')">PRODUCTS</button>
+                <button class="tab-btn" onclick="switchTab('wallpaper')">WALLPAPER</button>
+            </div>
+        </div>
+
+        <!-- Products Tab -->
+        <div id="products-tab" class="tab-content">
+            <div class="item-list" id="products-list">
+                <!-- Products loaded here -->
+            </div>
+        </div>
+
+        <!-- Wallpaper Tab -->
+        <div id="wallpaper-tab" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-24">
+                <h2 class="text-xl font-mono">GALLERY_INDEX</h2>
+                <button class="btn btn-primary" onclick="openS3Picker('wallpaper')">+ ADD NEW WALLPAPER</button>
+            </div>
+            <div class="wallpaper-grid" id="wallpaper-list">
+                <!-- Wallpapers loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Universal S3 Picker Modal -->
+    <div id="s3-picker-modal" class="modal">
+        <div class="modal-content artifact-frame">
+            <div class="corner-accent corner-tl"></div>
+            <div class="flex justify-between items-center mb-24">
+                <h3 id="picker-title">SELECT ASSET</h3>
+                <div class="flex gap-4">
+                    <select id="folder-filter" class="btn"
+                        style="height: 32px; font-size: 10px; background: var(--matter);" onchange="fetchS3Assets()">
+                        <option value="">ALL FOLDERS</option>
+                        <option value="Products/Pledges/">PLEDGES</option>
+                        <option value="Products/Add ons/">ADD-ONS</option>
+                        <option value="Assets/Wallpaper/">WALLPAPERS</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="triggerUpload()" style="height: 32px;">+ UPLOAD
+                        NEW</button>
+                    <button class="btn" onclick="closeModal('s3-picker-modal')" style="height: 32px;">CLOSE</button>
+                    <!-- Hidden File Input -->
+                    <input type="file" id="s3-upload-input" style="display: none" accept="image/*"
+                        onchange="handleFileUpload(this)">
+                </div>
+            </div>
+
+            <div id="s3-explorer" class="s3-explorer">
+                <!-- S3 Files loaded here -->
+            </div>
+
+            <div class="flex justify-end gap-4 mt-24">
+                <button id="confirm-selection-btn" class="btn btn-primary" disabled onclick="confirmSelection()">CONFIRM
+                    SELECTION</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="product-details-modal" class="modal">
+        <div class="modal-content artifact-frame" style="max-width: 600px;">
+            <div class="corner-accent corner-tl"></div>
+            <div class="flex justify-between items-center mb-24">
+                <h3 id="product-modal-title">EDIT DETAILS</h3>
+                <button class="btn" onclick="closeModal('product-details-modal')" style="height: 32px;">CLOSE</button>
+            </div>
+
+            <form id="product-edit-form" class="flex flex-col gap-4">
+                <input type="hidden" id="edit-id">
+                <input type="hidden" id="edit-type">
+
+                <div class="flex flex-col gap-2">
+                    <label class="text-xs font-mono text-dim">NAME</label>
+                    <input type="text" id="edit-name" class="form-input" required>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="text-xs font-mono text-dim">DESCRIPTION</label>
+                    <textarea id="edit-description" class="form-input" rows="4"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-2">
+                        <label class="text-xs font-mono text-dim">PRICE ($)</label>
+                        <input type="number" step="0.01" id="edit-price" class="form-input" required>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label class="text-xs font-mono text-dim">BACKER PRICE ($)</label>
+                        <input type="number" step="0.01" id="edit-backer-price" class="form-input">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-2">
+                        <label class="text-xs font-mono text-dim">WEIGHT (KG)</label>
+                        <input type="number" step="0.01" id="edit-weight" class="form-input">
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label class="text-xs font-mono text-dim">STATUS</label>
+                        <select id="edit-active" class="form-input">
+                            <option value="1">ACTIVE</option>
+                            <option value="0">INACTIVE</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-4 mt-8">
+                    <button type="button" class="btn btn-primary" onclick="saveProductDetails()">SAVE CHANGES</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'products';
+        let currentTarget = null; // { type, id }
+        let selectedS3Key = null;
+
+        /**
+         * INITIALIZATION
+         */
+        async function init() {
+            await Promise.all([
+                loadProducts(),
+                loadWallpapers()
+            ]);
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            document.getElementById(`${tab}-tab`).classList.remove('hidden');
+        }
+
+        /**
+         * PRODUCTS LOGIC
+         */
+        async function loadProducts() {
+            // Force cache busting to see updates
+            const res = await fetch(`/api/products?t=${Date.now()}`);
+            const data = await res.json();
+            const list = document.getElementById('products-list');
+
+            list.innerHTML = data.map(item => {
+                // Encode item data to pass to function safely
+                const itemData = encodeURIComponent(JSON.stringify(item));
+
+                return `
+                <div class="item-row">
+                    <div class="item-info">
+                        <div class="item-thumb">
+                            ${item.s3_key ? `<img src="/api/assets/thumbnail?key=${encodeURIComponent(item.s3_key)}" alt="Thumb">` : `<span class="text-dim">NO IMG</span>`}
+                        </div>
+                        <div>
+                            <div class="item-name">${item.name}</div>
+                            <div class="item-meta">
+                                ${item.type.toUpperCase()} | \$${parseFloat(item.price).toFixed(2)}
+                                ${item.backer_price ? `<span class="text-dim"> (Backer: \$${parseFloat(item.backer_price).toFixed(2)})</span>` : ''}
+                                ${!item.active ? '<span class="text-red"> [INACTIVE]</span>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="btn" style="height: 36px; padding: 0 16px; font-size: 11px;" onclick="openProductModal('${itemData}')">EDIT DETAILS</button>
+                        <button class="btn btn-primary" style="height: 36px; padding: 0 16px; font-size: 11px;" onclick="openS3Picker('product', ${item.id}, ${item.type === 'pledge'})">CHANGE IMAGE</button>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function openProductModal(encodedItem) {
+            const item = JSON.parse(decodeURIComponent(encodedItem));
+
+            document.getElementById('edit-id').value = item.id;
+            document.getElementById('edit-type').value = item.type; // 'pledge' or 'addon'
+            document.getElementById('edit-name').value = item.name;
+            document.getElementById('edit-description').value = item.description || '';
+
+            // Handle prices - if logged in as backer, api returns 'price' as backer price.
+            // But we want to edit 'original_price' (retail) and raw 'backer_price'.
+            // The API returns 'original_price' if 'is_backer_price' is true. 
+            // If not logged in or not backer, 'price' is retail price.
+            // Let's rely on what the API provided. 
+            // Wait, standardizing: The API modifications I made in server.js always returns `original_price` if `is_backer_price` is set.
+            // But wait, if I am admin, am I logged in as backer? Probably not.
+            // Let's look at the object:
+            // If `is_backer_price` is true, then `price` is backer price, `original_price` is retail.
+            // If `is_backer_price` is false, `price` is retail.
+
+            let retailPrice = item.price;
+            let backerPrice = item.backer_price;
+
+            if (item.is_backer_price) {
+                retailPrice = item.original_price;
+                // item.price is currently the backer price in this case, but let's use the explicit field if available
+                // Actually server logic: 
+                // if (isLoggedIn && backerPrice !== null) { ... price: backerPrice, original_price: price ... }
+                // So if we are seeing backer pricing, `price` is backer price.
+                backerPrice = item.price;
+            } else {
+                // If not seeing backer pricing, `price` is retail. `backer_price` might be null in the object if not returned? 
+                // My server logic lines 854: `const backerPrice = ...` 
+                // But line 867: returns `...item`. If `item` from DB had `backer_price`, it is passed through.
+            }
+
+            // To be safe, let's use the raw fields from the object if we can trust them?
+            // The safest is to use `original_price` if existing, otherwise `price`.
+            // And use `backer_price` (which is passed through from DB row in `...item`).
+
+            // Let's re-read the server logic carefully.
+            // `const processPricing = (item) => { ... return { ...item, ... } }`
+            // So `backer_price` from DB is present in the object regardless of login state (unless explicitly removed, which it isn't).
+            // `price` from DB is overwritten if `is_backer_price`.
+            // So `retailPrice` should be `item.original_price` (if set) OR `item.price` (if NOT set, meaning it wasn't overwritten).
+
+            document.getElementById('edit-price').value = item.original_price || item.price;
+            document.getElementById('edit-backer-price').value = item.backer_price;
+            document.getElementById('edit-weight').value = item.weight || 0;
+            document.getElementById('edit-active').value = item.active !== undefined ? item.active : 1;
+
+            document.getElementById('product-details-modal').style.display = 'flex';
+        }
+
+        async function saveProductDetails() {
+            const id = document.getElementById('edit-id').value;
+            const type = document.getElementById('edit-type').value;
+
+            const payload = {
+                name: document.getElementById('edit-name').value,
+                description: document.getElementById('edit-description').value,
+                price: document.getElementById('edit-price').value,
+                backer_price: document.getElementById('edit-backer-price').value || null,
+                weight: document.getElementById('edit-weight').value,
+                active: document.getElementById('edit-active').value
+            };
+
+            const btn = document.querySelector('#product-edit-form button');
+            const originalText = btn.textContent;
+            btn.textContent = 'SAVING...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`/api/admin/products/${type}/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    closeModal('product-details-modal');
+                    loadProducts();
+                } else {
+                    alert('FAILED TO UPDATE');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('ERROR UPDATING PRODUCT');
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        /**
+         * WALLPAPER LOGIC
+         */
+        async function loadWallpapers() {
+            const res = await fetch('/api/assets/wallpaper');
+            const data = await res.json();
+            const list = document.getElementById('wallpaper-list');
+
+            list.innerHTML = data.map(wp => `
+                <div class="wallpaper-card">
+                    <div class="wallpaper-preview">
+                        <img src="${wp.thumbUrl}" alt="${wp.name}">
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="text-sm font-bold text-white">${wp.name}</div>
+                            <div class="text-xs font-mono text-dim">${(wp.type || 'IMAGE').toUpperCase()}</div>
+                        </div>
+                        <button class="btn" style="border-color: var(--accent); color: var(--accent); padding: 0 8px; height: 24px; font-size: 9px;" onclick="removeWallpaper('${wp.key}')">REMOVE</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function removeWallpaper(key) {
+            if (!confirm('Remove this wallpaper from gallery?')) return;
+            try {
+                const res = await fetch(`/api/admin/assets/registration/${encodeURIComponent(key)}`, { method: 'DELETE' });
+                if (res.ok) {
+                    loadWallpapers();
+                } else {
+                    alert('FAILED TO REMOVE FROM GALLERY');
+                }
+            } catch (err) {
+                alert('ERROR IN REMOVE');
+            }
+        }
+
+        /**
+         * S3 PICKER LOGIC
+         */
+        function openS3Picker(type, id = null, isPledge = false) {
+            currentTarget = { type, id, isPledge };
+            selectedS3Key = null;
+            document.getElementById('confirm-selection-btn').disabled = true;
+            document.getElementById('s3-picker-modal').style.display = 'flex';
+
+            // Auto filter folder if applicable
+            const filter = document.getElementById('folder-filter');
+            if (type === 'product') {
+                filter.value = isPledge ? 'Products/Pledges/' : 'Products/Add ons/';
+            } else if (type === 'wallpaper') {
+                filter.value = 'Assets/Wallpaper/';
+            }
+
+            fetchS3Assets();
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        async function fetchS3Assets() {
+            const prefix = document.getElementById('folder-filter').value;
+            const explorer = document.getElementById('s3-explorer');
+            explorer.innerHTML = '<div class="col-span-full text-center p-40 text-dim">ACCESSING VAULTS...</div>';
+
+            try {
+                const res = await fetch(`/api/admin/assets?prefix=${encodeURIComponent(prefix)}`);
+                const assets = await res.json();
+
+                // Only show images
+                const images = assets.filter(a => a.key.match(/\.(jpg|jpeg|png|webp|gif)$/i));
+
+                explorer.innerHTML = images.map(asset => `
+                    <div class="s3-item" onclick="selectS3File(this, '${asset.key}')">
+                        <div class="s3-thumb">
+                            <img src="/api/assets/thumbnail?key=${encodeURIComponent(asset.key)}" loading="lazy">
+                        </div>
+                        <div class="s3-name">${asset.key.split('/').pop()}</div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                explorer.innerHTML = '<div class="col-span-full text-center p-40 text-red">FAILED TO SCAN SECTOR</div>';
+            }
+        }
+
+        function triggerUpload() {
+            document.getElementById('s3-upload-input').click();
+        }
+
+        async function handleFileUpload(input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+            const folder = document.getElementById('folder-filter').value.replace(/\/$/, ""); // Remove trailing slash
+
+            if (!folder) {
+                alert('Please select a folder first');
+                return;
+            }
+
+            // Create visual feedback
+            const explorer = document.getElementById('s3-explorer');
+            const originalContent = explorer.innerHTML;
+            explorer.innerHTML = '<div class="col-span-full text-center p-40 text-accent">UPLOADING ASSET...</div>';
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('folder', folder);
+
+            try {
+                const res = await fetch('/api/admin/assets/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    await fetchS3Assets();
+                    // Try to highlight the new file if possible (optional enhancement)
+                } else {
+                    alert('UPLOAD FAILED: ' + (data.error || 'Unknown error'));
+                    explorer.innerHTML = originalContent;
+                }
+            } catch (err) {
+                console.error(err);
+                alert('UPLOAD ERROR');
+                explorer.innerHTML = originalContent;
+            } finally {
+                input.value = ''; // Reset input to allow re-uploading same file
+            }
+        }
+
+        function selectS3File(el, key) {
+            document.querySelectorAll('.s3-item').forEach(i => i.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedS3Key = key;
+            document.getElementById('confirm-selection-btn').disabled = false;
+        }
+
+        async function confirmSelection() {
+            if (!selectedS3Key || !currentTarget) return;
+
+            const btn = document.getElementById('confirm-selection-btn');
+            btn.textContent = 'ASSIGNING...';
+            btn.disabled = true;
+
+            try {
+                let payload = {};
+                if (currentTarget.type === 'product') {
+                    payload = {
+                        assetKey: selectedS3Key,
+                        entityType: currentTarget.isPledge ? 'product' : 'addon',
+                        entityId: currentTarget.id
+                    };
+                } else if (currentTarget.type === 'wallpaper') {
+                    payload = {
+                        assetKey: selectedS3Key,
+                        entityType: 'digital_asset',
+                        category: 'wallpaper',
+                        name: selectedS3Key.split('/').pop().split('.')[0]
+                    };
+                }
+
+                const res = await fetch('/api/admin/assets/assign', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    closeModal('s3-picker-modal');
+                    if (currentTarget.type === 'product') loadProducts();
+                    else loadWallpapers();
+                } else {
+                    alert('ASSIGNMENT FAILED');
+                }
+            } catch (err) {
+                alert('ERROR IN ASSIGNMENT');
+            } finally {
+                btn.textContent = 'CONFIRM SELECTION';
+                btn.disabled = false;
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

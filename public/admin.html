@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAYA Downloads – Admin</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="admin-wrap">
+    <div class="container">
+      <div id="admin-login" class="admin-login">
+        <h2 class="admin-title">Admin</h2>
+        <label for="admin-pw">Password</label>
+        <input type="password" id="admin-pw" placeholder="Admin password" autocomplete="current-password">
+        <button type="button" id="admin-login-btn">Enter</button>
+      </div>
+
+      <div id="admin-dashboard" hidden>
+        <div class="admin-toolbar">
+          <h1 class="admin-title">Dashboard</h1>
+          <button type="button" class="logout-btn" id="logout-btn">Log out</button>
+        </div>
+
+        <div class="admin-form">
+          <h3 style="margin-bottom: 16px;">Add asset</h3>
+          <form id="add-form">
+            <label for="add-title">Title</label>
+            <input type="text" id="add-title" required placeholder="e.g. Chapter 1: The Awakening">
+            <label for="add-desc">Description</label>
+            <textarea id="add-desc" required placeholder="Short description"></textarea>
+            <label for="add-category">Category</label>
+            <select id="add-category" required>
+              <option value="wallpapers">Wallpapers</option>
+              <option value="stl">3D Printables (STL)</option>
+              <option value="ebook">E-Book</option>
+            </select>
+            <label for="add-thumb">Thumbnail URL</label>
+            <input type="text" id="add-thumb" required placeholder="/images/addons/maya-book.jpeg">
+            <label for="add-chapter">Chapter (e-book only)</label>
+            <input type="number" id="add-chapter" min="1" placeholder="1" style="max-width: 120px;">
+            <div class="variants-editor">
+              <label>Download variants</label>
+              <div id="variants-container"></div>
+              <button type="button" id="add-variant-btn" class="btn" style="margin-top: 8px;">+ Add variant</button>
+            </div>
+            <button type="submit" style="margin-top: 16px;">Save</button>
+          </form>
+        </div>
+
+        <h3 style="margin-bottom: 12px;">Current assets</h3>
+        <div id="admin-list" class="admin-list"></div>
+      </div>
+    </div>
+  </div>
+  <script src="/js/admin.js"></script>
+</body>
+</html>
