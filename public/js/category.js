@@ -145,10 +145,13 @@
 
   function handleDownloadAll() {
     var filtered = filterList(list);
-    filtered.forEach(function (item) {
-      if (!isPlaceholderUrl(item.downloadUrl)) {
-        window.open('/api/download/' + encodeURIComponent(item.id), '_blank');
-      }
+    var urls = filtered
+      .filter(function (item) { return !isPlaceholderUrl(item.downloadUrl); })
+      .map(function (item) { return '/api/download/' + encodeURIComponent(item.id); });
+    urls.forEach(function (url, i) {
+      setTimeout(function () {
+        window.open(url, '_blank', 'noopener');
+      }, i * 500);
     });
   }
 
