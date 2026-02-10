@@ -105,7 +105,24 @@ app.get('/stl', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'stl.html'));
 });
 
-// ─── Public: redirect to presigned download URL (or direct URL if S3 not configured) ─
+// ─── Health check (S3 diagnostics) ──────────────────────────────────────
+app.get('/api/health', (req, res) => {
+  const hasKey = !!process.env.S3_ACCESS_KEY_ID;
+  const hasSecret = !!process.env.S3_SECRET_ACCESS_KEY;
+  const bucket = process.env.S3_BUCKET || '(default)';
+  const endpoint = process.env.S3_ENDPOINT || '(default)';
+  const s3 = getS3Client();
+  res.json({
+    s3Configured: !!s3,
+    hasAccessKeyId: hasKey,
+    hasSecretAccessKey: hasSecret,
+    bucket,
+    endpoint,
+    envKeys: Object.keys(process.env).filter(k => k.startsWith('S3_')).sort(),
+  });
+});
+
+// ─── Public: stream download from S3 (or redirect if S3 not configured) ─
 app.get('/api/download/:id', async (req, res) => {
   try {
     const data = await readData();
