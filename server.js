@@ -6,7 +6,7 @@ const { v4: uuidv4 } = require('uuid');
 const multer = require('multer');
 const sharp = require('sharp');
 const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
-const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -124,15 +124,15 @@ app.get('/api/download/:id', async (req, res) => {
     }
     const bucket = getBucket();
     const filename = key.split('/').pop() || 'download';
-    const command = new GetObjectCommand({
-      Bucket: bucket,
-      Key: key,
-      ResponseContentDisposition: 'attachment; filename="' + filename.replace(/"/g, '\\"') + '"',
-    });
-    const signedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
-    res.redirect(302, signedUrl);
+    // Stream file through server instead of presigned URL redirect
+    const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+    const s3Resp = await s3.send(command);
+    res.set('Content-Disposition', 'attachment; filename="' + filename.replace(/"/g, '\\"') + '"');
+    if (s3Resp.ContentType) res.set('Content-Type', s3Resp.ContentType);
+    if (s3Resp.ContentLength) res.set('Content-Length', String(s3Resp.ContentLength));
+    s3Resp.Body.pipe(res);
   } catch (e) {
-    console.error('Download redirect error:', e);
+    console.error('Download error:', e);
     res.status(500).send('Download failed');
   }
 });
