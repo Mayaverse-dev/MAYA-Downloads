@@ -123,6 +123,14 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// ─── Public: analytics config (GA + Meta Pixel IDs; no secrets) ───────────
+app.get('/api/config', (req, res) => {
+  res.json({
+    gaId: cleanEnv(process.env.GA_ID) || '',
+    metaPixelId: cleanEnv(process.env.META_PIXEL_ID) || '',
+  });
+});
+
 // ─── Public: stream thumbnail from S3 (so thumbnails work with private bucket) ─
 app.get('/api/thumbnail/:id', async (req, res) => {
   try {

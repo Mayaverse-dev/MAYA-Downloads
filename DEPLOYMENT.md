@@ -51,9 +51,12 @@ Replace `YOUR_USERNAME` and `YOUR_REPO_NAME` with your GitHub repo URL.
 | `S3_SECRET_ACCESS_KEY`   | Tigris secret key                  |
 | `S3_BUCKET`              | Your Tigris bucket name            |
 | `S3_ENDPOINT`            | Your Tigris endpoint URL           |
+| `GA_ID`                  | *(optional)* Google Analytics 4 Measurement ID |
+| `META_PIXEL_ID`          | *(optional)* Meta (Facebook) Pixel ID |
 
 - No quotes in values.
 - `ADMIN_PASSWORD` is for the `/admin` page. S3 vars are **required for downloads** to work (presigned URLs); without them, download links will fail.
+- Leave `GA_ID` and `META_PIXEL_ID` empty or omit them if you don’t want analytics; the site works without them.
 
 ### 4. Confirm build and start commands
 
@@ -201,3 +204,32 @@ npm start
 ```
 
 Open [http://localhost:3000](http://localhost:3000) and [http://localhost:3000/admin](http://localhost:3000/admin).
+
+---
+
+## Analytics keys (optional)
+
+The site can send page views to **Google Analytics 4** and **Meta (Facebook) Pixel** for visitor data and targeting. Set these only if you want tracking; leave them empty otherwise.
+
+### Keys you need
+
+| Key | Where to set | Example value |
+|-----|----------------|---------------|
+| `GA_ID` | Railway Variables, or local `.env` | `G-XXXXXXXXXX` |
+| `META_PIXEL_ID` | Railway Variables, or local `.env` | `1234567890123456` |
+
+### How to get them
+
+**Google Analytics 4 (GA_ID)**  
+1. Go to [Google Analytics](https://analytics.google.com/) and sign in.  
+2. Create a **GA4 property** for this site (or use an existing one).  
+3. In **Admin** → **Data Streams** → select (or add) the web stream for `downloads.entermaya.com`.  
+4. Copy the **Measurement ID** (starts with `G-`). That is your `GA_ID`.
+
+**Meta (Facebook) Pixel (META_PIXEL_ID)**  
+1. Go to [Meta Events Manager](https://business.facebook.com/events_manager) and sign in.  
+2. Create a **Pixel** (or use an existing one) and select “Web”.  
+3. Add your website URL if prompted.  
+4. In the pixel’s setup or “Settings”, copy the **Pixel ID** (numeric). That is your `META_PIXEL_ID`.
+
+After adding the values in Railway (Variables), redeploy once. Page views will then be sent automatically on the public pages (home, wallpapers, ebook, stl). The admin page is not tracked.
