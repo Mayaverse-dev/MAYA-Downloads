@@ -469,7 +469,7 @@ app.post('/api/track', async (req, res) => {
 
     if (body.type === 'pageview') {
       const geo = await getGeo(ip);
-      analytics.insertVisit({
+      await analytics.insertVisit({
         session_id:   body.sid,
         ts,
         page:         s(body.page, 200),
@@ -499,7 +499,7 @@ app.post('/api/track', async (req, res) => {
         client_tz:    s(body.tz, 60),
       });
     } else {
-      analytics.insertEvent({
+      await analytics.insertEvent({
         session_id:     body.sid,
         ts,
         type:           s(body.type, 30),
@@ -518,11 +518,11 @@ app.post('/api/track', async (req, res) => {
 });
 
 // ─── Admin: analytics stats ───────────────────────────────────────────────
-app.get('/api/admin/analytics', (req, res) => {
+app.get('/api/admin/analytics', async (req, res) => {
   if (!checkAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
   try {
     const days = Math.min(Math.max(parseInt(req.query.days) || 30, 1), 365);
-    res.json(analytics.getStats(days));
+    res.json(await analytics.getStats(days));
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
