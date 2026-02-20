@@ -7,6 +7,7 @@ const multer = require('multer');
 const sharp = require('sharp');
 const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 const archiver = require('archiver');
+const analytics = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -402,6 +403,128 @@ app.delete('/api/admin/downloads', async (req, res) => {
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: 'Failed to delete' });
+  }
+});
+
+// ─── Tracking helpers ────────────────────────────────────────────────────
+function getIp(req) {
+  const fwd = req.headers['x-forwarded-for'];
+  if (fwd) return fwd.split(',')[0].trim();
+  return req.socket.remoteAddress || '';
+}
+
+function parseUA(ua) {
+  if (!ua) return { browser: '', bver: '', os: '', osver: '', device: 'desktop' };
+  let browser = '', bver = '', os = '', osver = '', device = 'desktop', m;
+  if (/Mobi|Android(?!.*Tablet)|iPhone|iPod|Windows Phone/i.test(ua)) device = 'mobile';
+  else if (/iPad|Tablet|PlayBook/i.test(ua)) device = 'tablet';
+  if      ((m = ua.match(/Edg\/([\d.]+)/)))           { browser = 'Edge';    bver = m[1]; }
+  else if ((m = ua.match(/OPR\/([\d.]+)/)))            { browser = 'Opera';   bver = m[1]; }
+  else if ((m = ua.match(/SamsungBrowser\/([\d.]+)/))) { browser = 'Samsung'; bver = m[1]; }
+  else if ((m = ua.match(/Chrome\/([\d.]+)/)))         { browser = 'Chrome';  bver = m[1]; }
+  else if ((m = ua.match(/Firefox\/([\d.]+)/)))        { browser = 'Firefox'; bver = m[1]; }
+  else if ((m = ua.match(/Version\/([\d.]+).*Safari/))){ browser = 'Safari';  bver = m[1]; }
+  if      ((m = ua.match(/Windows NT ([\d.]+)/)))      { os = 'Windows'; osver = m[1]; }
+  else if ((m = ua.match(/Mac OS X ([\d_]+)/)))        { os = 'macOS';   osver = m[1].replace(/_/g, '.'); }
+  else if ((m = ua.match(/Android ([\d.]+)/)))         { os = 'Android'; osver = m[1]; }
+  else if (/iPhone|iPad|iPod/.test(ua) && (m = ua.match(/OS ([\d_]+)/))) { os = 'iOS'; osver = m[1].replace(/_/g, '.'); }
+  else if (/Linux/.test(ua)) os = 'Linux';
+  return { browser, bver, os, osver, device };
+}
+
+const geoCache = new Map();
+async function getGeo(ip) {
+  const localRanges = ['127.', '::1', '192.168.', '10.', '172.'];
+  if (!ip || localRanges.some((p) => ip.startsWith(p))) {
+    return { country: 'Local', region: '', city: '', isp: '', lat: 0, lon: 0, tz: '' };
+  }
+  if (geoCache.has(ip)) return geoCache.get(ip);
+  try {
+    const r = await fetch(`http://ip-api.com/json/${ip}?fields=country,regionName,city,isp,lat,lon,timezone`);
+    const d = await r.json();
+    const geo = {
+      country: d.country || '', region: d.regionName || '', city: d.city || '',
+      isp: d.isp || '', lat: d.lat || 0, lon: d.lon || 0, tz: d.timezone || '',
+    };
+    if (geoCache.size > 5000) geoCache.clear();
+    geoCache.set(ip, geo);
+    return geo;
+  } catch {
+    return { country: '', region: '', city: '', isp: '', lat: 0, lon: 0, tz: '' };
+  }
+}
+
+// ─── Public: receive tracking beacon ─────────────────────────────────────
+app.post('/api/track', async (req, res) => {
+  res.status(204).end();
+  try {
+    const body = req.body;
+    if (!body || !body.type || !body.sid) return;
+    const ip  = getIp(req);
+    const ua  = req.headers['user-agent'] || '';
+    const { browser, bver, os, osver, device } = parseUA(ua);
+    const utm = body.utm || {};
+    const ts  = new Date().toISOString();
+    const s = (v, n) => (String(v || '')).slice(0, n);
+
+    if (body.type === 'pageview') {
+      const geo = await getGeo(ip);
+      analytics.insertVisit({
+        session_id:   body.sid,
+        ts,
+        page:         s(body.page, 200),
+        referrer:     s(body.referrer, 500),
+        utm_source:   s(utm.source, 100),
+        utm_medium:   s(utm.medium, 100),
+        utm_campaign: s(utm.campaign, 100),
+        utm_content:  s(utm.content, 100),
+        utm_term:     s(utm.term, 100),
+        ip:           s(ip, 45),
+        country:      geo.country,
+        region:       geo.region,
+        city:         geo.city,
+        isp:          geo.isp,
+        lat:          geo.lat,
+        lon:          geo.lon,
+        geo_tz:       geo.tz,
+        ua:           s(ua, 300),
+        browser,
+        browser_ver:  bver,
+        os,
+        os_ver:       osver,
+        device,
+        screen_w:     body.screen && body.screen.w ? Number(body.screen.w) : null,
+        screen_h:     body.screen && body.screen.h ? Number(body.screen.h) : null,
+        lang:         s(body.lang, 20),
+        client_tz:    s(body.tz, 60),
+      });
+    } else {
+      analytics.insertEvent({
+        session_id:     body.sid,
+        ts,
+        type:           s(body.type, 30),
+        asset_id:       s(body.asset_id, 100),
+        asset_title:    s(body.asset_title, 200),
+        asset_category: s(body.asset_category, 50),
+        page:           s(body.page, 200),
+        utm_source:     s(utm.source, 100),
+        utm_campaign:   s(utm.campaign, 100),
+        utm_term:       s(utm.term, 100),
+      });
+    }
+  } catch (e) {
+    console.error('Track error:', e.message);
+  }
+});
+
+// ─── Admin: analytics stats ───────────────────────────────────────────────
+app.get('/api/admin/analytics', (req, res) => {
+  if (!checkAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
+  try {
+    const days = Math.min(Math.max(parseInt(req.query.days) || 30, 1), 365);
+    res.json(analytics.getStats(days));
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
 });
 

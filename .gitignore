@@ -7,3 +7,6 @@ node_modules/
 *.log
 .vercel
 .railway
+data/analytics.db
+data/analytics.db-shm
+data/analytics.db-wal
