@@ -57,6 +57,8 @@
   var addForm = document.getElementById('add-form');
   var editModal = document.getElementById('edit-modal');
   var editForm = document.getElementById('edit-form');
+  var searchEl = document.getElementById('admin-search');
+  var filterCatEl = document.getElementById('admin-filter-cat');
 
   function showLogin() {
     loginEl.hidden = false;
@@ -142,12 +144,26 @@
   }
 
   var allAssetsList = [];
+  function applyFilters(list) {
+    var q = (searchEl && searchEl.value ? searchEl.value : '').trim().toLowerCase();
+    var cat = (filterCatEl && filterCatEl.value ? filterCatEl.value : '').trim();
+    return (list || []).filter(function (item) {
+      if (cat && item.category !== cat) return false;
+      if (!q) return true;
+      var hay = [
+        item.title, item.subtitle, item.description, item.category, item.type, item.resolution, item.format
+      ].filter(Boolean).join(' ').toLowerCase();
+      return hay.indexOf(q) !== -1;
+    });
+  }
+
   function loadList() {
     api('GET', '/api/admin/downloads')
       .then(function (data) {
         var list = Array.isArray(data) ? data : [];
         allAssetsList = list;
-        var g = groupedByCategory(list);
+        var filtered = applyFilters(list);
+        var g = groupedByCategory(filtered);
         var html = '';
         g.order.forEach(function (cat) {
           var items = (g.groups[cat] || []).map(renderItem).join('');
@@ -192,6 +208,9 @@
       })
       .catch(function () { showLogin(); });
   }
+
+  if (searchEl) searchEl.addEventListener('input', function () { loadList(); });
+  if (filterCatEl) filterCatEl.addEventListener('change', function () { loadList(); });
 
   var currentEditItem = null;
   function openEditModal(item) {
@@ -263,6 +282,7 @@
           payload.downloadUrl = res.url;
           payload.fileSize = res.fileSize;
           if (res.thumbnailUrl) payload.thumbnailUrl = res.thumbnailUrl;
+          if (res.resolution && payload.category === 'wallpapers') payload.resolution = res.resolution;
         });
     }
     if (thumbInput.files && thumbInput.files[0]) {
@@ -287,8 +307,12 @@
   addUploadZone.addEventListener('click', function () { addFileInput.click(); });
   addThumbZone.addEventListener('click', function () { addThumbInput.click(); });
   addFileInput.addEventListener('change', function () {
-    if (this.files && this.files[0]) addUploadZone.textContent = this.files[0].name;
-    addUploadZone.classList.toggle('has-file', !!(this.files && this.files[0]));
+    if (this.files && this.files.length) {
+      addUploadZone.textContent = (this.files.length === 1) ? this.files[0].name : (this.files.length + ' files selected');
+    } else {
+      addUploadZone.textContent = 'Click or drop file to upload';
+    }
+    addUploadZone.classList.toggle('has-file', !!(this.files && this.files.length));
   });
   addThumbInput.addEventListener('change', function () {
     if (this.files && this.files[0]) addThumbZone.textContent = this.files[0].name;
@@ -365,46 +389,96 @@
     var desc = (document.getElementById('add-desc') || {}).value || '';
     if (!title.trim()) { alert('Please enter a title.'); return; }
     if (!desc.trim()) { alert('Please enter a description.'); return; }
-    if (!addFileInput.files || !addFileInput.files[0]) {
+    if (!addFileInput.files || !addFileInput.files.length) {
       alert('Please choose a download file (click or drop on the upload area).');
       return;
     }
-    var file = addFileInput.files[0];
     var thumbFile = addThumbInput.files && addThumbInput.files[0] ? addThumbInput.files[0] : null;
     var category = document.getElementById('add-category').value;
-    var payload = {
+    var basePayload = {
       title: document.getElementById('add-title').value,
       description: document.getElementById('add-desc').value,
       category: category,
       downloadUrl: '#',
       tags: []
     };
-    if (category === 'wallpapers') {
-      payload.type = document.getElementById('add-type').value;
-      payload.subtitle = payload.type ? payload.type.charAt(0).toUpperCase() + payload.type.slice(1) : undefined;
-      payload.resolution = document.getElementById('add-resolution').value || undefined;
-    }
     if (category === 'ebook') {
       var ch = document.getElementById('add-chapter').value;
-      if (ch) payload.chapter = parseInt(ch, 10);
-      payload.format = document.getElementById('add-format').value || 'PDF';
+      if (ch) basePayload.chapter = parseInt(ch, 10);
+      basePayload.format = document.getElementById('add-format').value || 'PDF';
     }
     var saveBtn = addForm.querySelector('button[type="submit"]');
     var btnText = saveBtn ? saveBtn.textContent : '';
     if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
-    apiUpload(file)
-      .then(function (res) {
-        payload.downloadUrl = res.url;
-        payload.fileSize = res.fileSize;
-        payload.thumbnailUrl = res.thumbnailUrl || '';
-        if (thumbFile) return apiUpload(thumbFile).then(function (r) {
-          payload.thumbnailUrl = r.url;
-          return payload;
+    var files = Array.prototype.slice.call(addFileInput.files || []);
+
+    function variantSubtitleFromFilename(filename) {
+      var base = (filename || '').replace(/\.[^.]+$/, '').trim();
+      var map = {
+        'andriod': 'Android',
+        'android': 'Android',
+        'iphones': 'iPhone',
+        'iphone': 'iPhone',
+        'tablet': 'Tablet',
+        'mackbook': 'Macbook',
+        'macbook': 'Macbook',
+        'ultrawide': 'Ultrawide',
+        'standard hd': 'Standard HD',
+        '4k ultra hd': '4K Ultra HD'
+      };
+      var key = base.toLowerCase().replace(/\s+/g, ' ').trim();
+      return map[key] || base;
+    }
+
+    function wallpaperTypeFromSubtitle(subtitle) {
+      var s = (subtitle || '').toLowerCase();
+      if (s.indexOf('android') !== -1 || s.indexOf('iphone') !== -1 || s.indexOf('tablet') !== -1) return 'mobile';
+      return 'desktop';
+    }
+
+    var overrideThumbPromise = thumbFile ? apiUpload(thumbFile).then(function (r) { return r.url; }) : Promise.resolve('');
+
+    overrideThumbPromise
+      .then(function (overrideThumbUrl) {
+        // Wallpapers: batch upload variants (creates one item per file; public page groups by title)
+        if (category === 'wallpapers' && files.length > 1) {
+          var chain = Promise.resolve();
+          files.forEach(function (file) {
+            chain = chain
+              .then(function () { return apiUpload(file); })
+              .then(function (res) {
+                var subtitle = variantSubtitleFromFilename(file.name);
+                var payload = {
+                  title: basePayload.title,
+                  description: basePayload.description,
+                  category: 'wallpapers',
+                  tags: [],
+                  subtitle: subtitle,
+                  type: wallpaperTypeFromSubtitle(subtitle),
+                  resolution: res.resolution || undefined,
+                  downloadUrl: res.url,
+                  fileSize: res.fileSize,
+                  thumbnailUrl: overrideThumbUrl || res.thumbnailUrl || ''
+                };
+                return api('POST', '/api/admin/downloads', payload);
+              });
+          });
+          return chain;
+        }
+
+        // Default: single upload
+        return apiUpload(files[0]).then(function (res) {
+          var payload = Object.assign({}, basePayload);
+          payload.downloadUrl = res.url;
+          payload.fileSize = res.fileSize;
+          payload.thumbnailUrl = overrideThumbUrl || res.thumbnailUrl || '';
+          if (category === 'wallpapers') {
+            payload.type = document.getElementById('add-type').value;
+            payload.subtitle = payload.type ? payload.type.charAt(0).toUpperCase() + payload.type.slice(1) : undefined;
+            payload.resolution = res.resolution || document.getElementById('add-resolution').value || undefined;
+          }
+          return api('POST', '/api/admin/downloads', payload);
         });
-        return payload;
-      })
-      .then(function () {
-        return api('POST', '/api/admin/downloads', payload);
       })
       .then(function () {
         addForm.reset();

@@ -20,6 +20,15 @@
       <div id="admin-dashboard" hidden>
         <div class="admin-toolbar">
           <h1 class="admin-title">Dashboard</h1>
+          <div class="admin-tools">
+            <input id="admin-search" type="search" placeholder="Search title / subtitle…" autocomplete="off">
+            <select id="admin-filter-cat" aria-label="Filter category">
+              <option value="">All</option>
+              <option value="wallpapers">Wallpapers</option>
+              <option value="ebook">E-Book</option>
+              <option value="stl">3D Printables (STL)</option>
+            </select>
+          </div>
           <button type="button" class="logout-btn" id="logout-btn">Log out</button>
         </div>
 
@@ -56,9 +65,9 @@
               <input type="text" id="add-format" placeholder="PDF" value="PDF" style="max-width: 120px;">
             </div>
 
-            <label>Download file (upload)</label>
+            <label>Download file(s) (upload)</label>
             <div id="add-upload-zone" class="admin-upload-zone">Click or drop file to upload</div>
-            <input type="file" id="add-file-input" accept="*/*" style="display: none;">
+            <input type="file" id="add-file-input" accept="*/*" multiple style="display: none;">
 
             <label>Thumbnail (optional – upload image or leave blank)</label>
             <div id="add-thumb-zone" class="admin-upload-zone">Click or drop image for thumbnail</div>

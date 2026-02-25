@@ -10,3 +10,5 @@ node_modules/
 data/analytics.db
 data/analytics.db-shm
 data/analytics.db-wal
+Wallpaper/
+instructions.md

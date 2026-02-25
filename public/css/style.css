@@ -577,6 +577,7 @@ body {
 .footer-social a img {
   flex-shrink: 0;
   opacity: 0.85;
+  transition: transform var(--transition), opacity var(--transition), filter var(--transition);
 }
 
 .footer-social a:hover {
@@ -585,6 +586,81 @@ body {
 
 .footer-social a:hover img {
   opacity: 1;
+  transform: translateY(-1px) scale(1.06);
+  filter: brightness(1.15);
+}
+
+/* Discord popup (shown after download click) */
+.discord-popup-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 9999;
+}
+
+.discord-popup-overlay.open {
+  display: flex;
+}
+
+.discord-popup {
+  width: 100%;
+  max-width: 520px;
+  background: #101114;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 18px 16px;
+  box-shadow: 0 12px 50px rgba(0, 0, 0, 0.6);
+  position: relative;
+}
+
+.discord-popup-title {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-bottom: 12px;
+}
+
+.discord-popup-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+  background: #5865F2; /* Discord brand */
+  color: #fff;
+  transition: transform var(--transition), filter var(--transition);
+}
+
+.discord-popup-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.discord-popup-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.discord-popup-close:hover {
+  background: var(--bg-card);
+  border-color: var(--border-hover);
+  color: var(--text);
 }
 
 .footer-credits {
@@ -660,6 +736,33 @@ body {
   margin-bottom: var(--gap);
   flex-wrap: wrap;
   gap: var(--gap);
+}
+
+.admin-tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  justify-content: center;
+  min-width: 240px;
+}
+
+.admin-tools input,
+.admin-tools select {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+
+.admin-tools input {
+  width: min(420px, 100%);
+}
+
+.admin-tools select {
+  width: 180px;
 }
 
 .admin-list {
@@ -1045,6 +1148,59 @@ body {
   color: var(--text-muted);
   cursor: default;
   opacity: 0.6;
+}
+
+.wp-download-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.wp-variants {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg-card);
+}
+
+.wp-variant {
+  display: grid;
+  grid-template-columns: 28px 1fr 72px 86px;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition);
+}
+
+.wp-variant:last-child {
+  border-bottom: none;
+}
+
+.wp-variant:hover {
+  background: var(--bg-card-hover);
+}
+
+.wp-variant input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.wp-variant-res {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+}
+
+.wp-variant-mid,
+.wp-variant-right {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-align: right;
 }
 
 .card-preview {

@@ -300,11 +300,20 @@ app.post(
       const url = getPublicUrl(key);
       const fileSize = formatBytes(req.file.size);
       let thumbnailUrl = null;
+      let imageWidth = null;
+      let imageHeight = null;
+      let resolution = null;
 
       // Generate thumbnail for images
       const imgMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
       if (imgMimes.includes(req.file.mimetype)) {
         try {
+          const meta = await sharp(req.file.buffer).metadata();
+          if (meta && meta.width && meta.height) {
+            imageWidth = meta.width;
+            imageHeight = meta.height;
+            resolution = `${meta.width}x${meta.height}`;
+          }
           const thumbBuffer = await sharp(req.file.buffer)
             .resize(400, 400, { fit: 'inside', withoutEnlargement: true })
             .jpeg({ quality: 80 })
@@ -325,7 +334,7 @@ app.post(
         }
       }
 
-      res.json({ url, fileSize, thumbnailUrl });
+      res.json({ url, fileSize, thumbnailUrl, imageWidth, imageHeight, resolution });
     } catch (e) {
       console.error('Upload error:', e);
       res.status(500).json({ error: e.message || 'Upload failed' });

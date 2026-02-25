@@ -3,6 +3,8 @@
 
   var SESSION_KEY = 'maya_sid';
   var UTM_KEY = 'maya_utm';
+  var DISCORD_SHOWN_KEY = 'maya_discord_shown';
+  var DISCORD_URL = 'https://discord.gg/7HwhQaN6';
 
   function uuid() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -62,6 +64,48 @@
     };
   }
 
+  function ensureDiscordPopup() {
+    if (document.getElementById('discord-popup')) return;
+    var wrap = document.createElement('div');
+    wrap.id = 'discord-popup';
+    wrap.className = 'discord-popup-overlay';
+    wrap.setAttribute('aria-hidden', 'true');
+    wrap.innerHTML =
+      '<div class=\"discord-popup\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Join Discord\">' +
+        '<button type=\"button\" class=\"discord-popup-close\" aria-label=\"Close\">×</button>' +
+        '<div class=\"discord-popup-title\">MAYA is also on Discord.</div>' +
+        '<a class=\"discord-popup-btn\" href=\"' + DISCORD_URL + '\" target=\"_blank\" rel=\"noopener\">Join Discord</a>' +
+      '</div>';
+    document.body.appendChild(wrap);
+    wrap.addEventListener('click', function (e) {
+      if (e.target === wrap) hideDiscordPopup();
+    });
+    var close = wrap.querySelector('.discord-popup-close');
+    if (close) close.addEventListener('click', hideDiscordPopup);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') hideDiscordPopup();
+    });
+  }
+
+  function showDiscordPopupOnce() {
+    try {
+      if (sessionStorage.getItem(DISCORD_SHOWN_KEY) === '1') return;
+      sessionStorage.setItem(DISCORD_SHOWN_KEY, '1');
+    } catch (e) {}
+    ensureDiscordPopup();
+    var el = document.getElementById('discord-popup');
+    if (!el) return;
+    el.classList.add('open');
+    el.setAttribute('aria-hidden', 'false');
+  }
+
+  function hideDiscordPopup() {
+    var el = document.getElementById('discord-popup');
+    if (!el) return;
+    el.classList.remove('open');
+    el.setAttribute('aria-hidden', 'true');
+  }
+
   // Pageview
   beacon(base('pageview'));
 
@@ -78,6 +122,7 @@
     payload.asset_title = titleEl ? titleEl.textContent.trim() : '';
     payload.asset_category = document.body.getAttribute('data-category') || '';
     beacon(payload);
+    setTimeout(showDiscordPopupOnce, 0);
   }, true);
 
   // Modal download button (inside #modal-downloads)
@@ -92,6 +137,7 @@
     payload.asset_title = titleEl ? titleEl.textContent.trim() : '';
     payload.asset_category = document.body.getAttribute('data-category') || '';
     beacon(payload);
+    setTimeout(showDiscordPopupOnce, 0);
   }, true);
 
   // Download-all button
@@ -101,6 +147,7 @@
     var payload = base('download_all');
     payload.asset_category = document.body.getAttribute('data-category') || '';
     beacon(payload);
+    setTimeout(showDiscordPopupOnce, 0);
   }, true);
 
   // Modal preview open (card click)
