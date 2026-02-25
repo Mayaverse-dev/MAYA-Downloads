@@ -1,5 +1,719 @@
 [
   {
+    "id": "wp-lib-vaanar-tablet",
+    "title": "VAANAR",
+    "subtitle": "Tablet",
+    "description": "VAANAR wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "2732x2732",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/VAANAR/Tablet.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/VAANAR/Tablet.png",
+    "fileSize": "11.1 MB",
+    "tags": [
+      "vaanar"
+    ],
+    "createdAt": "2026-02-25T14:44:41.918Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-vaanar-iphone",
+    "title": "VAANAR",
+    "subtitle": "iPhone",
+    "description": "VAANAR wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "1290x2796",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/VAANAR/Iphones.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/VAANAR/Iphones.png",
+    "fileSize": "5.5 MB",
+    "tags": [
+      "vaanar"
+    ],
+    "createdAt": "2026-02-25T14:44:38.434Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-vaanar-android",
+    "title": "VAANAR",
+    "subtitle": "Android",
+    "description": "VAANAR wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "1440x3200",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/VAANAR/Andriod.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/VAANAR/Andriod.png",
+    "fileSize": "6.9 MB",
+    "tags": [
+      "vaanar"
+    ],
+    "createdAt": "2026-02-25T14:44:35.418Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-rk-saswat-ultrawide",
+    "title": "RK SASWAT",
+    "subtitle": "Ultrawide",
+    "description": "RK SASWAT wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "3440x1440",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/RK_SASWAT/Ultrawide.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/RK_SASWAT/Ultrawide.png",
+    "fileSize": "5.4 MB",
+    "tags": [
+      "rk-saswat"
+    ],
+    "createdAt": "2026-02-25T14:44:32.936Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-rk-saswat-tablet",
+    "title": "RK SASWAT",
+    "subtitle": "Tablet",
+    "description": "RK SASWAT wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "2732x2732",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/RK_SASWAT/Tablet.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/RK_SASWAT/Tablet.png",
+    "fileSize": "8.2 MB",
+    "tags": [
+      "rk-saswat"
+    ],
+    "createdAt": "2026-02-25T14:44:30.436Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-rk-saswat-standard-hd",
+    "title": "RK SASWAT",
+    "subtitle": "Standard HD",
+    "description": "RK SASWAT wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "1920x1080",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/RK_SASWAT/Standard%20HD.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/RK_SASWAT/Standard%20HD.png",
+    "fileSize": "2.7 MB",
+    "tags": [
+      "rk-saswat"
+    ],
+    "createdAt": "2026-02-25T14:44:26.661Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-rk-saswat-macbook",
+    "title": "RK SASWAT",
+    "subtitle": "Macbook",
+    "description": "RK SASWAT wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "2880x1800",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/RK_SASWAT/Mackbook.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/RK_SASWAT/Mackbook.png",
+    "fileSize": "6.0 MB",
+    "tags": [
+      "rk-saswat"
+    ],
+    "createdAt": "2026-02-25T14:44:24.334Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-rk-saswat-iphone",
+    "title": "RK SASWAT",
+    "subtitle": "iPhone",
+    "description": "RK SASWAT wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "1290x2796",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/RK_SASWAT/Iphones.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/RK_SASWAT/Iphones.png",
+    "fileSize": "4.5 MB",
+    "tags": [
+      "rk-saswat"
+    ],
+    "createdAt": "2026-02-25T14:44:20.484Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-rk-saswat-android",
+    "title": "RK SASWAT",
+    "subtitle": "Android",
+    "description": "RK SASWAT wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "1440x3200",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/RK_SASWAT/Andriod.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/RK_SASWAT/Andriod.png",
+    "fileSize": "5.4 MB",
+    "tags": [
+      "rk-saswat"
+    ],
+    "createdAt": "2026-02-25T14:44:13.377Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-rk-saswat-4k-ultra-hd",
+    "title": "RK SASWAT",
+    "subtitle": "4K Ultra HD",
+    "description": "RK SASWAT wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "3840x2160",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/RK_SASWAT/4K%20ultra%20HD.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/RK_SASWAT/4K%20ultra%20HD.png",
+    "fileSize": "8.4 MB",
+    "tags": [
+      "rk-saswat"
+    ],
+    "createdAt": "2026-02-25T14:44:10.584Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-naag-tablet",
+    "title": "NAAG",
+    "subtitle": "Tablet",
+    "description": "NAAG wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "2732x2732",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/NAAG/Tablet.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/NAAG/Tablet.png",
+    "fileSize": "9.5 MB",
+    "tags": [
+      "naag"
+    ],
+    "createdAt": "2026-02-25T14:44:07.923Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-naag-iphone",
+    "title": "NAAG",
+    "subtitle": "iPhone",
+    "description": "NAAG wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "1290x2796",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/NAAG/Iphones.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/NAAG/Iphones.png",
+    "fileSize": "4.4 MB",
+    "tags": [
+      "naag"
+    ],
+    "createdAt": "2026-02-25T14:44:04.894Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-naag-android",
+    "title": "NAAG",
+    "subtitle": "Android",
+    "description": "NAAG wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "1440x3200",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/NAAG/Andriod.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/NAAG/Andriod.png",
+    "fileSize": "5.2 MB",
+    "tags": [
+      "naag"
+    ],
+    "createdAt": "2026-02-25T14:44:01.890Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-moonlight-ultrawide",
+    "title": "Moonlight",
+    "subtitle": "Ultrawide",
+    "description": "Moonlight wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "3440x1440",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/Moonlight/Ultrawide.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/Moonlight/Ultrawide.png",
+    "fileSize": "7.0 MB",
+    "tags": [
+      "moonlight"
+    ],
+    "createdAt": "2026-02-25T14:43:56.591Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-moonlight-tablet",
+    "title": "Moonlight",
+    "subtitle": "Tablet",
+    "description": "Moonlight wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "2732x2732",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/Moonlight/Tablet.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/Moonlight/Tablet.png",
+    "fileSize": "8.8 MB",
+    "tags": [
+      "moonlight"
+    ],
+    "createdAt": "2026-02-25T14:43:52.162Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-moonlight-standard-hd",
+    "title": "Moonlight",
+    "subtitle": "Standard HD",
+    "description": "Moonlight wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "1920x1080",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/Moonlight/Standard%20HD.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/Moonlight/Standard%20HD.png",
+    "fileSize": "3.1 MB",
+    "tags": [
+      "moonlight"
+    ],
+    "createdAt": "2026-02-25T14:43:48.529Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-moonlight-macbook",
+    "title": "Moonlight",
+    "subtitle": "Macbook",
+    "description": "Moonlight wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "2880x1800",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/Moonlight/Mackbook.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/Moonlight/Mackbook.png",
+    "fileSize": "7.0 MB",
+    "tags": [
+      "moonlight"
+    ],
+    "createdAt": "2026-02-25T14:43:46.231Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-moonlight-iphone",
+    "title": "Moonlight",
+    "subtitle": "iPhone",
+    "description": "Moonlight wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "1290x2796",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/Moonlight/Iphones.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/Moonlight/Iphones.png",
+    "fileSize": "4.8 MB",
+    "tags": [
+      "moonlight"
+    ],
+    "createdAt": "2026-02-25T14:43:43.013Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-moonlight-android",
+    "title": "Moonlight",
+    "subtitle": "Android",
+    "description": "Moonlight wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "1440x3200",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/Moonlight/Andriod.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/Moonlight/Andriod.png",
+    "fileSize": "5.8 MB",
+    "tags": [
+      "moonlight"
+    ],
+    "createdAt": "2026-02-25T14:43:40.064Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-moonlight-4k-ultra-hd",
+    "title": "Moonlight",
+    "subtitle": "4K Ultra HD",
+    "description": "Moonlight wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "3840x2160",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/Moonlight/4K%20ultra%20HD.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/Moonlight/4K%20ultra%20HD.png",
+    "fileSize": "10.7 MB",
+    "tags": [
+      "moonlight"
+    ],
+    "createdAt": "2026-02-25T14:43:37.366Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-maya-ultrawide",
+    "title": "MAYA",
+    "subtitle": "Ultrawide",
+    "description": "MAYA wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "3440x1440",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/MAYA/Ultrawide.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/MAYA/Ultrawide.png",
+    "fileSize": "397.7 KB",
+    "tags": [
+      "maya"
+    ],
+    "createdAt": "2026-02-25T14:43:34.380Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-maya-tablet",
+    "title": "MAYA",
+    "subtitle": "Tablet",
+    "description": "MAYA wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "2732x2732",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/MAYA/Tablet.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/MAYA/Tablet.png",
+    "fileSize": "537.2 KB",
+    "tags": [
+      "maya"
+    ],
+    "createdAt": "2026-02-25T14:43:33.162Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-maya-standard-hd",
+    "title": "MAYA",
+    "subtitle": "Standard HD",
+    "description": "MAYA wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "1920x1080",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/MAYA/Standard%20HD.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/MAYA/Standard%20HD.png",
+    "fileSize": "314.7 KB",
+    "tags": [
+      "maya"
+    ],
+    "createdAt": "2026-02-25T14:43:31.767Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-maya-macbook",
+    "title": "MAYA",
+    "subtitle": "Macbook",
+    "description": "MAYA wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "2880x1800",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/MAYA/Mackbook.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/MAYA/Mackbook.png",
+    "fileSize": "505.6 KB",
+    "tags": [
+      "maya"
+    ],
+    "createdAt": "2026-02-25T14:43:30.557Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-maya-iphone",
+    "title": "MAYA",
+    "subtitle": "iPhone",
+    "description": "MAYA wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "1290x2796",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/MAYA/Iphones.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/MAYA/Iphones.png",
+    "fileSize": "219.5 KB",
+    "tags": [
+      "maya"
+    ],
+    "createdAt": "2026-02-25T14:43:29.127Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-maya-android",
+    "title": "MAYA",
+    "subtitle": "Android",
+    "description": "MAYA wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "1440x3200",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/MAYA/Andriod.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/MAYA/Andriod.png",
+    "fileSize": "241.8 KB",
+    "tags": [
+      "maya"
+    ],
+    "createdAt": "2026-02-25T14:43:27.861Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-maya-4k-ultra-hd",
+    "title": "MAYA",
+    "subtitle": "4K Ultra HD",
+    "description": "MAYA wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "3840x2160",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/MAYA/4K%20ultra%20HD.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/MAYA/4K%20ultra%20HD.png",
+    "fileSize": "628.8 KB",
+    "tags": [
+      "maya"
+    ],
+    "createdAt": "2026-02-25T14:43:26.570Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-ku-saswat-ultrawide",
+    "title": "KU SASWAT",
+    "subtitle": "Ultrawide",
+    "description": "KU SASWAT wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "3440x1440",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/KU_SASWAT/Ultrawide.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/KU_SASWAT/Ultrawide.png",
+    "fileSize": "5.8 MB",
+    "tags": [
+      "ku-saswat"
+    ],
+    "createdAt": "2026-02-25T14:43:24.951Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-ku-saswat-tablet",
+    "title": "KU SASWAT",
+    "subtitle": "Tablet",
+    "description": "KU SASWAT wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "2732x2732",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/KU_SASWAT/Tablet.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/KU_SASWAT/Tablet.png",
+    "fileSize": "9.3 MB",
+    "tags": [
+      "ku-saswat"
+    ],
+    "createdAt": "2026-02-25T14:43:21.175Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-ku-saswat-standard-hd",
+    "title": "KU SASWAT",
+    "subtitle": "Standard HD",
+    "description": "KU SASWAT wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "1920x1080",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/KU_SASWAT/Standard%20HD.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/KU_SASWAT/Standard%20HD.png",
+    "fileSize": "2.9 MB",
+    "tags": [
+      "ku-saswat"
+    ],
+    "createdAt": "2026-02-25T14:43:16.467Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-ku-saswat-macbook",
+    "title": "KU SASWAT",
+    "subtitle": "Macbook",
+    "description": "KU SASWAT wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "2880x1800",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/KU_SASWAT/Mackbook.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/KU_SASWAT/Mackbook.png",
+    "fileSize": "6.5 MB",
+    "tags": [
+      "ku-saswat"
+    ],
+    "createdAt": "2026-02-25T14:43:14.271Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-ku-saswat-iphone",
+    "title": "KU SASWAT",
+    "subtitle": "iPhone",
+    "description": "KU SASWAT wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "1290x2796",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/KU_SASWAT/Iphones.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/KU_SASWAT/Iphones.png",
+    "fileSize": "4.7 MB",
+    "tags": [
+      "ku-saswat"
+    ],
+    "createdAt": "2026-02-25T14:43:07.649Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-ku-saswat-android",
+    "title": "KU SASWAT",
+    "subtitle": "Android",
+    "description": "KU SASWAT wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "mobile",
+    "resolution": "1440x3200",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/KU_SASWAT/Andriod.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/KU_SASWAT/Andriod.png",
+    "fileSize": "5.6 MB",
+    "tags": [
+      "ku-saswat"
+    ],
+    "createdAt": "2026-02-25T14:43:05.286Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-ku-saswat-4k-ultra-hd",
+    "title": "KU SASWAT",
+    "subtitle": "4K Ultra HD",
+    "description": "KU SASWAT wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "3840x2160",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/KU_SASWAT/4K%20ultra%20HD.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/KU_SASWAT/4K%20ultra%20HD.png",
+    "fileSize": "9.4 MB",
+    "tags": [
+      "ku-saswat"
+    ],
+    "createdAt": "2026-02-25T14:43:01.845Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-kulichase-ultrawide",
+    "title": "KULICHASE",
+    "subtitle": "Ultrawide",
+    "description": "KULICHASE wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "3440x1440",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/KULICHASE/Ultrawide.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/KULICHASE/Ultrawide.png",
+    "fileSize": "7.5 MB",
+    "tags": [
+      "kulichase"
+    ],
+    "createdAt": "2026-02-25T14:42:57.613Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-kulichase-standard-hd",
+    "title": "KULICHASE",
+    "subtitle": "Standard HD",
+    "description": "KULICHASE wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "1920x1080",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/KULICHASE/Standard%20HD.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/KULICHASE/Standard%20HD.png",
+    "fileSize": "3.4 MB",
+    "tags": [
+      "kulichase"
+    ],
+    "createdAt": "2026-02-25T14:42:54.829Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-kulichase-macbook",
+    "title": "KULICHASE",
+    "subtitle": "Macbook",
+    "description": "KULICHASE wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "2880x1800",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/KULICHASE/Mackbook.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/KULICHASE/Mackbook.png",
+    "fileSize": "8.0 MB",
+    "tags": [
+      "kulichase"
+    ],
+    "createdAt": "2026-02-25T14:42:51.837Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-kulichase-4k-ultra-hd",
+    "title": "KULICHASE",
+    "subtitle": "4K Ultra HD",
+    "description": "KULICHASE wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "3840x2160",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/KULICHASE/4K%20ultra%20HD.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/KULICHASE/4K%20ultra%20HD.png",
+    "fileSize": "12.5 MB",
+    "tags": [
+      "kulichase"
+    ],
+    "createdAt": "2026-02-25T14:42:49.231Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-hidamma-vibhav-ultrawide",
+    "title": "Hidamma vibhav",
+    "subtitle": "Ultrawide",
+    "description": "Hidamma vibhav wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "3440x1440",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/Hidamma_vibhav/Ultrawide.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/Hidamma_vibhav/Ultrawide.png",
+    "fileSize": "6.1 MB",
+    "tags": [
+      "hidamma-vibhav"
+    ],
+    "createdAt": "2026-02-25T14:42:45.900Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-hidamma-vibhav-standard-hd",
+    "title": "Hidamma vibhav",
+    "subtitle": "Standard HD",
+    "description": "Hidamma vibhav wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "1920x1080",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/Hidamma_vibhav/Standard%20HD.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/Hidamma_vibhav/Standard%20HD.png",
+    "fileSize": "2.6 MB",
+    "tags": [
+      "hidamma-vibhav"
+    ],
+    "createdAt": "2026-02-25T14:42:42.644Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-hidamma-vibhav-macbook",
+    "title": "Hidamma vibhav",
+    "subtitle": "Macbook",
+    "description": "Hidamma vibhav wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "2880x1800",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/Hidamma_vibhav/Mackbook.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/Hidamma_vibhav/Mackbook.png",
+    "fileSize": "6.5 MB",
+    "tags": [
+      "hidamma-vibhav"
+    ],
+    "createdAt": "2026-02-25T14:42:37.041Z",
+    "visible": true
+  },
+  {
+    "id": "wp-lib-hidamma-vibhav-4k-ultra-hd",
+    "title": "Hidamma vibhav",
+    "subtitle": "4K Ultra HD",
+    "description": "Hidamma vibhav wallpaper from the MAYA universe.",
+    "category": "wallpapers",
+    "type": "desktop",
+    "resolution": "3840x2160",
+    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/Hidamma_vibhav/4K%20ultra%20HD.png.webp",
+    "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/Hidamma_vibhav/4K%20ultra%20HD.png",
+    "fileSize": "10.1 MB",
+    "tags": [
+      "hidamma-vibhav"
+    ],
+    "createdAt": "2026-02-25T14:42:32.961Z",
+    "visible": true
+  },
+  {
     "id": "wp-hidamma-desktop",
     "title": "Hidamma",
     "subtitle": "Desktop",
