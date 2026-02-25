@@ -5,9 +5,9 @@ const fs = require('fs').promises;
 const { v4: uuidv4 } = require('uuid');
 const multer = require('multer');
 const sharp = require('sharp');
-const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand, GetObjectCommand, ListObjectsV2Command, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const archiver = require('archiver');
-const analytics = require('./db');
+const db = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -32,16 +32,21 @@ function checkAdmin(req) {
 const CATS_PATH = path.join(__dirname, 'data', 'categories.json');
 
 async function readCats() {
-  try {
-    const raw = await fs.readFile(CATS_PATH, 'utf8');
-    return JSON.parse(raw);
-  } catch (e) {
-    return [];
+  let cats = await db.getCategories();
+  if (cats.length === 0) {
+    try {
+      const raw = await fs.readFile(CATS_PATH, 'utf8');
+      cats = JSON.parse(raw);
+      await db.saveCategories(cats);
+    } catch (e) {
+      // no file or parse error
+    }
   }
+  return cats;
 }
 
 async function writeCats(cats) {
-  await fs.writeFile(CATS_PATH, JSON.stringify(cats, null, 2), 'utf8');
+  await db.saveCategories(cats);
 }
 
 async function catIsVisible(slug) {
@@ -103,6 +108,58 @@ function keyFromDownloadUrl(downloadUrl) {
   } catch (e) {
     return null;
   }
+}
+
+const ORPHAN_CUTOFF_DAYS = 7;
+
+/** Remove S3 objects that are no longer referenced by any asset and are older than ORPHAN_CUTOFF_DAYS. Runs in background. */
+function scheduleOrphanCleanup() {
+  setImmediate(async () => {
+    const s3 = getS3Client();
+    const bucket = getBucket();
+    if (!s3) return;
+    try {
+      const data = await readData();
+      const list = Array.isArray(data) ? data : [];
+      const referencedKeys = new Set();
+      for (const item of list) {
+        const k1 = keyFromDownloadUrl(item.downloadUrl);
+        const k2 = keyFromDownloadUrl(item.thumbnailUrl);
+        if (k1) referencedKeys.add(k1);
+        if (k2) referencedKeys.add(k2);
+      }
+      const cutoff = new Date(Date.now() - ORPHAN_CUTOFF_DAYS * 24 * 60 * 60 * 1000);
+      const prefixes = ['uploads/', 'uploads/thumbs/', 'Assets/', '_thumbs/'];
+      for (const prefix of prefixes) {
+        let continuationToken;
+        do {
+          const listCmd = new ListObjectsV2Command({
+            Bucket: bucket,
+            Prefix: prefix,
+            ContinuationToken: continuationToken,
+          });
+          const listResp = await s3.send(listCmd);
+          const contents = listResp.Contents || [];
+          for (const obj of contents) {
+            const key = obj.Key;
+            if (!key || referencedKeys.has(key)) continue;
+            const lastMod = obj.LastModified ? new Date(obj.LastModified) : null;
+            if (lastMod && lastMod < cutoff) {
+              try {
+                await s3.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));
+                console.log('Orphan S3 deleted:', key);
+              } catch (err) {
+                console.warn('Orphan delete failed:', key, err.message);
+              }
+            }
+          }
+          continuationToken = listResp.NextContinuationToken;
+        } while (continuationToken);
+      }
+    } catch (e) {
+      console.warn('Orphan cleanup error:', e.message);
+    }
+  });
 }
 
 async function readData() {
@@ -410,6 +467,7 @@ app.post('/api/admin/downloads', async (req, res) => {
     Object.keys(item).forEach((k) => item[k] === undefined && delete item[k]);
     data.unshift(item);
     await writeData(data);
+    scheduleOrphanCleanup();
     res.json(item);
   } catch (e) {
     res.status(500).json({ error: 'Failed to save' });
@@ -437,6 +495,7 @@ app.patch('/api/admin/downloads/:id', async (req, res) => {
       data[idx].visible = body.visible;
     }
     await writeData(data);
+    scheduleOrphanCleanup();
     res.json(data[idx]);
   } catch (e) {
     res.status(500).json({ error: 'Failed to update' });
@@ -451,6 +510,7 @@ app.delete('/api/admin/downloads', async (req, res) => {
     let data = await readData();
     data = data.filter((i) => i.id !== id);
     await writeData(data);
+    scheduleOrphanCleanup();
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: 'Failed to delete' });
@@ -578,7 +638,7 @@ app.post('/api/track', async (req, res) => {
 
     if (body.type === 'pageview') {
       const geo = await getGeo(ip);
-      await analytics.insertVisit({
+      await db.insertVisit({
         session_id:   body.sid,
         ts,
         page:         s(body.page, 200),
@@ -608,7 +668,7 @@ app.post('/api/track', async (req, res) => {
         client_tz:    s(body.tz, 60),
       });
     } else {
-      await analytics.insertEvent({
+      await db.insertEvent({
         session_id:     body.sid,
         ts,
         type:           s(body.type, 30),
@@ -631,7 +691,7 @@ app.get('/api/admin/analytics', async (req, res) => {
   if (!checkAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
   try {
     const days = Math.min(Math.max(parseInt(req.query.days) || 30, 1), 365);
-    res.json(await analytics.getStats(days));
+    res.json(await db.getStats(days));
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

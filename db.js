@@ -42,6 +42,16 @@ const DDL = `
   CREATE INDEX IF NOT EXISTS idx_e_ts      ON events(ts);
   CREATE INDEX IF NOT EXISTS idx_e_type    ON events(type);
   CREATE INDEX IF NOT EXISTS idx_e_asset   ON events(asset_id);
+
+  CREATE TABLE IF NOT EXISTS categories (
+    slug TEXT PRIMARY KEY,
+    label TEXT NOT NULL,
+    "desc" TEXT,
+    color_class TEXT,
+    visible INTEGER NOT NULL DEFAULT 1,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    built_in INTEGER NOT NULL DEFAULT 0
+  );
 `;
 
 // ── PostgreSQL ─────────────────────────────────────────────────────────────
@@ -118,7 +128,52 @@ if (process.env.DATABASE_URL) {
     };
   }
 
-  module.exports = { insertVisit, insertEvent, getStats };
+  async function getCategories() {
+    await ensureReady();
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS categories (
+        slug TEXT PRIMARY KEY,
+        label TEXT NOT NULL,
+        "desc" TEXT,
+        color_class TEXT,
+        visible INTEGER NOT NULL DEFAULT 1,
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        built_in INTEGER NOT NULL DEFAULT 0
+      )
+    `).catch(() => {});
+    const r = await pool.query('SELECT slug, label, "desc", color_class, visible, sort_order, built_in FROM categories ORDER BY sort_order, slug');
+    return (r.rows || []).map((row) => ({
+      slug: row.slug,
+      label: row.label,
+      desc: row.desc || '',
+      colorClass: row.color_class || 'home-box-custom',
+      visible: row.visible !== false && row.visible !== 0,
+      order: row.sort_order ?? 99,
+      builtIn: row.built_in === true || row.built_in === 1,
+    }));
+  }
+
+  async function saveCategories(cats) {
+    await ensureReady();
+    await pool.query('DELETE FROM categories');
+    for (const c of cats || []) {
+      await pool.query(
+        `INSERT INTO categories (slug, label, "desc", color_class, visible, sort_order, built_in)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          c.slug,
+          c.label ?? '',
+          c.desc ?? '',
+          c.colorClass ?? 'home-box-custom',
+          c.visible !== false ? 1 : 0,
+          c.order ?? 99,
+          c.builtIn ? 1 : 0,
+        ]
+      );
+    }
+  }
+
+  module.exports = { insertVisit, insertEvent, getStats, getCategories, saveCategories };
 
 } else {
   // ── SQLite (local dev) ────────────────────────────────────────────────────
@@ -145,6 +200,45 @@ if (process.env.DATABASE_URL) {
     return Promise.resolve();
   }
 
+  function getCategories() {
+    try {
+      const rows = db.prepare('SELECT slug, label, "desc", color_class, visible, sort_order, built_in FROM categories ORDER BY sort_order, slug').all();
+      return Promise.resolve((rows || []).map((row) => ({
+        slug: row.slug,
+        label: row.label,
+        desc: row.desc || '',
+        colorClass: row.color_class || 'home-box-custom',
+        visible: row.visible !== 0,
+        order: row.sort_order ?? 99,
+        builtIn: row.built_in === 1,
+      })));
+    } catch (e) {
+      return Promise.resolve([]);
+    }
+  }
+
+  function saveCategories(cats) {
+    const del = db.prepare('DELETE FROM categories');
+    const ins = db.prepare(
+      'INSERT INTO categories (slug, label, "desc", color_class, visible, sort_order, built_in) VALUES (?, ?, ?, ?, ?, ?, ?)'
+    );
+    db.transaction(() => {
+      del.run();
+      for (const c of cats || []) {
+        ins.run(
+          c.slug,
+          c.label ?? '',
+          c.desc ?? '',
+          c.colorClass ?? 'home-box-custom',
+          c.visible !== false ? 1 : 0,
+          c.order ?? 99,
+          c.builtIn ? 1 : 0
+        );
+      }
+    })();
+    return Promise.resolve();
+  }
+
   function getStats(days) {
     const since = new Date(Date.now() - days * 86400000).toISOString();
     return Promise.resolve({
@@ -165,5 +259,5 @@ if (process.env.DATABASE_URL) {
     });
   }
 
-  module.exports = { insertVisit, insertEvent, getStats };
+  module.exports = { insertVisit, insertEvent, getStats, getCategories, saveCategories };
 }
