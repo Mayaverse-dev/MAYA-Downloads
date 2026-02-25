@@ -66,16 +66,16 @@
 
     <section class="home-categories">
       <div class="container">
-        <div class="home-grid">
-          <a href="/wallpapers" class="home-box home-box-wallpaper">
+        <div class="home-grid" id="home-categories-grid">
+          <a href="/wallpapers" class="home-box home-box-wallpaper" data-category="wallpapers">
             <h2 class="home-box-title">WALLPAPERS</h2>
             <p class="home-box-desc">High-resolution images for desktop and mobile.</p>
           </a>
-          <a href="/ebook" class="home-box home-box-ebook">
+          <a href="/ebook" class="home-box home-box-ebook" data-category="ebook">
             <h2 class="home-box-title">E-BOOK</h2>
             <p class="home-box-desc">Selected chapters from MAYA.</p>
           </a>
-          <a href="/stl" class="home-box home-box-stl">
+          <a href="/stl" class="home-box home-box-stl" data-category="stl">
             <h2 class="home-box-title">3D PRINTABLES</h2>
             <p class="home-box-desc">STL files from the MAYA universe.</p>
           </a>
@@ -97,5 +97,18 @@
   </footer>
   <script src="/js/tracker.js"></script>
   <script src="/js/analytics.js"></script>
+  <script>
+    (function () {
+      fetch('/api/config').then(function (r) { return r.json(); }).then(function (c) {
+        var visible = (c.visibleCategories || []).map(function (x) { return x.toLowerCase(); });
+        var grid = document.getElementById('home-categories-grid');
+        if (!grid) return;
+        [].forEach.call(grid.querySelectorAll('.home-box[data-category]'), function (el) {
+          var cat = (el.getAttribute('data-category') || '').toLowerCase();
+          el.style.display = visible.length && visible.indexOf(cat) === -1 ? 'none' : '';
+        });
+      }).catch(function () {});
+    })();
+  </script>
 </body>
 </html>

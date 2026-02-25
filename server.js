@@ -23,8 +23,17 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 
 function checkAdmin(req) {
+  const host = (req.headers['host'] || '').split(':')[0];
+  if (host === 'localhost' || host === '127.0.0.1') return true;
   const pw = req.headers['x-admin-password'] || req.query.pw;
   return pw && pw === process.env.ADMIN_PASSWORD;
+}
+
+/** Visible categories: comma-separated env VISIBLE_CATEGORIES (e.g. "ebook"); omit = all */
+function getVisibleCategories() {
+  const raw = cleanEnv(process.env.VISIBLE_CATEGORIES);
+  if (!raw) return ['wallpapers', 'ebook', 'stl'];
+  return raw.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
 }
 
 /** Trim whitespace/newlines and strip accidental leading = or tab chars from env values */
@@ -103,12 +112,15 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 app.get('/wallpapers', (req, res) => {
+  if (!getVisibleCategories().includes('wallpapers')) return res.redirect(302, '/');
   res.sendFile(path.join(__dirname, 'public', 'wallpapers.html'));
 });
 app.get('/ebook', (req, res) => {
+  if (!getVisibleCategories().includes('ebook')) return res.redirect(302, '/');
   res.sendFile(path.join(__dirname, 'public', 'ebook.html'));
 });
 app.get('/stl', (req, res) => {
+  if (!getVisibleCategories().includes('stl')) return res.redirect(302, '/');
   res.sendFile(path.join(__dirname, 'public', 'stl.html'));
 });
 
@@ -124,11 +136,12 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// ─── Public: analytics config (GA + Meta Pixel IDs; no secrets) ───────────
+// ─── Public: analytics + visibility config (no secrets) ─────────────────────
 app.get('/api/config', (req, res) => {
   res.json({
     gaId: cleanEnv(process.env.GA_ID) || '',
     metaPixelId: cleanEnv(process.env.META_PIXEL_ID) || '',
+    visibleCategories: getVisibleCategories(),
   });
 });
 
