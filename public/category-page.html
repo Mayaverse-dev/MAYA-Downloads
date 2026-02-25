@@ -3,14 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MAYA Downloads | Free Downloads</title>
-  <meta name="description" content="Free wallpapers, 3D printables, and e-book chapters from the MAYA Narrative Universe.">
+  <title>MAYA Downloads</title>
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png">
-  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <!-- Google Tag Manager -->
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -34,22 +28,21 @@
   </script>
   <!-- End Meta Pixel Code -->
 </head>
-<body>
+<body data-category="" data-title="" data-desc="">
   <!-- Google Tag Manager (noscript) -->
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5PVJLXP7"
   height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-  <!-- End Google Tag Manager (noscript) -->
   <!-- Meta Pixel (noscript) -->
   <noscript><img height="1" width="1" style="display:none"
-  src="https://www.facebook.com/tr?id=1253256319479243&amp;ev=PageView&amp;noscript=1"
+  src="https://www.facebook.com/tr?id=1253256319479243&ev=PageView&noscript=1"
   alt="" /></noscript>
-  <!-- End Meta Pixel Code -->
   <header class="site-header">
     <div class="container">
       <a href="/" class="logo">
         <img src="/images/maya-logo.png" alt="MAYA" class="logo-img">
       </a>
       <nav class="nav">
+        <a href="/">Home</a>
         <a href="https://store.entermaya.com" target="_blank" rel="noopener">Store</a>
         <a href="https://entermaya.com" target="_blank" rel="noopener">Main Site</a>
       </nav>
@@ -57,19 +50,31 @@
   </header>
 
   <main class="main">
-    <section class="hero">
-      <div class="container">
-        <h1 class="hero-title">MAYA <span class="accent">Downloads</span></h1>
-        <p class="hero-desc">Free to download. No login required.</p>
+    <div class="container">
+      <a href="/" class="back-link">← Back to Home</a>
+      <div class="section-header">
+        <div>
+          <h1 class="section-title" id="page-title"></h1>
+          <p class="section-desc" id="page-desc"></p>
+        </div>
+        <button type="button" class="btn btn-primary" id="download-all-btn" hidden>Download all</button>
       </div>
-    </section>
-
-    <section class="home-categories">
-      <div class="container">
-        <div class="home-grid" id="home-categories-grid"></div>
-      </div>
-    </section>
+      <div id="card-grid" class="card-grid"></div>
+      <p id="empty-msg" class="empty-state" hidden>Nothing here yet.</p>
+    </div>
   </main>
+
+  <div id="modal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-content">
+      <button type="button" class="modal-close" id="modal-close" aria-label="Close">×</button>
+      <img id="modal-img" class="modal-preview-img" alt="" src="">
+      <div class="modal-body">
+        <h2 id="modal-title" class="modal-title"></h2>
+        <p id="modal-desc" class="modal-desc"></p>
+        <div id="modal-downloads" class="modal-downloads"></div>
+      </div>
+    </div>
+  </div>
 
   <footer class="site-footer">
     <div class="container">
@@ -78,27 +83,12 @@
         <a href="https://www.youtube.com/@maya_lore/featured" target="_blank" rel="noopener" aria-label="YouTube"><img src="/images/icons/youtube.svg" alt="" width="20" height="20">YouTube</a>
         <a href="https://discord.gg/7HwhQaN6" target="_blank" rel="noopener" aria-label="Discord"><img src="/images/icons/discord.svg" alt="" width="20" height="20">Discord</a>
       </div>
-      <p class="footer-credits">Department of Lore Inc. · Anand Gandhi & Zain Memon · MAYA Narrative Universe</p>
-      <p class="footer-disclaimer">All assets are for personal, non-commercial use only. Redistribution or commercial use is prohibited. By downloading, you agree to these terms.</p>
+      <p class="footer-credits">Department of Lore Inc. · MAYA Narrative Universe</p>
+      <p class="footer-disclaimer">All assets are for personal, non-commercial use only.</p>
     </div>
   </footer>
   <script src="/js/tracker.js"></script>
   <script src="/js/analytics.js"></script>
-  <script>
-    (function () {
-      var grid = document.getElementById('home-categories-grid');
-      function render(cats) {
-        if (!grid) return;
-        grid.innerHTML = (cats || []).map(function (c) {
-          var href = c.builtIn ? ('/' + c.slug) : ('/c/' + c.slug);
-          return '<a href="' + href + '" class="home-box ' + (c.colorClass || 'home-box-custom') + '">' +
-            '<h2 class="home-box-title">' + c.label + '</h2>' +
-            '<p class="home-box-desc">' + (c.desc || '') + '</p>' +
-            '</a>';
-        }).join('');
-      }
-      fetch('/api/categories').then(function (r) { return r.json(); }).then(render).catch(function () {});
-    })();
-  </script>
+  <script src="/js/category.js"></script>
 </body>
 </html>

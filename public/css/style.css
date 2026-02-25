@@ -1210,3 +1210,117 @@ body {
 .card-preview .card-thumb {
   cursor: pointer;
 }
+
+/* ── Admin: categories section ─────────────────────────────────────── */
+.admin-cat-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-cat-info {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-cat-label {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.admin-cat-desc {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.admin-cat-badge {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+.admin-cat-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ── Homepage: custom categories (no background image) ─────────────── */
+.home-box-custom {
+  background: var(--bg-card);
+}
+
+/* ── Mobile fixes ───────────────────────────────────────────────────── */
+@media (max-width: 540px) {
+  /* Admin item row: stack on very small screens */
+  .admin-item {
+    flex-wrap: wrap;
+  }
+  .admin-item-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  .admin-item-visible {
+    display: none;
+  }
+
+  /* Admin toolbar: stack search + filter */
+  .admin-tools {
+    flex-direction: column;
+    align-items: stretch;
+    min-width: 0;
+    width: 100%;
+  }
+  .admin-tools input,
+  .admin-tools select {
+    width: 100%;
+  }
+
+  /* Wallpaper variant list: collapse mid/right columns */
+  .wp-variant {
+    grid-template-columns: 28px 1fr 72px;
+  }
+  .wp-variant-right {
+    display: none;
+  }
+
+  /* Footer social: wrap tightly */
+  .footer-social {
+    gap: var(--gap);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* Modal: full-width on mobile */
+  .modal-content {
+    max-height: 95vh;
+  }
+
+  /* Discord popup: full width on very small screens */
+  .discord-popup {
+    padding: 14px;
+  }
+
+  /* Category add form: single column */
+  #add-cat-form {
+    grid-template-columns: 1fr !important;
+  }
+}

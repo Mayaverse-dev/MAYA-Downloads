@@ -4,6 +4,7 @@
   var pw = '';
   var STORAGE_KEY = 'maya_admin_pw';
   var CATEGORY_ORDER = ['wallpapers', 'ebook', 'stl'];
+  var allCategories = [];
 
   function getPw() {
     return pw || (typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null) || '';
@@ -67,6 +68,7 @@
   function showDashboard() {
     loginEl.hidden = true;
     dashboardEl.hidden = false;
+    loadCategories();
     loadList();
   }
 
@@ -93,6 +95,128 @@
     return d.innerHTML;
   }
 
+  // ─── Category management ───────────────────────────────────────────────────
+  var catListEl = document.getElementById('cat-list');
+  var addCatFormWrap = document.getElementById('add-cat-form-wrap');
+  var addCatForm = document.getElementById('add-cat-form');
+  var addCatToggleBtn = document.getElementById('add-cat-toggle-btn');
+  var addCatCancel = document.getElementById('add-cat-cancel');
+
+  if (addCatToggleBtn) {
+    addCatToggleBtn.addEventListener('click', function () {
+      addCatFormWrap.hidden = !addCatFormWrap.hidden;
+    });
+  }
+  if (addCatCancel) {
+    addCatCancel.addEventListener('click', function () {
+      addCatFormWrap.hidden = true;
+      if (addCatForm) addCatForm.reset();
+    });
+  }
+  if (addCatForm) {
+    addCatForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var slug = (document.getElementById('add-cat-slug') || {}).value || '';
+      var label = (document.getElementById('add-cat-label') || {}).value || '';
+      var desc = (document.getElementById('add-cat-desc') || {}).value || '';
+      api('POST', '/api/admin/categories', { slug: slug, label: label, desc: desc })
+        .then(function () {
+          addCatForm.reset();
+          addCatFormWrap.hidden = true;
+          loadCategories();
+        })
+        .catch(function (e) { alert('Failed: ' + (e.message || 'Unknown error')); });
+    });
+  }
+
+  function renderCatItem(cat) {
+    var visible = cat.visible !== false;
+    var deleteBtn = cat.builtIn ? '' :
+      '<button type="button" class="cat-delete-btn btn" data-slug="' + escapeHtml(cat.slug) + '" style="padding:6px 12px;font-size:11px;">Delete</button>';
+    return (
+      '<div class="admin-cat-item" data-slug="' + escapeHtml(cat.slug) + '">' +
+        '<div class="admin-cat-info">' +
+          '<span class="admin-cat-label">' + escapeHtml(cat.label) + '</span>' +
+          '<span class="admin-cat-desc">' + escapeHtml(cat.desc || '') + '</span>' +
+          (cat.builtIn ? '' : '<span class="admin-cat-badge">custom</span>') +
+        '</div>' +
+        '<div class="admin-cat-actions">' +
+          '<span class="admin-item-visible">' + (visible ? 'Visible' : 'Hidden') + '</span>' +
+          '<div class="admin-toggle-switch ' + (visible ? 'on' : '') + '" data-slug="' + escapeHtml(cat.slug) + '" data-visible="' + visible + '" aria-label="Toggle visibility"></div>' +
+          deleteBtn +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function populateCategorySelects(cats) {
+    var slugs = cats.map(function (c) { return c.slug; });
+    var labels = {};
+    cats.forEach(function (c) { labels[c.slug] = c.label; });
+
+    [document.getElementById('add-category'), document.getElementById('edit-category'), document.getElementById('admin-filter-cat')].forEach(function (sel) {
+      if (!sel) return;
+      var isFilter = sel.id === 'admin-filter-cat';
+      var current = sel.value;
+      sel.innerHTML = isFilter ? '<option value="">All categories</option>' : '';
+      slugs.forEach(function (s) {
+        var opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = labels[s] || s;
+        sel.appendChild(opt);
+      });
+      if (current && slugs.indexOf(current) !== -1) sel.value = current;
+    });
+
+    // Update category-specific field visibility in add form after repopulating
+    updateAddVisibility();
+    updateEditVisibility();
+  }
+
+  function loadCategories() {
+    api('GET', '/api/admin/categories')
+      .then(function (cats) {
+        allCategories = Array.isArray(cats) ? cats : [];
+        CATEGORY_ORDER = allCategories.map(function (c) { return c.slug; });
+
+        if (catListEl) {
+          catListEl.innerHTML = allCategories.map(renderCatItem).join('') || '<p class="admin-item-meta">No categories yet.</p>';
+
+          catListEl.querySelectorAll('.admin-toggle-switch').forEach(function (el) {
+            el.addEventListener('click', function () {
+              var slug = this.getAttribute('data-slug');
+              var visible = this.getAttribute('data-visible') === 'true';
+              api('PATCH', '/api/admin/categories/' + encodeURIComponent(slug), { visible: !visible })
+                .then(function (updated) {
+                  el.classList.toggle('on', updated.visible !== false);
+                  el.setAttribute('data-visible', updated.visible !== false ? 'true' : 'false');
+                  var row = el.closest('.admin-cat-item');
+                  if (row) {
+                    var vis = row.querySelector('.admin-item-visible');
+                    if (vis) vis.textContent = (updated.visible !== false) ? 'Visible' : 'Hidden';
+                  }
+                })
+                .catch(function (e) { alert('Failed: ' + (e.message || 'Unknown')); });
+            });
+          });
+
+          catListEl.querySelectorAll('.cat-delete-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+              var slug = this.getAttribute('data-slug');
+              if (!confirm('Delete category "' + slug + '"? Assets in this category will remain but won\'t be shown.')) return;
+              api('DELETE', '/api/admin/categories/' + encodeURIComponent(slug))
+                .then(function () { loadCategories(); loadList(); })
+                .catch(function (e) { alert('Failed: ' + (e.message || 'Unknown')); });
+            });
+          });
+        }
+
+        populateCategorySelects(allCategories);
+      })
+      .catch(function () {});
+  }
+
+  // ─── Asset list rendering ──────────────────────────────────────────────────
   function sortByHomepageOrder(list) {
     var order = {};
     CATEGORY_ORDER.forEach(function (c, i) { order[c] = i; });
@@ -110,12 +234,22 @@
     var groups = {};
     CATEGORY_ORDER.forEach(function (c) { groups[c] = []; });
     sorted.forEach(function (item) {
-      if (groups[item.category]) groups[item.category].push(item);
+      if (groups[item.category] !== undefined) groups[item.category].push(item);
       else { groups.other = groups.other || []; groups.other.push(item); }
     });
-    if (groups.other && groups.other.length) sorted = CATEGORY_ORDER.concat(['other']);
-    else sorted = CATEGORY_ORDER;
-    return { order: sorted, groups: groups };
+    var order = CATEGORY_ORDER.slice();
+    if (groups.other && groups.other.length) order = order.concat(['other']);
+    return { order: order, groups: groups };
+  }
+
+  function categoryLabel(slug) {
+    var cat = allCategories.find(function (c) { return c.slug === slug; });
+    if (cat) return cat.label;
+    if (slug === 'wallpapers') return 'Wallpapers';
+    if (slug === 'ebook') return 'E-Book';
+    if (slug === 'stl') return '3D Printables (STL)';
+    if (slug === 'other') return 'Other';
+    return slug;
   }
 
   function renderItem(item) {
@@ -168,7 +302,7 @@
         g.order.forEach(function (cat) {
           var items = (g.groups[cat] || []).map(renderItem).join('');
           if (!items) return;
-          var label = cat === 'wallpapers' ? 'Wallpapers' : cat === 'ebook' ? 'E-Book' : cat === 'stl' ? '3D Printables (STL)' : cat;
+          var label = categoryLabel(cat);
           html += '<div class="admin-category-section">';
           html += '<h4 class="admin-category-title">' + escapeHtml(label) + '</h4>';
           html += '<div class="admin-list">' + items + '</div></div>';

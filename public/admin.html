@@ -23,13 +23,39 @@
           <div class="admin-tools">
             <input id="admin-search" type="search" placeholder="Search title / subtitle…" autocomplete="off">
             <select id="admin-filter-cat" aria-label="Filter category">
-              <option value="">All</option>
-              <option value="wallpapers">Wallpapers</option>
-              <option value="ebook">E-Book</option>
-              <option value="stl">3D Printables (STL)</option>
+              <option value="">All categories</option>
             </select>
           </div>
           <button type="button" class="logout-btn" id="logout-btn">Log out</button>
+        </div>
+
+        <!-- ── Categories ──────────────────────────────── -->
+        <div class="admin-form" id="categories-section">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+            <h3 style="margin:0;">Categories</h3>
+            <button type="button" class="btn" id="add-cat-toggle-btn" style="padding:8px 14px;font-size:11px;">+ Add category</button>
+          </div>
+          <div id="cat-list"></div>
+          <div id="add-cat-form-wrap" hidden style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px;">
+            <form id="add-cat-form" style="display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;align-items:end;">
+              <div>
+                <label for="add-cat-slug">Slug (URL path)</label>
+                <input type="text" id="add-cat-slug" placeholder="e.g. videos" required>
+              </div>
+              <div>
+                <label for="add-cat-label">Label</label>
+                <input type="text" id="add-cat-label" placeholder="e.g. VIDEOS" required>
+              </div>
+              <div style="grid-column:1/-1;">
+                <label for="add-cat-desc">Description</label>
+                <input type="text" id="add-cat-desc" placeholder="Short description shown on homepage">
+              </div>
+              <div style="grid-column:1/-1;display:flex;gap:10px;">
+                <button type="submit" style="padding:10px 20px;font-size:13px;font-weight:500;border:none;background:var(--accent);color:#fff;cursor:pointer;border-radius:4px;">Add</button>
+                <button type="button" id="add-cat-cancel" style="padding:10px 20px;font-size:13px;background:none;border:1px solid var(--border);color:var(--text-muted);cursor:pointer;border-radius:4px;">Cancel</button>
+              </div>
+            </form>
+          </div>
         </div>
 
         <div class="admin-form">
@@ -44,8 +70,8 @@
             <label for="add-category">Category</label>
             <select id="add-category">
               <option value="wallpapers">Wallpapers</option>
-              <option value="stl">3D Printables (STL)</option>
               <option value="ebook">E-Book</option>
+              <option value="stl">3D Printables (STL)</option>
             </select>
 
             <div id="wallpaper-fields">
@@ -99,8 +125,8 @@
           <label for="edit-category">Category</label>
           <select id="edit-category">
             <option value="wallpapers">Wallpapers</option>
-            <option value="stl">3D Printables (STL)</option>
             <option value="ebook">E-Book</option>
+            <option value="stl">3D Printables (STL)</option>
           </select>
           <div id="edit-wallpaper-fields">
             <label for="edit-type">Type</label>

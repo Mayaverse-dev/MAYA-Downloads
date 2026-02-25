@@ -1,0 +1,29 @@
+[
+  {
+    "slug": "wallpapers",
+    "label": "WALLPAPERS",
+    "desc": "High-resolution images for desktop and mobile.",
+    "colorClass": "home-box-wallpaper",
+    "visible": false,
+    "order": 1,
+    "builtIn": true
+  },
+  {
+    "slug": "ebook",
+    "label": "E-BOOK",
+    "desc": "Selected chapters from MAYA.",
+    "colorClass": "home-box-ebook",
+    "visible": true,
+    "order": 2,
+    "builtIn": true
+  },
+  {
+    "slug": "stl",
+    "label": "3D PRINTABLES",
+    "desc": "STL files from the MAYA universe.",
+    "colorClass": "home-box-stl",
+    "visible": false,
+    "order": 3,
+    "builtIn": true
+  }
+]

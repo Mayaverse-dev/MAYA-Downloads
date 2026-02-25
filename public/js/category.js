@@ -2,9 +2,31 @@
   'use strict';
 
   var body = document.body;
-  var category = body.getAttribute('data-category');
+  var category = body.getAttribute('data-category') || '';
+  // For custom category pages served at /c/:slug, derive slug from URL
+  if (!category) {
+    var parts = window.location.pathname.split('/').filter(Boolean);
+    if (parts.length >= 2 && parts[0] === 'c') category = parts[1];
+  }
   var pageTitle = body.getAttribute('data-title') || category;
   var pageDesc = body.getAttribute('data-desc') || '';
+  // If no title set (generic category-page.html), pull from /api/categories
+  if (category && !body.getAttribute('data-title')) {
+    fetch('/api/categories').then(function (r) { return r.json(); }).then(function (cats) {
+      var cat = cats.find(function (c) { return c.slug === category; });
+      if (cat) {
+        pageTitle = cat.label;
+        pageDesc = cat.desc || '';
+        var titleEl = document.getElementById('page-title');
+        var descEl = document.getElementById('page-desc');
+        if (titleEl) titleEl.textContent = pageTitle;
+        if (descEl) descEl.textContent = pageDesc;
+        document.title = pageTitle + ' | MAYA Downloads';
+        body.setAttribute('data-title', pageTitle);
+        body.setAttribute('data-desc', pageDesc);
+      }
+    }).catch(function () {});
+  }
   var list = [];
   var itemsById = {};
   var wallpaperGroupsById = {};

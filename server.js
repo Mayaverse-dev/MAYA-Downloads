@@ -29,11 +29,25 @@ function checkAdmin(req) {
   return pw && pw === process.env.ADMIN_PASSWORD;
 }
 
-/** Visible categories: comma-separated env VISIBLE_CATEGORIES (e.g. "ebook"); omit = all */
-function getVisibleCategories() {
-  const raw = cleanEnv(process.env.VISIBLE_CATEGORIES);
-  if (!raw) return ['wallpapers', 'ebook', 'stl'];
-  return raw.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
+const CATS_PATH = path.join(__dirname, 'data', 'categories.json');
+
+async function readCats() {
+  try {
+    const raw = await fs.readFile(CATS_PATH, 'utf8');
+    return JSON.parse(raw);
+  } catch (e) {
+    return [];
+  }
+}
+
+async function writeCats(cats) {
+  await fs.writeFile(CATS_PATH, JSON.stringify(cats, null, 2), 'utf8');
+}
+
+async function catIsVisible(slug) {
+  const cats = await readCats();
+  const cat = cats.find((c) => c.slug === slug);
+  return !!(cat && cat.visible !== false);
 }
 
 /** Trim whitespace/newlines and strip accidental leading = or tab chars from env values */
@@ -111,17 +125,23 @@ app.get('/', (req, res) => {
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
-app.get('/wallpapers', (req, res) => {
-  if (!getVisibleCategories().includes('wallpapers')) return res.redirect(302, '/');
+app.get('/wallpapers', async (req, res) => {
+  if (!await catIsVisible('wallpapers')) return res.redirect(302, '/');
   res.sendFile(path.join(__dirname, 'public', 'wallpapers.html'));
 });
-app.get('/ebook', (req, res) => {
-  if (!getVisibleCategories().includes('ebook')) return res.redirect(302, '/');
+app.get('/ebook', async (req, res) => {
+  if (!await catIsVisible('ebook')) return res.redirect(302, '/');
   res.sendFile(path.join(__dirname, 'public', 'ebook.html'));
 });
-app.get('/stl', (req, res) => {
-  if (!getVisibleCategories().includes('stl')) return res.redirect(302, '/');
+app.get('/stl', async (req, res) => {
+  if (!await catIsVisible('stl')) return res.redirect(302, '/');
   res.sendFile(path.join(__dirname, 'public', 'stl.html'));
+});
+app.get('/c/:slug', async (req, res) => {
+  const cats = await readCats();
+  const cat = cats.find((c) => c.slug === req.params.slug && !c.builtIn);
+  if (!cat || !cat.visible) return res.redirect(302, '/');
+  res.sendFile(path.join(__dirname, 'public', 'category-page.html'));
 });
 
 // ─── Health check (S3 diagnostics) ──────────────────────────────────────
@@ -136,13 +156,22 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// ─── Public: analytics + visibility config (no secrets) ─────────────────────
+// ─── Public: analytics config ────────────────────────────────────────────────
 app.get('/api/config', (req, res) => {
   res.json({
     gaId: cleanEnv(process.env.GA_ID) || '',
     metaPixelId: cleanEnv(process.env.META_PIXEL_ID) || '',
-    visibleCategories: getVisibleCategories(),
   });
+});
+
+// ─── Public: categories (visible only) ────────────────────────────────────
+app.get('/api/categories', async (req, res) => {
+  try {
+    const cats = await readCats();
+    res.json(cats.filter((c) => c.visible !== false).sort((a, b) => (a.order || 99) - (b.order || 99)));
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to load categories' });
+  }
 });
 
 // ─── Public: stream thumbnail from S3 (so thumbnails work with private bucket) ─
@@ -425,6 +454,64 @@ app.delete('/api/admin/downloads', async (req, res) => {
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: 'Failed to delete' });
+  }
+});
+
+// ─── Admin: categories CRUD ───────────────────────────────────────────────
+app.get('/api/admin/categories', async (req, res) => {
+  if (!checkAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
+  try {
+    const cats = await readCats();
+    res.json(cats.sort((a, b) => (a.order || 99) - (b.order || 99)));
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to load categories' });
+  }
+});
+
+app.post('/api/admin/categories', async (req, res) => {
+  if (!checkAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
+  try {
+    const cats = await readCats();
+    const { slug, label, desc } = req.body;
+    if (!slug || !label) return res.status(400).json({ error: 'slug and label required' });
+    const clean = slug.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    if (cats.find((c) => c.slug === clean)) return res.status(409).json({ error: 'Category already exists' });
+    const cat = { slug: clean, label, desc: desc || '', colorClass: 'home-box-custom', visible: true, order: cats.length + 1, builtIn: false };
+    cats.push(cat);
+    await writeCats(cats);
+    res.json(cat);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to add category' });
+  }
+});
+
+app.patch('/api/admin/categories/:slug', async (req, res) => {
+  if (!checkAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
+  try {
+    const cats = await readCats();
+    const idx = cats.findIndex((c) => c.slug === req.params.slug);
+    if (idx === -1) return res.status(404).json({ error: 'Not found' });
+    const allowed = ['visible', 'label', 'desc', 'order'];
+    allowed.forEach((k) => { if (req.body[k] !== undefined) cats[idx][k] = req.body[k]; });
+    await writeCats(cats);
+    res.json(cats[idx]);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to update category' });
+  }
+});
+
+app.delete('/api/admin/categories/:slug', async (req, res) => {
+  if (!checkAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
+  try {
+    let cats = await readCats();
+    const cat = cats.find((c) => c.slug === req.params.slug);
+    if (!cat) return res.status(404).json({ error: 'Not found' });
+    if (cat.builtIn) return res.status(403).json({ error: 'Cannot delete a built-in category' });
+    cats = cats.filter((c) => c.slug !== req.params.slug);
+    await writeCats(cats);
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to delete category' });
   }
 });
 
