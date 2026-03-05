@@ -151,17 +151,23 @@
       downloadsEl.innerHTML =
         '<div class="wp-variants">' +
           variants.map(function (v) {
-            var label = v.name || 'Download';
-            if (v.resolution) label += ' (' + v.resolution.replace('x', ' \xd7 ') + ')';
             var href = '/api/download/' + encodeURIComponent(v.id);
+            var name = v.name || 'Download';
+            var res = v.resolution ? v.resolution.replace('x', '\u00d7') : '';
             var size = v.fileSize || '';
             return (
               '<div class="wp-variant-row">' +
                 '<div class="wp-variant-info">' +
-                  '<span class="wp-variant-name">' + escapeHtml(label) + '</span>' +
-                  (size ? '<span class="wp-variant-size">' + escapeHtml(size) + '</span>' : '') +
+                  '<span class="wp-variant-name">' + escapeHtml(name) + '</span>' +
+                  (res || size
+                    ? '<span class="wp-variant-meta">' +
+                        (res ? '<span class="wp-variant-res">' + escapeHtml(res) + '</span>' : '') +
+                        (res && size ? '<span class="wp-variant-dot">\xb7</span>' : '') +
+                        (size ? '<span class="wp-variant-size">' + escapeHtml(size) + '</span>' : '') +
+                      '</span>'
+                    : '') +
                 '</div>' +
-                '<a href="' + escapeHtml(href) + '" target="_blank" rel="noopener" class="btn btn-primary wp-variant-dl">Download free</a>' +
+                '<a href="' + escapeHtml(href) + '" target="_blank" rel="noopener" class="wp-variant-dl">↓ Download</a>' +
               '</div>'
             );
           }).join('') +

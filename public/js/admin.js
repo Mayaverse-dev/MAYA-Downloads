@@ -90,38 +90,81 @@
   // ─── Login ────────────────────────────────────────────────────────────────
   var loginEl = document.getElementById('admin-login');
   var dashboardEl = document.getElementById('admin-dashboard');
+  var loginErrorEl = document.getElementById('login-error');
+  var loginFieldWrap = document.getElementById('login-field-wrap');
+  var pwInput = document.getElementById('admin-pw');
+  var pwToggle = document.getElementById('pw-toggle');
+  var pwEyeShow = document.getElementById('pw-eye-show');
+  var pwEyeHide = document.getElementById('pw-eye-hide');
 
-  function showLogin() { loginEl.hidden = false; dashboardEl.hidden = true; }
+  function showLogin() {
+    loginEl.style.display = 'flex';
+    dashboardEl.style.display = 'none';
+  }
   function showDashboard() {
-    loginEl.hidden = true;
-    dashboardEl.hidden = false;
+    loginEl.style.display = 'none';
+    dashboardEl.style.display = 'block';
     loadCategories();
     loadAssets();
   }
+  function showLoginError(msg) {
+    if (loginErrorEl) { loginErrorEl.textContent = msg || 'Incorrect password.'; loginErrorEl.style.display = 'block'; }
+    if (loginFieldWrap) {
+      loginFieldWrap.classList.add('error');
+      setTimeout(function () { loginFieldWrap.classList.remove('error'); }, 400);
+    }
+  }
+  function clearLoginError() {
+    if (loginErrorEl) loginErrorEl.style.display = 'none';
+    if (loginFieldWrap) loginFieldWrap.classList.remove('error');
+  }
+
+  // Show / hide password toggle
+  if (pwToggle) {
+    pwToggle.addEventListener('click', function () {
+      var isHidden = pwInput.type === 'password';
+      pwInput.type = isHidden ? 'text' : 'password';
+      if (pwEyeShow) pwEyeShow.style.display = isHidden ? 'none' : '';
+      if (pwEyeHide) pwEyeHide.style.display = isHidden ? '' : 'none';
+    });
+  }
 
   document.getElementById('admin-login-btn').addEventListener('click', doLogin);
-  document.getElementById('admin-pw').addEventListener('keydown', function (e) {
+  pwInput.addEventListener('keydown', function (e) {
     if (e.key === 'Enter') doLogin();
+    clearLoginError();
   });
   document.getElementById('logout-btn').addEventListener('click', function () {
     clearPw();
     showLogin();
-    document.getElementById('admin-pw').value = '';
+    pwInput.value = '';
+    clearLoginError();
   });
 
   function doLogin() {
-    var val = document.getElementById('admin-pw').value.trim();
+    var val = pwInput.value;
+    if (!val) { showLoginError('Please enter the password.'); pwInput.focus(); return; }
+    var btn = document.getElementById('admin-login-btn');
+    btn.disabled = true;
+    btn.textContent = 'Verifying\u2026';
     setPw(val);
     api('GET', '/api/admin/downloads')
       .then(function () { showDashboard(); })
-      .catch(function () { alert('Invalid password'); clearPw(); });
+      .catch(function () {
+        clearPw();
+        pwInput.value = '';
+        showLoginError('Incorrect password. Try again.');
+        pwInput.focus();
+        btn.disabled = false;
+        btn.textContent = 'Enter';
+      });
   }
 
-  // Auto-login if password cached
+  // Auto-login if valid password is cached
   if (getPw()) {
     api('GET', '/api/admin/downloads')
-      .then(function () { showDashboard(); })
-      .catch(showLogin);
+      .then(function () { setTimeout(showDashboard, 0); })
+      .catch(function () { clearPw(); showLogin(); });
   }
 
   // ─── Categories ───────────────────────────────────────────────────────────

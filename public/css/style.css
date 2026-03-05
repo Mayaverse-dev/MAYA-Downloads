@@ -590,77 +590,162 @@ body {
   filter: brightness(1.15);
 }
 
-/* Discord popup (shown after download click) */
+/* ── Discord invite popup ──────────────────────────────────────────────── */
+@keyframes discordSlideUp {
+  from { opacity: 0; transform: translateY(22px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
 .discord-popup-overlay {
   position: fixed;
   inset: 0;
   display: none;
   align-items: center;
   justify-content: center;
-  padding: 16px;
-  background: rgba(0, 0, 0, 0.55);
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: 9999;
 }
 
-.discord-popup-overlay.open {
-  display: flex;
-}
+.discord-popup-overlay.open { display: flex; }
 
 .discord-popup {
   width: 100%;
-  max-width: 520px;
-  background: #101114;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 18px 18px 16px;
-  box-shadow: 0 12px 50px rgba(0, 0, 0, 0.6);
+  max-width: 440px;
+  background: #1e1f22;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.7);
+  position: relative;
+  animation: discordSlideUp 0.28s cubic-bezier(0.34,1.3,0.64,1) both;
+}
+
+/* Banner */
+.discord-popup-banner {
+  height: 80px;
+  background: linear-gradient(135deg, #5865F2 0%, #4752C4 60%, #36393f 100%);
   position: relative;
 }
 
-.discord-popup-title {
+/* Avatar */
+.discord-popup-avatar {
+  position: absolute;
+  left: 20px;
+  bottom: -28px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #111214;
+  border: 4px solid #1e1f22;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--font-mono);
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -1px;
+  overflow: hidden;
+}
+
+/* Body */
+.discord-popup-body {
+  padding: 42px 24px 24px;
+}
+
+.discord-popup-eyebrow {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #b5bac1;
+  margin-bottom: 4px;
+}
+
+.discord-popup-server {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.01em;
   margin-bottom: 12px;
 }
 
+.discord-popup-stats {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.discord-popup-stat {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  color: #b5bac1;
+}
+
+.discord-popup-stat-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.discord-popup-stat-dot.online { background: #23a55a; }
+.discord-popup-stat-dot.members { background: #80848e; }
+
 .discord-popup-btn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
+  gap: 10px;
   width: 100%;
-  padding: 12px 14px;
-  border-radius: 12px;
+  padding: 13px 20px;
+  border-radius: 10px;
   text-decoration: none;
+  font-size: 0.95rem;
   font-weight: 700;
-  background: #5865F2; /* Discord brand */
+  background: #5865F2;
   color: #fff;
-  transition: transform var(--transition), filter var(--transition);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
 }
 
 .discord-popup-btn:hover {
+  background: #4752C4;
   transform: translateY(-1px);
-  filter: brightness(1.05);
+}
+
+.discord-popup-btn svg {
+  flex-shrink: 0;
 }
 
 .discord-popup-close {
   position: absolute;
-  top: 8px;
-  right: 10px;
-  width: 34px;
-  height: 34px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: transparent;
-  color: var(--text-muted);
+  top: 10px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.3);
+  color: rgba(255,255,255,0.75);
   cursor: pointer;
-  transition: all var(--transition);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+  line-height: 1;
 }
 
 .discord-popup-close:hover {
-  background: var(--bg-card);
-  border-color: var(--border-hover);
-  color: var(--text);
+  background: rgba(0,0,0,0.55);
+  color: #fff;
 }
 
 .footer-credits {
@@ -1114,7 +1199,7 @@ body {
   gap: 8px;
 }
 
-.modal-downloads a,
+.modal-downloads a:not(.wp-variant-dl),
 .modal-downloads button {
   display: flex;
   align-items: center;
@@ -1137,7 +1222,7 @@ body {
   transition: all var(--transition);
 }
 
-.modal-downloads a:hover:not(.no-url),
+.modal-downloads a:not(.wp-variant-dl):hover:not(.no-url),
 .modal-downloads button:hover:not(.no-url) {
   border-color: var(--accent);
   background: var(--accent);
@@ -1166,44 +1251,79 @@ body {
   background: var(--bg-card);
 }
 
+.wp-variants {
+  display: flex;
+  flex-direction: column;
+}
+
 .wp-variant-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: 16px;
+  padding: 13px 18px;
   border-bottom: 1px solid var(--border);
   transition: background var(--transition);
 }
 
 .wp-variant-row:last-child { border-bottom: none; }
-.wp-variant-row:hover { background: var(--bg-card-hover); }
+.wp-variant-row:hover { background: rgba(255,255,255,0.03); }
 
 .wp-variant-info {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
 .wp-variant-name {
   font-family: var(--font-mono);
-  font-size: 0.9rem;
-  letter-spacing: 0.01em;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.wp-variant-size {
-  font-size: 0.75rem;
+.wp-variant-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
   color: var(--text-muted);
 }
 
+.wp-variant-res { letter-spacing: 0.01em; }
+.wp-variant-dot { opacity: 0.4; }
+.wp-variant-size {}
+
 .wp-variant-dl {
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   white-space: nowrap;
-  font-size: 0.8125rem;
-  padding: 7px 14px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 7px 13px;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.wp-variant-dl:hover {
+  background: var(--text);
+  color: var(--void);
+  border-color: var(--text);
 }
 
 .card-preview {
@@ -1297,13 +1417,8 @@ body {
     width: 100%;
   }
 
-  /* Wallpaper variant row: stack on narrow screens */
-  .wp-variant-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-  .wp-variant-dl { width: 100%; justify-content: center; }
+  .wp-variant-row { padding: 12px 14px; gap: 10px; }
+  .wp-variant-dl { padding: 8px 12px; }
 
   /* Footer social: wrap tightly */
   .footer-social {
@@ -1317,10 +1432,7 @@ body {
     max-height: 95vh;
   }
 
-  /* Discord popup: full width on very small screens */
-  .discord-popup {
-    padding: 14px;
-  }
+  .discord-popup-body { padding: 40px 18px 20px; }
 
   /* Category add form: single column */
   #add-cat-form {
@@ -1338,48 +1450,112 @@ body {
 }
 
 /* ─ Login screen ─────────────────────────────────────────────────────────── */
+@keyframes adm-shake {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-7px); }
+  40%      { transform: translateX(7px); }
+  60%      { transform: translateX(-4px); }
+  80%      { transform: translateX(4px); }
+}
+
 .adm-login {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--void);
+  padding: 24px;
 }
 
 .adm-login-box {
+  width: 100%;
+  max-width: 360px;
+  background: #111214;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px 32px 36px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  width: 320px;
+  gap: 0;
 }
 
 .adm-login-logo {
   font-family: var(--font-mono);
-  font-size: 1.5rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  margin-bottom: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
 }
 
-.adm-login-box input[type="password"] {
+.adm-login-tagline {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+  letter-spacing: 0.02em;
+}
+
+.adm-login-field {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.adm-login-field input[type="password"],
+.adm-login-field input[type="text"] {
   width: 100%;
   background: var(--matter);
   border: 1px solid var(--border);
   color: var(--text);
-  padding: 10px 14px;
+  padding: 12px 44px 12px 14px;
   border-radius: var(--radius);
-  font-size: 1rem;
+  font-size: 0.95rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+  transition: border-color var(--transition);
+  box-sizing: border-box;
 }
 
-.adm-login-box input[type="password"]:focus {
+.adm-login-field input:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: rgba(255,255,255,0.35);
 }
 
-.adm-login-box .btn {
+.adm-login-field.error input {
+  border-color: var(--accent);
+  animation: adm-shake 0.35s ease;
+}
+
+.adm-pw-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: color var(--transition);
+}
+.adm-pw-toggle:hover { color: var(--text); }
+
+.adm-login-error {
+  display: none;
+  font-size: 0.78rem;
+  color: var(--accent);
+  margin-bottom: 14px;
+  letter-spacing: 0.02em;
+}
+
+.adm-login-btn {
   width: 100%;
   justify-content: center;
+  padding: 13px;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  margin-top: 4px;
 }
 
 /* ─ Dashboard layout ─────────────────────────────────────────────────────── */
