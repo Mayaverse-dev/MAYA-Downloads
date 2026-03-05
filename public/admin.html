@@ -3,162 +3,137 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MAYA Downloads – Admin</title>
+  <title>MAYA Admin</title>
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
   <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
-  <div class="admin-wrap">
-    <div class="container">
-      <div id="admin-login" class="admin-login">
-        <h2 class="admin-title">Admin</h2>
-        <label for="admin-pw">Password</label>
-        <input type="password" id="admin-pw" placeholder="Admin password" autocomplete="current-password">
-        <button type="button" id="admin-login-btn">Enter</button>
-      </div>
+<body class="adm-body">
 
-      <div id="admin-dashboard" hidden>
-        <div class="admin-toolbar">
-          <h1 class="admin-title">Dashboard</h1>
-          <div class="admin-tools">
-            <input id="admin-search" type="search" placeholder="Search title / subtitle…" autocomplete="off">
-            <select id="admin-filter-cat" aria-label="Filter category">
-              <option value="">All categories</option>
-            </select>
-          </div>
-          <button type="button" class="logout-btn" id="logout-btn">Log out</button>
-        </div>
-
-        <!-- ── Categories ──────────────────────────────── -->
-        <div class="admin-form" id="categories-section">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
-            <h3 style="margin:0;">Categories</h3>
-            <button type="button" class="btn" id="add-cat-toggle-btn" style="padding:8px 14px;font-size:11px;">+ Add category</button>
-          </div>
-          <div id="cat-list"></div>
-          <div id="add-cat-form-wrap" hidden style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px;">
-            <form id="add-cat-form" style="display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;align-items:end;">
-              <div>
-                <label for="add-cat-slug">Slug (URL path)</label>
-                <input type="text" id="add-cat-slug" placeholder="e.g. videos" required>
-              </div>
-              <div>
-                <label for="add-cat-label">Label</label>
-                <input type="text" id="add-cat-label" placeholder="e.g. VIDEOS" required>
-              </div>
-              <div style="grid-column:1/-1;">
-                <label for="add-cat-desc">Description</label>
-                <input type="text" id="add-cat-desc" placeholder="Short description shown on homepage">
-              </div>
-              <div style="grid-column:1/-1;display:flex;gap:10px;">
-                <button type="submit" style="padding:10px 20px;font-size:13px;font-weight:500;border:none;background:var(--accent);color:#fff;cursor:pointer;border-radius:4px;">Add</button>
-                <button type="button" id="add-cat-cancel" style="padding:10px 20px;font-size:13px;background:none;border:1px solid var(--border);color:var(--text-muted);cursor:pointer;border-radius:4px;">Cancel</button>
-              </div>
-            </form>
-          </div>
-        </div>
-
-        <div class="admin-form">
-          <h3 style="margin-bottom: 16px;">Add asset</h3>
-          <form id="add-form">
-            <label for="add-title">Title</label>
-            <input type="text" id="add-title" placeholder="e.g. MAYA Crimson Horizon">
-
-            <label for="add-desc">Description</label>
-            <textarea id="add-desc" placeholder="Short description"></textarea>
-
-            <label for="add-category">Category</label>
-            <select id="add-category">
-              <option value="wallpapers">Wallpapers</option>
-              <option value="ebook">E-Book</option>
-              <option value="stl">3D Printables (STL)</option>
-            </select>
-
-            <div id="wallpaper-fields">
-              <label for="add-type">Type</label>
-              <select id="add-type">
-                <option value="desktop">Desktop</option>
-                <option value="mobile">Mobile</option>
-              </select>
-              <label for="add-resolution">Resolution</label>
-              <input type="text" id="add-resolution" placeholder="e.g. 1920x1080">
-            </div>
-
-            <div id="ebook-fields" hidden>
-              <label for="add-chapter">Chapter</label>
-              <input type="number" id="add-chapter" min="1" placeholder="1" style="max-width: 120px;">
-              <label for="add-format">Format</label>
-              <input type="text" id="add-format" placeholder="PDF" value="PDF" style="max-width: 120px;">
-            </div>
-
-            <label>Download file(s) (upload)</label>
-            <div id="add-upload-zone" class="admin-upload-zone">Click or drop file to upload</div>
-            <input type="file" id="add-file-input" accept="*/*" multiple style="display: none;">
-
-            <label>Thumbnail (optional – upload image or leave blank)</label>
-            <div id="add-thumb-zone" class="admin-upload-zone">Click or drop image for thumbnail</div>
-            <input type="file" id="add-thumb-input" accept="image/*" style="display: none;">
-
-            <button type="submit" style="margin-top: 16px;">Save</button>
-          </form>
-        </div>
-
-        <h3 style="margin-bottom: 12px;">Current assets (same order as homepage)</h3>
-        <div id="admin-list"></div>
-      </div>
+  <!-- Login screen -->
+  <div id="admin-login" class="adm-login">
+    <div class="adm-login-box">
+      <div class="adm-login-logo">MAYA <span class="accent">Admin</span></div>
+      <input type="password" id="admin-pw" placeholder="Password" autocomplete="current-password">
+      <button id="admin-login-btn" class="btn btn-primary">Enter</button>
     </div>
   </div>
 
-  <div id="edit-modal" class="admin-edit-modal-overlay" aria-hidden="true">
-    <div class="admin-edit-modal">
-      <button type="button" class="modal-close" id="edit-modal-close" aria-label="Close">×</button>
-      <div class="form-section">
-        <h3 class="admin-title" style="margin-bottom: 16px;">Edit asset</h3>
-        <form id="edit-form">
-          <input type="hidden" id="edit-id">
-          <label for="edit-title">Title</label>
-          <input type="text" id="edit-title" required>
-          <label for="edit-subtitle">Subtitle (e.g. Desktop / Mobile)</label>
-          <input type="text" id="edit-subtitle" placeholder="Optional">
-          <label for="edit-desc">Description</label>
-          <textarea id="edit-desc" required></textarea>
-          <label for="edit-category">Category</label>
-          <select id="edit-category">
-            <option value="wallpapers">Wallpapers</option>
-            <option value="ebook">E-Book</option>
-            <option value="stl">3D Printables (STL)</option>
-          </select>
-          <div id="edit-wallpaper-fields">
-            <label for="edit-type">Type</label>
-            <select id="edit-type">
-              <option value="desktop">Desktop</option>
-              <option value="mobile">Mobile</option>
-            </select>
-            <label for="edit-resolution">Resolution</label>
-            <input type="text" id="edit-resolution" placeholder="e.g. 1920x1080">
+  <!-- Dashboard -->
+  <div id="admin-dashboard" hidden class="adm-dashboard">
+
+    <!-- Top bar -->
+    <div class="adm-topbar">
+      <span class="adm-brand">MAYA <span class="accent">Admin</span></span>
+      <button id="logout-btn" class="adm-logout">Log out</button>
+    </div>
+
+    <!-- Categories panel -->
+    <div class="adm-panel">
+      <div class="adm-panel-hdr">
+        <h3>Categories</h3>
+        <button id="add-cat-toggle-btn" class="btn">+ Add</button>
+      </div>
+      <div id="cat-list" class="adm-cat-list"></div>
+      <div id="add-cat-form-wrap" hidden class="adm-cat-add-form">
+        <form id="add-cat-form">
+          <input id="add-cat-slug" placeholder="Slug (e.g. videos)" required>
+          <input id="add-cat-label" placeholder="Label (e.g. VIDEOS)" required>
+          <input id="add-cat-desc" placeholder="Short description">
+          <div class="adm-cat-form-btns">
+            <button type="submit" class="btn btn-primary">Add category</button>
+            <button type="button" id="add-cat-cancel" class="btn">Cancel</button>
           </div>
-          <div id="edit-ebook-fields" hidden>
-            <label for="edit-chapter">Chapter</label>
-            <input type="number" id="edit-chapter" min="1" style="max-width: 120px;">
-            <label for="edit-format">Format</label>
-            <input type="text" id="edit-format" style="max-width: 120px;">
-          </div>
-          <p class="admin-item-meta" style="margin-bottom: 8px;">Download file size shown on site: <strong id="edit-filesize-display">—</strong></p>
-          <label>Replace download file (upload new file)</label>
-          <div id="edit-upload-zone" class="admin-upload-zone">Click or drop file to replace</div>
-          <input type="file" id="edit-file-input" accept="*/*" style="display: none;">
-          <label>Thumbnail (optional)</label>
-          <div id="edit-thumb-zone" class="admin-upload-zone">Click or drop image</div>
-          <input type="file" id="edit-thumb-input" accept="image/*" style="display: none;">
-          <div style="margin-top: 16px; display: flex; align-items: center; gap: 12px;">
-            <label style="margin: 0;">Show on homepage</label>
-            <div id="edit-visible-toggle" class="admin-toggle-switch on"></div>
-          </div>
-          <button type="submit" style="margin-top: 16px;">Save changes</button>
         </form>
       </div>
     </div>
-  </div>
+
+    <!-- Assets toolbar -->
+    <div class="adm-assets-bar">
+      <div class="adm-tools">
+        <input id="admin-search" type="search" placeholder="Search assets…">
+        <select id="admin-filter-cat">
+          <option value="">All categories</option>
+        </select>
+      </div>
+      <button id="add-asset-btn" class="btn btn-primary">+ New Asset</button>
+    </div>
+
+    <!-- Asset grid -->
+    <div id="admin-asset-grid" class="adm-asset-grid"></div>
+
+  </div><!-- /dashboard -->
+
+  <!-- Asset drawer -->
+  <div id="asset-drawer" class="adm-drawer" aria-hidden="true">
+    <div class="adm-drawer-backdrop" id="drawer-backdrop"></div>
+    <div class="adm-drawer-panel">
+
+      <div class="adm-drawer-hdr">
+        <h2 id="drawer-title">Add Asset</h2>
+        <button id="drawer-close" class="adm-drawer-close" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="adm-drawer-body">
+        <input type="hidden" id="d-id">
+
+        <div class="adm-field-group">
+          <label for="d-title">Title</label>
+          <input id="d-title" type="text" placeholder="e.g. VAANAR">
+        </div>
+
+        <div class="adm-field-group">
+          <label for="d-desc">Description</label>
+          <textarea id="d-desc" rows="2" placeholder="Short description…"></textarea>
+        </div>
+
+        <div class="adm-field-row">
+          <div class="adm-field-group">
+            <label for="d-category">Category</label>
+            <select id="d-category"></select>
+          </div>
+          <div class="adm-field-group" id="d-ebook-fields" hidden>
+            <label for="d-chapter">Chapter #</label>
+            <input id="d-chapter" type="number" min="1" placeholder="1">
+          </div>
+        </div>
+
+        <div class="adm-field-group">
+          <label>Thumbnail</label>
+          <div id="d-thumb-zone" class="admin-upload-zone">
+            <span id="d-thumb-zone-label">Click or drop image</span>
+          </div>
+          <input id="d-thumb-input" type="file" accept="image/*" hidden>
+          <div id="d-thumb-preview" class="adm-thumb-preview" hidden>
+            <img id="d-thumb-img" src="" alt="">
+            <button type="button" id="d-thumb-clear" class="adm-thumb-clear">&times;</button>
+          </div>
+        </div>
+
+        <!-- Variants section -->
+        <div class="adm-variants-section">
+          <div class="adm-variants-hdr">
+            <span class="adm-variants-label">Files / Variants</span>
+            <button type="button" id="add-variant-btn" class="btn">+ Add variant</button>
+          </div>
+          <div id="d-variants-list" class="adm-variants-list"></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="adm-drawer-footer">
+          <div class="adm-visible-row">
+            <span class="adm-visible-label">Show on site</span>
+            <div id="d-visible" class="admin-toggle-switch on" role="switch" aria-checked="true" tabindex="0"></div>
+          </div>
+          <div class="adm-drawer-btns">
+            <button id="drawer-cancel" class="btn">Cancel</button>
+            <button id="drawer-save" class="btn btn-primary">Save</button>
+          </div>
+        </div>
+
+      </div><!-- /drawer-body -->
+    </div><!-- /drawer-panel -->
+  </div><!-- /asset-drawer -->
+
   <script src="/js/admin.js"></script>
 </body>
 </html>

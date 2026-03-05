@@ -112,6 +112,88 @@ function keyFromDownloadUrl(downloadUrl) {
 
 const ORPHAN_CUTOFF_DAYS = 7;
 
+/** Normalize wallpaper title: strip trailing "(N)" */
+function normalizeTitle(title) {
+  return (title || '').trim().replace(/\s*\(\d+\)\s*$/, '').trim();
+}
+
+/**
+ * One-time migration: convert flat items (old schema) → new assets-with-variants schema.
+ * Idempotent: items already in new format are passed through unchanged.
+ */
+function migrateToVariants(data) {
+  if (!Array.isArray(data) || data.length === 0) return { data, changed: false };
+  const needsMigration = data.some((item) => 'downloadUrl' in item && !Array.isArray(item.variants));
+  if (!needsMigration) return { data, changed: false };
+
+  const alreadyNew = data.filter((i) => Array.isArray(i.variants));
+  const oldFlat = data.filter((i) => !Array.isArray(i.variants));
+
+  // Group flat wallpapers by normalized title
+  const wpGroups = {};
+  const nonWp = [];
+  for (const item of oldFlat) {
+    if (item.category === 'wallpapers') {
+      const key = normalizeTitle(item.title);
+      if (!wpGroups[key]) wpGroups[key] = [];
+      wpGroups[key].push(item);
+    } else {
+      nonWp.push(item);
+    }
+  }
+
+  const migrated = [];
+
+  // Convert wallpaper groups → single asset with variants
+  for (const [title, items] of Object.entries(wpGroups)) {
+    const primary = items.find((i) => i.type === 'desktop') || items[0];
+    migrated.push({
+      id: primary.id,
+      title,
+      description: primary.description || '',
+      category: 'wallpapers',
+      thumbnailUrl: primary.thumbnailUrl || '',
+      visible: items.every((i) => i.visible !== false),
+      createdAt: primary.createdAt || new Date().toISOString(),
+      tags: primary.tags || [],
+      variants: items.map((item) => ({
+        id: item.id,
+        name: item.subtitle || item.type || 'Download',
+        resolution: item.resolution || '',
+        fileSize: item.fileSize || '',
+        downloadUrl: item.downloadUrl || '#',
+      })),
+    });
+  }
+
+  // Convert non-wallpaper flat items → single-variant asset
+  for (const item of nonWp) {
+    const { id, title, description, category, format, chapter, thumbnailUrl, visible, createdAt, tags,
+            downloadUrl, fileSize, resolution, subtitle } = item;
+    migrated.push({
+      id,
+      title,
+      description: description || '',
+      category,
+      ...(format !== undefined && { format }),
+      ...(chapter !== undefined && { chapter }),
+      thumbnailUrl: thumbnailUrl || '',
+      visible: visible !== false,
+      createdAt: createdAt || new Date().toISOString(),
+      tags: tags || [],
+      variants: [{
+        id: uuidv4(),
+        name: subtitle || 'Download',
+        resolution: resolution || '',
+        fileSize: fileSize || '',
+        downloadUrl: downloadUrl || '#',
+      }],
+    });
+  }
+
+  return { data: [...alreadyNew, ...migrated], changed: true };
+}
+
 /** Remove S3 objects that are no longer referenced by any asset and are older than ORPHAN_CUTOFF_DAYS. Runs in background. */
 function scheduleOrphanCleanup() {
   setImmediate(async () => {
@@ -123,10 +205,12 @@ function scheduleOrphanCleanup() {
       const list = Array.isArray(data) ? data : [];
       const referencedKeys = new Set();
       for (const item of list) {
-        const k1 = keyFromDownloadUrl(item.downloadUrl);
-        const k2 = keyFromDownloadUrl(item.thumbnailUrl);
-        if (k1) referencedKeys.add(k1);
-        if (k2) referencedKeys.add(k2);
+        const thumbKey = keyFromDownloadUrl(item.thumbnailUrl);
+        if (thumbKey) referencedKeys.add(thumbKey);
+        for (const v of (item.variants || [])) {
+          const vKey = keyFromDownloadUrl(v.downloadUrl);
+          if (vKey) referencedKeys.add(vKey);
+        }
       }
       const cutoff = new Date(Date.now() - ORPHAN_CUTOFF_DAYS * 24 * 60 * 60 * 1000);
       const prefixes = ['uploads/', 'uploads/thumbs/', 'Assets/', '_thumbs/'];
@@ -165,7 +249,13 @@ function scheduleOrphanCleanup() {
 async function readData() {
   try {
     const raw = await fs.readFile(DATA_PATH, 'utf8');
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    const { data, changed } = migrateToVariants(parsed);
+    if (changed) {
+      // Write back new format; don't await to avoid blocking reads
+      writeData(data).catch((e) => console.warn('Migration write failed:', e.message));
+    }
+    return data;
   } catch (e) {
     return [];
   }
@@ -255,26 +345,39 @@ app.get('/api/thumbnail/:id', async (req, res) => {
   }
 });
 
-// ─── Public: stream download from S3 (or redirect if S3 not configured) ─
+// ─── Public: stream download from S3 — id can be asset id or variant id ─
 app.get('/api/download/:id', async (req, res) => {
   try {
     const data = await readData();
-    const item = (Array.isArray(data) ? data : []).find((i) => i.id === req.params.id);
-    if (!item || !item.downloadUrl || item.downloadUrl === '#') {
-      return res.status(404).send('Download not found');
+    const list = Array.isArray(data) ? data : [];
+    const reqId = req.params.id;
+    let downloadUrl = null;
+
+    // Match asset id → use first downloadable variant
+    const asset = list.find((i) => i.id === reqId);
+    if (asset) {
+      const v = (asset.variants || []).find((v) => v.downloadUrl && v.downloadUrl !== '#');
+      if (v) downloadUrl = v.downloadUrl;
     }
+
+    // Match variant id across all assets
+    if (!downloadUrl) {
+      for (const a of list) {
+        const v = (a.variants || []).find((v) => v.id === reqId);
+        if (v && v.downloadUrl && v.downloadUrl !== '#') { downloadUrl = v.downloadUrl; break; }
+      }
+    }
+
+    if (!downloadUrl) return res.status(404).send('Download not found');
+
     const s3 = getS3Client();
-    if (!s3) {
-      console.warn('S3 not configured (missing S3_ACCESS_KEY_ID/S3_SECRET_ACCESS_KEY). Redirecting to direct URL.');
-      return res.redirect(302, item.downloadUrl);
-    }
-    const key = keyFromDownloadUrl(item.downloadUrl);
-    if (!key) {
-      return res.redirect(302, item.downloadUrl);
-    }
+    if (!s3) return res.redirect(302, downloadUrl);
+
+    const key = keyFromDownloadUrl(downloadUrl);
+    if (!key) return res.redirect(302, downloadUrl);
+
     const bucket = getBucket();
     const filename = key.split('/').pop() || 'download';
-    // Stream file through server instead of presigned URL redirect
     const command = new GetObjectCommand({ Bucket: bucket, Key: key });
     const s3Resp = await s3.send(command);
     res.set('Content-Disposition', 'attachment; filename="' + filename.replace(/"/g, '\\"') + '"');
@@ -287,29 +390,29 @@ app.get('/api/download/:id', async (req, res) => {
   }
 });
 
-// ─── Public: batch download as ZIP ───────────────────────────────────────
+// ─── Public: batch download as ZIP (asset ids → all variants zipped) ─────
 app.post('/api/download-zip', async (req, res) => {
   const ids = Array.isArray(req.body?.ids) ? req.body.ids : [];
-  if (ids.length === 0) {
-    return res.status(400).json({ error: 'No ids provided' });
-  }
+  if (ids.length === 0) return res.status(400).json({ error: 'No ids provided' });
   const s3 = getS3Client();
-  if (!s3) {
-    return res.status(503).json({ error: 'Downloads not available' });
-  }
+  if (!s3) return res.status(503).json({ error: 'Downloads not available' });
   try {
     const data = await readData();
     const list = Array.isArray(data) ? data : [];
-    const items = ids
-      .map((id) => list.find((i) => i.id === id))
-      .filter((i) => i && i.downloadUrl && i.downloadUrl !== '#');
-    if (items.length === 0) {
-      return res.status(404).json({ error: 'No valid downloads found' });
-    }
-    const bucket = getBucket();
-    const category = items[0].category || 'downloads';
-    const zipName = 'maya-' + category + '.zip';
 
+    // Collect (asset, variant) pairs
+    const toZip = [];
+    for (const id of ids) {
+      const asset = list.find((i) => i.id === id);
+      if (!asset) continue;
+      for (const v of (asset.variants || [])) {
+        if (v.downloadUrl && v.downloadUrl !== '#') toZip.push({ asset, variant: v });
+      }
+    }
+    if (toZip.length === 0) return res.status(404).json({ error: 'No valid downloads found' });
+
+    const category = toZip[0].asset.category || 'downloads';
+    const zipName = 'maya-' + category + '.zip';
     res.set('Content-Type', 'application/zip');
     res.set('Content-Disposition', 'attachment; filename="' + zipName.replace(/"/g, '\\"') + '"');
 
@@ -320,16 +423,16 @@ app.post('/api/download-zip', async (req, res) => {
     });
     archive.pipe(res);
 
-    for (const item of items) {
-      const key = keyFromDownloadUrl(item.downloadUrl);
+    const bucket = getBucket();
+    for (const { asset, variant } of toZip) {
+      const key = keyFromDownloadUrl(variant.downloadUrl);
       if (!key) continue;
       const ext = path.extname(key) || '';
-      const base = (item.title || item.id || 'file').replace(/[<>:"/\\|?*]/g, '-').trim() || item.id;
-      const name = base + ext;
+      const baseName = [asset.title, variant.name].filter(Boolean).join('-').replace(/[<>:"/\\|?*]/g, '-').trim() || asset.id;
       try {
         const cmd = new GetObjectCommand({ Bucket: bucket, Key: key });
         const obj = await s3.send(cmd);
-        archive.append(obj.Body, { name });
+        archive.append(obj.Body, { name: baseName + ext });
       } catch (e) {
         console.warn('Skip zip entry:', key, e.message);
       }
@@ -441,7 +544,7 @@ app.post(
   }
 );
 
-// ─── Admin: create asset ────────────────────────────────────────────────
+// ─── Admin: create asset (new variants schema) ──────────────────────────
 app.post('/api/admin/downloads', async (req, res) => {
   if (!checkAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
   try {
@@ -449,22 +552,23 @@ app.post('/api/admin/downloads', async (req, res) => {
     const body = req.body;
     const item = {
       id: uuidv4(),
-      title: body.title,
-      subtitle: body.subtitle,
-      description: body.description,
-      category: body.category,
-      type: body.type,
-      resolution: body.resolution,
+      title: body.title || '',
+      description: body.description || '',
+      category: body.category || '',
       thumbnailUrl: body.thumbnailUrl || '',
-      downloadUrl: body.downloadUrl || '#',
-      fileSize: body.fileSize,
-      format: body.format,
-      tags: body.tags || [],
-      chapter: body.chapter,
       visible: body.visible !== false,
       createdAt: new Date().toISOString(),
+      tags: body.tags || [],
+      variants: Array.isArray(body.variants) ? body.variants.map((v) => ({
+        id: v.id || uuidv4(),
+        name: v.name || 'Download',
+        resolution: v.resolution || '',
+        fileSize: v.fileSize || '',
+        downloadUrl: v.downloadUrl || '#',
+      })) : [],
     };
-    Object.keys(item).forEach((k) => item[k] === undefined && delete item[k]);
+    if (body.format !== undefined) item.format = body.format;
+    if (body.chapter !== undefined) item.chapter = body.chapter;
     data.unshift(item);
     await writeData(data);
     scheduleOrphanCleanup();
@@ -483,16 +587,16 @@ app.patch('/api/admin/downloads/:id', async (req, res) => {
     const idx = data.findIndex((i) => i.id === id);
     if (idx === -1) return res.status(404).json({ error: 'Not found' });
     const body = req.body;
-    const allowed = [
-      'title', 'subtitle', 'description', 'category', 'type', 'resolution',
-      'thumbnailUrl', 'downloadUrl', 'fileSize', 'format', 'chapter',
-      'tags', 'visible',
-    ];
-    allowed.forEach((k) => {
-      if (body[k] !== undefined) data[idx][k] = body[k];
-    });
-    if (body.visible === true || body.visible === false) {
-      data[idx].visible = body.visible;
+    const scalarFields = ['title', 'description', 'category', 'thumbnailUrl', 'format', 'chapter', 'tags', 'visible'];
+    scalarFields.forEach((k) => { if (body[k] !== undefined) data[idx][k] = body[k]; });
+    if (Array.isArray(body.variants)) {
+      data[idx].variants = body.variants.map((v) => ({
+        id: v.id || uuidv4(),
+        name: v.name || 'Download',
+        resolution: v.resolution || '',
+        fileSize: v.fileSize || '',
+        downloadUrl: v.downloadUrl || '#',
+      }));
     }
     await writeData(data);
     scheduleOrphanCleanup();
