@@ -13,11 +13,34 @@
   var thumbPendingFile = null;
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
-  function getPw() {
-    return pw || (typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : '') || '';
+  function safeStorageGet(key) {
+    try {
+      if (typeof localStorage === 'undefined') return '';
+      return localStorage.getItem(key) || '';
+    } catch (e) {
+      return '';
+    }
   }
-  function setPw(v) { pw = v; try { localStorage.setItem(STORAGE_KEY, v); } catch (e) {} }
-  function clearPw() { pw = ''; try { localStorage.removeItem(STORAGE_KEY); } catch (e) {} }
+
+  function safeStorageSet(key, value) {
+    try {
+      if (typeof localStorage === 'undefined') return;
+      localStorage.setItem(key, value);
+    } catch (e) {}
+  }
+
+  function safeStorageRemove(key) {
+    try {
+      if (typeof localStorage === 'undefined') return;
+      localStorage.removeItem(key);
+    } catch (e) {}
+  }
+
+  function getPw() {
+    return pw || safeStorageGet(STORAGE_KEY) || '';
+  }
+  function setPw(v) { pw = v; safeStorageSet(STORAGE_KEY, v); }
+  function clearPw() { pw = ''; safeStorageRemove(STORAGE_KEY); }
 
   function escapeHtml(s) {
     if (!s) return '';
