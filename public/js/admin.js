@@ -88,7 +88,6 @@
 
   function doLogin() {
     var val = document.getElementById('admin-pw').value.trim();
-    if (!val) return;
     setPw(val);
     api('GET', '/api/admin/downloads')
       .then(function () { showDashboard(); })

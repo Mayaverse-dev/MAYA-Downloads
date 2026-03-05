@@ -23,8 +23,17 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 
 function checkAdmin(req) {
-  const host = (req.headers['host'] || '').split(':')[0];
-  if (host === 'localhost' || host === '127.0.0.1') return true;
+  const hostHeader = req.headers['host'] || '';
+  const hostname = (req.hostname || hostHeader).toLowerCase();
+  const rawHost = hostHeader.toLowerCase();
+  const isLocal =
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '::1' ||
+    rawHost.startsWith('[::1]') ||
+    rawHost.startsWith('localhost:') ||
+    rawHost.startsWith('127.0.0.1:');
+  if (isLocal) return true;
   const pw = req.headers['x-admin-password'] || req.query.pw;
   return pw && pw === process.env.ADMIN_PASSWORD;
 }
