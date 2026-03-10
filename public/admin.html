@@ -34,7 +34,10 @@
     <!-- Top bar -->
     <div class="adm-topbar">
       <span class="adm-brand">MAYA <span class="accent">Admin</span></span>
-      <button id="logout-btn" class="adm-logout">Log out</button>
+      <div class="adm-topbar-actions">
+        <button id="adm-gamification-toggle-btn" class="btn">Gamification: ON</button>
+        <button id="logout-btn" class="adm-logout">Log out</button>
+      </div>
     </div>
 
     <!-- Categories panel -->
@@ -54,6 +57,27 @@
             <button type="button" id="add-cat-cancel" class="btn">Cancel</button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- Download dashboard -->
+    <div class="adm-panel adm-metrics-panel">
+      <div class="adm-panel-hdr">
+        <h3>Downloads Dashboard</h3>
+        <button id="adm-refresh-dashboard-btn" class="btn">Refresh</button>
+      </div>
+      <div class="adm-metrics-grid">
+        <div class="adm-metric-card">
+          <span class="adm-metric-label">Total Downloads</span>
+          <span id="adm-total-downloads" class="adm-metric-value">-</span>
+        </div>
+        <div class="adm-metric-card">
+          <span class="adm-metric-label">Last 24 Hours</span>
+          <span id="adm-downloads-24h" class="adm-metric-value">-</span>
+        </div>
+      </div>
+      <div class="adm-metrics-foot">
+        Last refreshed: <span id="adm-dashboard-updated-at">-</span>
       </div>
     </div>
 
@@ -108,6 +132,11 @@
         </div>
 
         <div class="adm-field-group">
+          <label for="d-unlock-threshold">Unlock Goal (downloads)</label>
+          <input id="d-unlock-threshold" type="number" min="0" step="1" placeholder="0 = available immediately">
+        </div>
+
+        <div class="adm-field-group">
           <label>Thumbnail</label>
           <div id="d-thumb-zone" class="admin-upload-zone">
             <span id="d-thumb-zone-label">Click or drop image</span>
@@ -144,6 +173,6 @@
     </div><!-- /drawer-panel -->
   </div><!-- /asset-drawer -->
 
-  <script src="/js/admin.js?v=20260320-login-v2"></script>
+  <script src="/js/admin.js?v=20260320-gamification"></script>
 </body>
 </html>

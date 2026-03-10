@@ -96,7 +96,7 @@ async function copyObject(key) {
   });
   await newClient.send(putCommand);
   
-  console.log(`  ✓ Copied: ${key} (${(body.length / 1024).toFixed(1)} KB)`);
+  console.log(`  ✓ : ${key} (${(body.length / 1024).toFixed(1)} KB)`);
 }
 
 async function migrate() {

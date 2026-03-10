@@ -1,15 +1,13 @@
 [
   {
     "id": "wp-lib-vaanar-tablet",
-    "title": "VAANAR",
+    "title": "Vaanar",
     "description": "VAANAR wallpaper from the MAYA universe.",
     "category": "wallpapers",
     "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/VAANAR/Tablet.png.webp",
-    "visible": true,
+    "visible": false,
     "createdAt": "2026-02-25T14:44:41.918Z",
-    "tags": [
-      "vaanar"
-    ],
+    "tags": [],
     "variants": [
       {
         "id": "wp-lib-vaanar-tablet",
@@ -36,15 +34,13 @@
   },
   {
     "id": "wp-lib-rk-saswat-ultrawide",
-    "title": "RK SASWAT",
-    "description": "RK SASWAT wallpaper from the MAYA universe.",
+    "title": "Rakshasi",
+    "description": "wallpaper from the MAYA universe.",
     "category": "wallpapers",
     "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/RK_SASWAT/Ultrawide.png.webp",
-    "visible": true,
+    "visible": false,
     "createdAt": "2026-02-25T14:44:32.936Z",
-    "tags": [
-      "rk-saswat"
-    ],
+    "tags": [],
     "variants": [
       {
         "id": "wp-lib-rk-saswat-ultrawide",
@@ -103,11 +99,9 @@
     "description": "NAAG wallpaper from the MAYA universe.",
     "category": "wallpapers",
     "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/NAAG/Tablet.png.webp",
-    "visible": true,
+    "visible": false,
     "createdAt": "2026-02-25T14:44:07.923Z",
-    "tags": [
-      "naag"
-    ],
+    "tags": [],
     "variants": [
       {
         "id": "wp-lib-naag-tablet",
@@ -130,7 +124,8 @@
         "fileSize": "5.2 MB",
         "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/NAAG/Andriod.png"
       }
-    ]
+    ],
+    "unlockThreshold": 500
   },
   {
     "id": "wp-lib-moonlight-ultrawide",
@@ -267,15 +262,13 @@
   },
   {
     "id": "wp-lib-ku-saswat-ultrawide",
-    "title": "KU SASWAT",
+    "title": "Kulie",
     "description": "KU SASWAT wallpaper from the MAYA universe.",
     "category": "wallpapers",
     "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/KU_SASWAT/Ultrawide.png.webp",
     "visible": true,
     "createdAt": "2026-02-25T14:43:24.951Z",
-    "tags": [
-      "ku-saswat"
-    ],
+    "tags": [],
     "variants": [
       {
         "id": "wp-lib-ku-saswat-ultrawide",
@@ -326,19 +319,18 @@
         "fileSize": "9.4 MB",
         "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/KU_SASWAT/4K%20ultra%20HD.png"
       }
-    ]
+    ],
+    "unlockThreshold": 200
   },
   {
     "id": "wp-lib-kulichase-ultrawide",
-    "title": "KULICHASE",
-    "description": "KULICHASE wallpaper from the MAYA universe.",
+    "title": "Kulie Chase",
+    "description": "Baluta Chasing Yachay and Ayn",
     "category": "wallpapers",
     "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/KULICHASE/Ultrawide.png.webp",
     "visible": true,
     "createdAt": "2026-02-25T14:42:57.613Z",
-    "tags": [
-      "kulichase"
-    ],
+    "tags": [],
     "variants": [
       {
         "id": "wp-lib-kulichase-ultrawide",
@@ -368,19 +360,18 @@
         "fileSize": "12.5 MB",
         "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/KULICHASE/4K%20ultra%20HD.png"
       }
-    ]
+    ],
+    "unlockThreshold": 300
   },
   {
     "id": "wp-lib-hidamma-vibhav-ultrawide",
-    "title": "Hidamma vibhav",
+    "title": "Hidamma",
     "description": "Hidamma vibhav wallpaper from the MAYA universe.",
     "category": "wallpapers",
     "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/Hidamma_vibhav/Ultrawide.png.webp",
     "visible": true,
     "createdAt": "2026-02-25T14:42:45.900Z",
-    "tags": [
-      "hidamma-vibhav"
-    ],
+    "tags": [],
     "variants": [
       {
         "id": "wp-lib-hidamma-vibhav-ultrawide",
@@ -410,116 +401,8 @@
         "fileSize": "10.1 MB",
         "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/Library/Hidamma_vibhav/4K%20ultra%20HD.png"
       }
-    ]
-  },
-  {
-    "id": "wp-hidamma-desktop",
-    "title": "Hidamma",
-    "description": "Hidamma wallpaper from the MAYA universe.",
-    "category": "wallpapers",
-    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/DESKTOP/HIDAMMA%20wallpaper%20DESKTOP.png.webp",
-    "visible": true,
-    "createdAt": "2026-02-10T10:00:00Z",
-    "tags": [
-      "hidamma",
-      "character"
     ],
-    "variants": [
-      {
-        "id": "wp-hidamma-desktop",
-        "name": "Desktop",
-        "resolution": "1920x1080",
-        "fileSize": "9.7 MB",
-        "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/DESKTOP/HIDAMMA%20wallpaper%20DESKTOP.png"
-      }
-    ]
-  },
-  {
-    "id": "wp-kuli-desktop",
-    "title": "Kuli",
-    "description": "Kuli wallpaper from the MAYA universe.",
-    "category": "wallpapers",
-    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/DESKTOP/KULI%20wallpaper%20DESKTOP.png.webp",
-    "visible": true,
-    "createdAt": "2026-02-10T09:00:00Z",
-    "tags": [
-      "kuli",
-      "character"
-    ],
-    "variants": [
-      {
-        "id": "wp-kuli-desktop",
-        "name": "Desktop",
-        "resolution": "1920x1080",
-        "fileSize": "8.0 MB",
-        "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/DESKTOP/KULI%20wallpaper%20DESKTOP.png"
-      },
-      {
-        "id": "wp-kuli-mobile",
-        "name": "Mobile",
-        "resolution": "1080x1920",
-        "fileSize": "2.3 MB",
-        "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/MOBILE/KU02%20wallpaper.png"
-      }
-    ]
-  },
-  {
-    "id": "wp-kulichase-desktop",
-    "title": "Kuli Chase",
-    "description": "Kuli Chase action wallpaper from the MAYA universe.",
-    "category": "wallpapers",
-    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/DESKTOP/KULICHASE%20wallpaper%20DESKTOP.png.webp",
-    "visible": true,
-    "createdAt": "2026-02-10T08:00:00Z",
-    "tags": [
-      "kuli",
-      "action"
-    ],
-    "variants": [
-      {
-        "id": "wp-kulichase-desktop",
-        "name": "Desktop",
-        "resolution": "1920x1080",
-        "fileSize": "10.5 MB",
-        "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/DESKTOP/KULICHASE%20wallpaper%20DESKTOP.png"
-      }
-    ]
-  },
-  {
-    "id": "wp-rakshasi-desktop",
-    "title": "Rakshasi",
-    "description": "Rakshasi wallpaper from the MAYA universe.",
-    "category": "wallpapers",
-    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/DESKTOP/RAKSHASI%20wallpaper%20DESKTOP.png.webp",
-    "visible": true,
-    "createdAt": "2026-02-10T06:00:00Z",
-    "tags": [
-      "rakshasi",
-      "character"
-    ],
-    "variants": [
-      {
-        "id": "wp-rakshasi-desktop",
-        "name": "Desktop",
-        "resolution": "1920x1080",
-        "fileSize": "6.8 MB",
-        "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/DESKTOP/RAKSHASI%20wallpaper%20DESKTOP.png"
-      },
-      {
-        "id": "wp-rakshasi-mobile-01",
-        "name": "Mobile",
-        "resolution": "1080x1920",
-        "fileSize": "2.1 MB",
-        "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/MOBILE/RK01%20wallpaper.png"
-      },
-      {
-        "id": "wp-rakshasi-mobile-04",
-        "name": "Mobile",
-        "resolution": "1080x1920",
-        "fileSize": "2.6 MB",
-        "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/MOBILE/RK04%20wallpaper.png"
-      }
-    ]
+    "unlockThreshold": 400
   },
   {
     "id": "wp-garuda-mobile",
@@ -540,50 +423,6 @@
         "resolution": "1080x1920",
         "fileSize": "2.5 MB",
         "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/MOBILE/GA03%20wallpaper.png"
-      }
-    ]
-  },
-  {
-    "id": "wp-naag-mobile",
-    "title": "Naag",
-    "description": "Naag mobile wallpaper from the MAYA universe.",
-    "category": "wallpapers",
-    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/MOBILE/NA06%20wallpaper.png.webp",
-    "visible": true,
-    "createdAt": "2026-02-09T08:00:00Z",
-    "tags": [
-      "naag",
-      "character"
-    ],
-    "variants": [
-      {
-        "id": "wp-naag-mobile",
-        "name": "Mobile",
-        "resolution": "1080x1920",
-        "fileSize": "2.8 MB",
-        "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/MOBILE/NA06%20wallpaper.png"
-      }
-    ]
-  },
-  {
-    "id": "wp-vaanar-mobile",
-    "title": "Vaanar",
-    "description": "Vaanar mobile wallpaper from the MAYA universe.",
-    "category": "wallpapers",
-    "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/MOBILE/VA%20ENV05wallpaper.png.webp",
-    "visible": true,
-    "createdAt": "2026-02-09T05:00:00Z",
-    "tags": [
-      "vaanar",
-      "character"
-    ],
-    "variants": [
-      {
-        "id": "wp-vaanar-mobile",
-        "name": "Mobile",
-        "resolution": "1080x1920",
-        "fileSize": "3.2 MB",
-        "downloadUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/Assets/Wallpaper/MOBILE/VA%20ENV05wallpaper.png"
       }
     ]
   },
