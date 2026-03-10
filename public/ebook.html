@@ -2,6 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="0; url=/ebook">
+  <title>Redirecting...</title>
+</head>
+<body>
+  <p>Redirecting to <a href="/ebook">/ebook</a>...</p>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>E-Book | MAYA Downloads</title>
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
@@ -59,8 +70,10 @@
           <h1 class="section-title" id="page-title">E-Book</h1>
           <p class="section-desc" id="page-desc">Free chapters from MAYA Book 1.</p>
         </div>
-        <button type="button" class="btn btn-primary" id="download-all-btn" hidden>Download all</button>
       </div>
+      <section id="unlock-progress" class="unlock-progress-wrap" hidden>
+        <div id="unlock-next-card" class="unlock-next-card" hidden></div>
+      </section>
       <div id="card-grid" class="card-grid"></div>
       <p id="empty-msg" class="empty-state" hidden>No chapters yet.</p>
     </div>
@@ -74,6 +87,22 @@
         <h2 id="modal-title" class="modal-title"></h2>
         <p id="modal-desc" class="modal-desc"></p>
         <div id="modal-downloads" class="modal-downloads"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="unlock-modal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-content unlock-modal-content">
+      <button type="button" class="modal-close" id="unlock-modal-close" aria-label="Close">×</button>
+      <div class="modal-body">
+        <p class="unlock-strip-label">Locked giveaway</p>
+        <h2 id="unlock-modal-title" class="modal-title"></h2>
+        <p id="unlock-modal-desc" class="modal-desc"></p>
+        <p id="unlock-modal-copy" class="unlock-modal-copy"></p>
+        <div class="unlock-meter">
+          <div id="unlock-modal-fill" class="unlock-meter-fill"></div>
+        </div>
+        <button type="button" id="unlock-share-btn" class="btn btn-primary unlock-share-btn">Share to unlock faster</button>
       </div>
     </div>
   </div>

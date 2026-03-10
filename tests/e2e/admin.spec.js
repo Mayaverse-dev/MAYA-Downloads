@@ -72,7 +72,7 @@ test.describe('Admin panel — dashboard', () => {
   });
 
   test('categories panel is visible', async ({ page }) => {
-    const panel = page.locator('.adm-panel');
+    const panel = page.locator('.adm-panel').filter({ hasText: /categories/i }).first();
     await expect(panel).toBeVisible();
     await expect(panel).toContainText(/categories/i);
   });
@@ -124,6 +124,34 @@ test.describe('Admin panel — dashboard', () => {
     await expect(select).toBeVisible();
     const options = await select.locator('option').count();
     expect(options).toBeGreaterThan(1); // "All" + at least one category
+  });
+
+  test('gamification toggle works and asset cards stay loaded in both states', async ({ page }) => {
+    await page.waitForFunction(() => document.querySelectorAll('.adm-asset-card').length > 0, { timeout: 8_000 });
+    const beforeCount = await page.locator('.adm-asset-card').count();
+    expect(beforeCount).toBeGreaterThan(0);
+
+    const toggleBtn = page.locator('#adm-gamification-toggle-btn');
+    await expect(toggleBtn).toBeVisible();
+    const beforeText = (await toggleBtn.textContent()) || '';
+
+    await Promise.all([
+      page.waitForResponse(r => r.url().includes('/api/admin/gamification') && r.request().method() === 'PATCH' && r.status() === 200, { timeout: 8_000 }),
+      toggleBtn.click(),
+    ]);
+    await page.waitForFunction(() => document.querySelectorAll('.adm-asset-card').length > 0, { timeout: 8_000 });
+    const afterFirstToggle = await page.locator('.adm-asset-card').count();
+    expect(afterFirstToggle).toBeGreaterThan(0);
+    await expect(toggleBtn).not.toHaveText(beforeText);
+
+    await Promise.all([
+      page.waitForResponse(r => r.url().includes('/api/admin/gamification') && r.request().method() === 'PATCH' && r.status() === 200, { timeout: 8_000 }),
+      toggleBtn.click(),
+    ]);
+    await page.waitForFunction(() => document.querySelectorAll('.adm-asset-card').length > 0, { timeout: 8_000 });
+    const afterSecondToggle = await page.locator('.adm-asset-card').count();
+    expect(afterSecondToggle).toBeGreaterThan(0);
+    await expect(toggleBtn).toHaveText(beforeText);
   });
 });
 

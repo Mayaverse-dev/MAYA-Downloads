@@ -6,6 +6,7 @@
   if (!category) {
     var parts = window.location.pathname.split('/').filter(Boolean);
     if (parts.length >= 2 && parts[0] === 'c') category = parts[1];
+    else if (parts.length >= 1 && (parts[0] === 'wallpapers' || parts[0] === 'ebook' || parts[0] === 'stl')) category = parts[0];
   }
   var pageTitle = body.getAttribute('data-title') || category;
   var pageDesc = body.getAttribute('data-desc') || '';
@@ -63,6 +64,16 @@
     return (asset.variants || []).find(function (v) { return !isPlaceholderUrl(v.downloadUrl); });
   }
 
+  function onImageFallbackError(img) {
+    if (!img || !img.dataset) return;
+    if (img.dataset.fallback && img.src !== img.dataset.fallback) {
+      img.src = img.dataset.fallback;
+      return;
+    }
+    img.style.background = '#1f1f1f';
+    img.alt = 'Preview';
+  }
+
   function sortByUnlockOrder(items) {
     return (items || []).slice().sort(function (a, b) {
       var ta = Number(a.unlockThreshold || 0);
@@ -117,7 +128,7 @@
     return (
       '<article class="card card-preview' + (isLocked ? ' card-locked' : '') + '" data-id="' + escapeHtml(asset.id) + '">' +
         '<div class="card-thumb-wrap">' +
-          '<img class="card-thumb" src="' + escapeHtml(thumb) + '" data-fallback="/api/thumbnail/' + escapeHtml(encodeURIComponent(asset.id)) + '" alt="" loading="lazy" onerror="if(this.dataset.fallback&&this.src!==this.dataset.fallback){this.src=this.dataset.fallback;}else{this.style.background=\'#1f1f1f\';this.alt=\'Preview\';}">' +
+          '<img class="card-thumb" src="' + escapeHtml(thumb) + '" data-fallback="/api/thumbnail/' + escapeHtml(encodeURIComponent(asset.id)) + '" alt="" loading="lazy">' +
           (isLocked
             ? '<div class="card-lock-overlay"><span class="card-lock-badge">🔒 Locked giveaway</span></div>'
             : '') +
@@ -169,7 +180,7 @@
             '<div class="gm-main">' +
               '<section class="gm-content">' +
                 '<div class="gm-media">' +
-                  '<img class="gm-thumb" src="' + escapeHtml(hiResPreview) + '" data-fallback="' + escapeHtml(nextThumb || ('/api/thumbnail/' + encodeURIComponent(next.id || ''))) + '" alt="" loading="lazy" onerror="if(this.dataset.fallback&&this.src!==this.dataset.fallback){this.src=this.dataset.fallback;}">' +
+                  '<img class="gm-thumb" src="' + escapeHtml(hiResPreview) + '" data-fallback="' + escapeHtml(nextThumb || ('/api/thumbnail/' + encodeURIComponent(next.id || ''))) + '" alt="" loading="lazy">' +
                 '</div>' +
                 '<div class="gm-progress-panel">' +
                   '<div class="gm-progress-head">' +
@@ -220,11 +231,7 @@
 
     img.src = thumbUrl(asset);
     img.dataset.fallback = '/api/thumbnail/' + encodeURIComponent(asset.id || '');
-    img.onerror = function () {
-      if (this.dataset.fallback && this.src !== this.dataset.fallback) {
-        this.src = this.dataset.fallback;
-      }
-    };
+    img.onerror = function () { onImageFallbackError(this); };
     img.alt = asset.title || 'Preview';
     titleEl.textContent = asset.title || '';
     descEl.textContent = asset.description || '';
@@ -408,6 +415,13 @@
     }
     var unlockShareBtn = document.getElementById('unlock-share-btn');
     if (unlockShareBtn) unlockShareBtn.addEventListener('click', handleCopyUnlockLink);
+
+    document.addEventListener('error', function (e) {
+      var t = e.target;
+      if (!(t instanceof HTMLImageElement)) return;
+      if (!t.classList.contains('card-thumb') && !t.classList.contains('gm-thumb')) return;
+      onImageFallbackError(t);
+    }, true);
 
   }
 
