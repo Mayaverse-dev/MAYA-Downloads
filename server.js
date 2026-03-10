@@ -91,6 +91,77 @@ function formatBytes(bytes) {
   return bytes + ' B';
 }
 
+function toUnlockThreshold(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0) return 0;
+  return Math.floor(n);
+}
+
+function isUnlocked(asset, totalDownloads) {
+  const threshold = toUnlockThreshold(asset && asset.unlockThreshold);
+  return threshold === 0 || totalDownloads >= threshold;
+}
+
+function sanitizePublicAsset(asset, totalDownloads) {
+  const threshold = toUnlockThreshold(asset.unlockThreshold);
+  const unlocked = isUnlocked(asset, totalDownloads);
+  const downloadsRemaining = unlocked ? 0 : Math.max(0, threshold - totalDownloads);
+  const base = {
+    ...asset,
+    unlockThreshold: threshold,
+    isLocked: !unlocked,
+    downloadsRemaining,
+  };
+  if (unlocked) return base;
+  return {
+    ...base,
+    // Never expose variant download URLs while locked.
+    variants: [],
+  };
+}
+
+function sanitizePublicAssetNoGamification(asset) {
+  return {
+    ...asset,
+    unlockThreshold: toUnlockThreshold(asset.unlockThreshold),
+    isLocked: false,
+    downloadsRemaining: 0,
+  };
+}
+
+function buildUnlockProgress(assets, totalDownloads) {
+  const withGoals = assets
+    .map((a) => ({ asset: a, threshold: toUnlockThreshold(a.unlockThreshold) }))
+    .filter((x) => x.threshold > 0)
+    .sort((a, b) => a.threshold - b.threshold);
+  const next = withGoals.find((x) => totalDownloads < x.threshold) || null;
+  if (!next) {
+    return {
+      totalDownloads,
+      hasActiveGoal: false,
+      nextThreshold: null,
+      downloadsToNext: 0,
+      progressPct: 100,
+      nextAsset: null,
+    };
+  }
+  return {
+    totalDownloads,
+    hasActiveGoal: true,
+    nextThreshold: next.threshold,
+    downloadsToNext: Math.max(0, next.threshold - totalDownloads),
+    progressPct: Math.max(0, Math.min(100, Math.round((totalDownloads / next.threshold) * 100))),
+    nextAsset: {
+      id: next.asset.id,
+      title: next.asset.title || '',
+      description: next.asset.description || '',
+      category: next.asset.category || '',
+      thumbnailUrl: next.asset.thumbnailUrl || '',
+      unlockThreshold: next.threshold,
+    },
+  };
+}
+
 /** Extract S3 key from a stored downloadUrl (e.g. https://t3.storageapi.dev/bucket/key/path) */
 function keyFromDownloadUrl(downloadUrl) {
   if (!downloadUrl || downloadUrl === '#') return null;
@@ -154,6 +225,7 @@ function migrateToVariants(data) {
       visible: items.every((i) => i.visible !== false),
       createdAt: primary.createdAt || new Date().toISOString(),
       tags: primary.tags || [],
+      unlockThreshold: toUnlockThreshold(primary.unlockThreshold),
       variants: items.map((item) => ({
         id: item.id,
         name: item.subtitle || item.type || 'Download',
@@ -179,6 +251,7 @@ function migrateToVariants(data) {
       visible: visible !== false,
       createdAt: createdAt || new Date().toISOString(),
       tags: tags || [],
+      unlockThreshold: toUnlockThreshold(item.unlockThreshold),
       variants: [{
         id: uuidv4(),
         name: subtitle || 'Download',
@@ -335,7 +408,9 @@ app.get('/api/thumbnail/:id', async (req, res) => {
     const command = new GetObjectCommand({ Bucket: bucket, Key: key });
     const obj = await s3.send(command);
     if (obj.ContentType) res.set('Content-Type', obj.ContentType);
-    if (obj.CacheControl) res.set('Cache-Control', obj.CacheControl);
+    res.set('Cache-Control', obj.CacheControl || 'public, max-age=31536000, immutable');
+    if (obj.ETag) res.set('ETag', String(obj.ETag));
+    if (obj.LastModified) res.set('Last-Modified', new Date(obj.LastModified).toUTCString());
     obj.Body.pipe(res);
   } catch (e) {
     console.error('Thumbnail error:', e);
@@ -343,17 +418,74 @@ app.get('/api/thumbnail/:id', async (req, res) => {
   }
 });
 
+// ─── Public: stream best available high-res preview image ───────────────────
+app.get('/api/preview-image/:id', async (req, res) => {
+  try {
+    const data = await readData();
+    const item = (Array.isArray(data) ? data : []).find((i) => i.id === req.params.id);
+    if (!item) return res.status(404).end();
+
+    const isImageUrl = (url) => {
+      if (!url || url === '#') return false;
+      try {
+        const u = new URL(url);
+        return /\.(avif|webp|png|jpe?g|gif)$/i.test(u.pathname || '');
+      } catch (_) {
+        return /\.(avif|webp|png|jpe?g|gif)(\?.*)?$/i.test(url);
+      }
+    };
+
+    const areaFromResolution = (resolution) => {
+      const m = String(resolution || '').match(/^(\d+)\s*x\s*(\d+)$/i);
+      if (!m) return 0;
+      return Number(m[1]) * Number(m[2]);
+    };
+
+    const imageVariants = (item.variants || [])
+      .filter((v) => v && isImageUrl(v.downloadUrl))
+      .sort((a, b) => areaFromResolution(b.resolution) - areaFromResolution(a.resolution));
+
+    const bestImageUrl =
+      (imageVariants[0] && imageVariants[0].downloadUrl) ||
+      (isImageUrl(item.thumbnailUrl) ? item.thumbnailUrl : '') ||
+      ((item.variants || []).find((v) => v && v.downloadUrl && v.downloadUrl !== '#') || {}).downloadUrl ||
+      '';
+
+    if (!bestImageUrl || bestImageUrl === '#') return res.status(404).end();
+
+    const s3 = getS3Client();
+    if (!s3) return res.redirect(302, bestImageUrl);
+
+    const key = keyFromDownloadUrl(bestImageUrl);
+    if (!key) return res.redirect(302, bestImageUrl);
+    const bucket = getBucket();
+    const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+    const obj = await s3.send(command);
+    if (obj.ContentType) res.set('Content-Type', obj.ContentType);
+    res.set('Cache-Control', obj.CacheControl || 'public, max-age=31536000, immutable');
+    if (obj.ETag) res.set('ETag', String(obj.ETag));
+    if (obj.LastModified) res.set('Last-Modified', new Date(obj.LastModified).toUTCString());
+    obj.Body.pipe(res);
+  } catch (e) {
+    console.error('Preview image error:', e);
+    if (!res.headersSent) res.status(500).end();
+  }
+});
+
 // ─── Public: stream download from S3 — id can be asset id or variant id ─
 app.get('/api/download/:id', async (req, res) => {
   try {
+    const gamificationEnabled = await db.getGamificationEnabled();
     const data = await readData();
     const list = Array.isArray(data) ? data : [];
     const reqId = req.params.id;
     let downloadUrl = null;
+    let matchedAsset = null;
 
     // Match asset id → use first downloadable variant
     const asset = list.find((i) => i.id === reqId);
     if (asset) {
+      matchedAsset = asset;
       const v = (asset.variants || []).find((v) => v.downloadUrl && v.downloadUrl !== '#');
       if (v) downloadUrl = v.downloadUrl;
     }
@@ -362,11 +494,19 @@ app.get('/api/download/:id', async (req, res) => {
     if (!downloadUrl) {
       for (const a of list) {
         const v = (a.variants || []).find((v) => v.id === reqId);
-        if (v && v.downloadUrl && v.downloadUrl !== '#') { downloadUrl = v.downloadUrl; break; }
+        if (v && v.downloadUrl && v.downloadUrl !== '#') {
+          matchedAsset = a;
+          downloadUrl = v.downloadUrl;
+          break;
+        }
       }
     }
 
     if (!downloadUrl) return res.status(404).send('Download not found');
+    const totalDownloads = await db.getAllTimeDownloadCount();
+    if (gamificationEnabled && !isUnlocked(matchedAsset, totalDownloads)) {
+      return res.status(403).send('Asset is locked');
+    }
 
     const s3 = getS3Client();
     if (!s3) return res.redirect(302, downloadUrl);
@@ -395,14 +535,17 @@ app.post('/api/download-zip', async (req, res) => {
   const s3 = getS3Client();
   if (!s3) return res.status(503).json({ error: 'Downloads not available' });
   try {
+    const gamificationEnabled = await db.getGamificationEnabled();
     const data = await readData();
     const list = Array.isArray(data) ? data : [];
+    const totalDownloads = await db.getAllTimeDownloadCount();
 
     // Collect (asset, variant) pairs
     const toZip = [];
     for (const id of ids) {
       const asset = list.find((i) => i.id === id);
       if (!asset) continue;
+      if (gamificationEnabled && !isUnlocked(asset, totalDownloads)) continue;
       for (const v of (asset.variants || [])) {
         if (v.downloadUrl && v.downloadUrl !== '#') toZip.push({ asset, variant: v });
       }
@@ -445,13 +588,42 @@ app.post('/api/download-zip', async (req, res) => {
 // ─── Public API: only visible assets ─────────────────────────────────────
 app.get('/api/downloads', async (req, res) => {
   try {
+    const gamificationEnabled = await db.getGamificationEnabled();
     const data = await readData();
+    const totalDownloads = await db.getAllTimeDownloadCount();
     const visible = (Array.isArray(data) ? data : []).filter(
       (i) => i.visible !== false
     );
-    res.json(visible);
+    res.json(visible.map((asset) => (
+      gamificationEnabled
+        ? sanitizePublicAsset(asset, totalDownloads)
+        : sanitizePublicAssetNoGamification(asset)
+    )));
   } catch (e) {
     res.status(500).json({ error: 'Failed to load downloads' });
+  }
+});
+
+// ─── Public: unlock progress summary ───────────────────────────────────────
+app.get('/api/unlocks/progress', async (req, res) => {
+  try {
+    const gamificationEnabled = await db.getGamificationEnabled();
+    const data = await readData();
+    const visible = (Array.isArray(data) ? data : []).filter((i) => i.visible !== false);
+    const totalDownloads = await db.getAllTimeDownloadCount();
+    if (!gamificationEnabled) {
+      return res.json({
+        totalDownloads,
+        hasActiveGoal: false,
+        nextThreshold: null,
+        downloadsToNext: 0,
+        progressPct: 100,
+        nextAsset: null,
+      });
+    }
+    res.json(buildUnlockProgress(visible, totalDownloads));
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to load unlock progress' });
   }
 });
 
@@ -495,6 +667,7 @@ app.post(
           Body: req.file.buffer,
           ContentType: req.file.mimetype,
           ContentLength: req.file.size,
+          CacheControl: 'public, max-age=31536000, immutable',
         })
       );
       const url = getPublicUrl(key);
@@ -526,6 +699,7 @@ app.post(
               Body: thumbBuffer,
               ContentType: 'image/jpeg',
               ContentLength: thumbBuffer.length,
+              CacheControl: 'public, max-age=31536000, immutable',
             })
           );
           thumbnailUrl = getPublicUrl(thumbKey);
@@ -555,6 +729,7 @@ app.post('/api/admin/downloads', async (req, res) => {
       category: body.category || '',
       thumbnailUrl: body.thumbnailUrl || '',
       visible: body.visible !== false,
+      unlockThreshold: toUnlockThreshold(body.unlockThreshold),
       createdAt: new Date().toISOString(),
       tags: body.tags || [],
       variants: Array.isArray(body.variants) ? body.variants.map((v) => ({
@@ -587,6 +762,9 @@ app.patch('/api/admin/downloads/:id', async (req, res) => {
     const body = req.body;
     const scalarFields = ['title', 'description', 'category', 'thumbnailUrl', 'format', 'chapter', 'tags', 'visible'];
     scalarFields.forEach((k) => { if (body[k] !== undefined) data[idx][k] = body[k]; });
+    if (body.unlockThreshold !== undefined) {
+      data[idx].unlockThreshold = toUnlockThreshold(body.unlockThreshold);
+    }
     if (Array.isArray(body.variants)) {
       data[idx].variants = body.variants.map((v) => ({
         id: v.id || uuidv4(),
@@ -796,6 +974,36 @@ app.get('/api/admin/analytics', async (req, res) => {
     res.json(await db.getStats(days));
   } catch (e) {
     res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/api/admin/dashboard', async (req, res) => {
+  if (!checkAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
+  try {
+    res.json(await db.getDownloadDashboard());
+  } catch (e) {
+    res.status(500).json({ error: e.message || 'Failed to load dashboard' });
+  }
+});
+
+app.get('/api/admin/gamification', async (req, res) => {
+  if (!checkAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
+  try {
+    const enabled = await db.getGamificationEnabled();
+    res.json({ enabled });
+  } catch (e) {
+    res.status(500).json({ error: e.message || 'Failed to load gamification setting' });
+  }
+});
+
+app.patch('/api/admin/gamification', async (req, res) => {
+  if (!checkAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
+  try {
+    const enabled = req.body && req.body.enabled !== false;
+    await db.setGamificationEnabled(enabled);
+    res.json({ enabled });
+  } catch (e) {
+    res.status(500).json({ error: e.message || 'Failed to update gamification setting' });
   }
 });
 

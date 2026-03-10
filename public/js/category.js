@@ -28,6 +28,14 @@
 
   var list = [];
   var assetsById = {};
+  var unlockProgress = {
+    totalDownloads: 0,
+    hasActiveGoal: false,
+    nextThreshold: null,
+    downloadsToNext: 0,
+    progressPct: 0,
+    nextAsset: null
+  };
 
   function escapeHtml(s) {
     if (!s) return '';
@@ -38,8 +46,9 @@
 
   function thumbUrl(asset) {
     if (!asset || !asset.thumbnailUrl || asset.thumbnailUrl === '#') return '';
+    if (/^https?:\/\//i.test(asset.thumbnailUrl)) return asset.thumbnailUrl;
     if (asset.id) return '/api/thumbnail/' + encodeURIComponent(asset.id);
-    return asset.thumbnailUrl;
+    return asset.thumbnailUrl || '';
   }
 
   function isPlaceholderUrl(url) {
@@ -52,6 +61,18 @@
 
   function firstDownloadableVariant(asset) {
     return (asset.variants || []).find(function (v) { return !isPlaceholderUrl(v.downloadUrl); });
+  }
+
+  function sortByUnlockOrder(items) {
+    return (items || []).slice().sort(function (a, b) {
+      var ta = Number(a.unlockThreshold || 0);
+      var tb = Number(b.unlockThreshold || 0);
+      if (ta !== tb) return ta - tb;
+      var ca = String(a.createdAt || '');
+      var cb = String(b.createdAt || '');
+      if (ca !== cb) return ca < cb ? -1 : 1;
+      return String(a.title || '').localeCompare(String(b.title || ''));
+    });
   }
 
   function renderCard(asset) {
@@ -67,6 +88,9 @@
     }
 
     var thumb = thumbUrl(asset);
+    var isLocked = asset.isLocked === true;
+    var unlockThreshold = Number(asset.unlockThreshold || 0);
+    var downloadsRemaining = Number(asset.downloadsRemaining || 0);
     assetsById[asset.id] = asset;
 
     var variants = asset.variants || [];
@@ -75,7 +99,9 @@
     var v1 = firstDownloadableVariant(asset);
     var actionsHtml;
 
-    if (!hasDownload(asset)) {
+    if (isLocked && unlockThreshold > 0) {
+      actionsHtml = '<button type="button" class="btn asset-help-unlock">Help unlock</button>';
+    } else if (!hasDownload(asset)) {
       actionsHtml = '<span class="btn no-url">Coming Soon</span>';
     } else if (hasMulti) {
       actionsHtml = '<button type="button" class="btn btn-primary asset-open">Download (' + downloadableVariants.length + ')</button>';
@@ -83,47 +109,108 @@
       var href = '/api/download/' + encodeURIComponent(v1.id);
       var btnLabel = 'Download';
       if (v1.fileSize) btnLabel += ' \xb7 ' + v1.fileSize;
-      actionsHtml = '<a href="' + escapeHtml(href) + '" target="_blank" rel="noopener" class="btn btn-primary">' + escapeHtml(btnLabel) + '</a>';
+      actionsHtml = '<a href="' + escapeHtml(href) + '" class="btn btn-primary">' + escapeHtml(btnLabel) + '</a>';
     } else {
       actionsHtml = '<span class="btn no-url">Coming Soon</span>';
     }
 
     return (
-      '<article class="card card-preview" data-id="' + escapeHtml(asset.id) + '">' +
-        '<img class="card-thumb" src="' + escapeHtml(thumb) + '" alt="" loading="lazy" onerror="this.style.background=\'#1f1f1f\';this.alt=\'Preview\'">' +
+      '<article class="card card-preview' + (isLocked ? ' card-locked' : '') + '" data-id="' + escapeHtml(asset.id) + '">' +
+        '<div class="card-thumb-wrap">' +
+          '<img class="card-thumb" src="' + escapeHtml(thumb) + '" data-fallback="/api/thumbnail/' + escapeHtml(encodeURIComponent(asset.id)) + '" alt="" loading="lazy" onerror="if(this.dataset.fallback&&this.src!==this.dataset.fallback){this.src=this.dataset.fallback;}else{this.style.background=\'#1f1f1f\';this.alt=\'Preview\';}">' +
+          (isLocked
+            ? '<div class="card-lock-overlay"><span class="card-lock-badge">🔒 Locked giveaway</span></div>'
+            : '') +
+        '</div>' +
         '<div class="card-body">' +
-          '<span class="card-badge">' + escapeHtml(badge) + '</span>' +
+          '<span class="card-badge">' + escapeHtml(isLocked && unlockThreshold > 0 ? ('Unlocks @ ' + unlockThreshold) : badge) + '</span>' +
           '<h3 class="card-title">' + escapeHtml(asset.title) + '</h3>' +
-          '<p class="card-desc">' + escapeHtml(asset.description || '') + '</p>' +
+          '<p class="card-desc">' + (
+            isLocked && unlockThreshold > 0
+              ? ('<span class="card-lock-remaining">' + escapeHtml(String(downloadsRemaining)) + ' more to unlock</span>')
+              : escapeHtml(asset.description || '')
+          ) + '</p>' +
           '<div class="card-actions">' + actionsHtml + '</div>' +
         '</div>' +
       '</article>'
     );
   }
 
+  function renderUnlockProgress() {
+    var strip = document.getElementById('unlock-progress');
+    if (!strip) return;
+    if (!unlockProgress || !unlockProgress.hasActiveGoal || !unlockProgress.nextAsset) {
+      strip.hidden = true;
+      return;
+    }
+    strip.hidden = false;
+    var nextCardEl = document.getElementById('unlock-next-card');
+    if (nextCardEl) {
+      var next = unlockProgress.nextAsset;
+      var nextThumb = thumbUrl(next);
+      var nextTitle = next.title || 'next reward';
+      var nextThreshold = Number(unlockProgress.nextThreshold || 0);
+      var toGo = Number(unlockProgress.downloadsToNext || 0);
+      var hiResPreview = next && next.id ? ('/api/preview-image/' + encodeURIComponent(next.id)) : nextThumb;
+      nextCardEl.hidden = false;
+      nextCardEl.innerHTML =
+        '<div class="gm-shell">' +
+          '<div class="gm-card">' +
+            '<div class="gm-head">' +
+              '<div>' +
+                '<div class="gm-label">Community Mission</div>' +
+                '<div class="gm-status">Live Progress</div>' +
+              '</div>' +
+              '<div class="gm-head-copy">' +
+                '<div class="gm-head-copy-title">Unlock <span class="accent">' + escapeHtml(nextTitle) + '</span> at <span class="accent">' + escapeHtml(String(nextThreshold)) + '</span> downloads. <span class="accent">' + escapeHtml(String(toGo)) + '</span> more to go.</div>' +
+                '<div class="gm-head-copy-sub">Each download pushes the community closer to the next unlock. </div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="gm-main">' +
+              '<section class="gm-content">' +
+                '<div class="gm-media">' +
+                  '<img class="gm-thumb" src="' + escapeHtml(hiResPreview) + '" data-fallback="' + escapeHtml(nextThumb || ('/api/thumbnail/' + encodeURIComponent(next.id || ''))) + '" alt="" loading="lazy" onerror="if(this.dataset.fallback&&this.src!==this.dataset.fallback){this.src=this.dataset.fallback;}">' +
+                '</div>' +
+                '<div class="gm-progress-panel">' +
+                  '<div class="gm-progress-head">' +
+                    '<span class="gm-progress-label">Mission Progress</span>' +
+                    '<span class="gm-progress-value">' + escapeHtml(String(unlockProgress.totalDownloads || 0)) + ' / ' + escapeHtml(String(unlockProgress.nextThreshold || 0)) + '</span>' +
+                  '</div>' +
+                  '<div class="gm-meter">' +
+                    '<div class="gm-fill" style="width:' + String(unlockProgress.progressPct || 0) + '%"></div>' +
+                  '</div>' +
+                  '<div class="gm-progress-foot">' +
+                    '<span>Target: ' + escapeHtml(String(unlockProgress.nextThreshold || 0)) + ' downloads</span>' +
+                    '<span class="gm-pct">' + escapeHtml(String(Math.round(unlockProgress.progressPct || 0))) + '%</span>' +
+                  '</div>' +
+                '</div>' +
+              '</section>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '';
+    }
+  }
+
   function render() {
     var grid = document.getElementById('card-grid');
     var emptyMsg = document.getElementById('empty-msg');
-    var downloadAllBtn = document.getElementById('download-all-btn');
-    var filtersEl = document.getElementById('filters');
 
     if (list.length === 0) {
       grid.innerHTML = '';
       if (emptyMsg) emptyMsg.hidden = false;
-      if (downloadAllBtn) downloadAllBtn.hidden = true;
       return;
     }
 
     if (emptyMsg) emptyMsg.hidden = true;
-    if (downloadAllBtn) {
-      downloadAllBtn.hidden = false;
-      downloadAllBtn.textContent = 'Download All (' + list.length + ')';
-    }
-    if (filtersEl) filtersEl.hidden = true;
     grid.innerHTML = list.map(renderCard).join('');
   }
 
   function openModal(asset) {
+    if (asset && asset.isLocked) {
+      openUnlockModal(asset);
+      return;
+    }
     var modal = document.getElementById('modal');
     var img = document.getElementById('modal-img');
     var titleEl = document.getElementById('modal-title');
@@ -132,6 +219,12 @@
     if (!modal || !img) return;
 
     img.src = thumbUrl(asset);
+    img.dataset.fallback = '/api/thumbnail/' + encodeURIComponent(asset.id || '');
+    img.onerror = function () {
+      if (this.dataset.fallback && this.src !== this.dataset.fallback) {
+        this.src = this.dataset.fallback;
+      }
+    };
     img.alt = asset.title || 'Preview';
     titleEl.textContent = asset.title || '';
     descEl.textContent = asset.description || '';
@@ -145,7 +238,7 @@
       var href = '/api/download/' + encodeURIComponent(v.id);
       var lbl = 'Download';
       if (v.fileSize) lbl += ' \xb7 ' + v.fileSize;
-      downloadsEl.innerHTML = '<a href="' + escapeHtml(href) + '" target="_blank" rel="noopener" class="btn btn-primary" style="width:100%;justify-content:center;">' + escapeHtml(lbl) + '</a>';
+      downloadsEl.innerHTML = '<a href="' + escapeHtml(href) + '" class="btn btn-primary" style="width:100%;justify-content:center;">' + escapeHtml(lbl) + '</a>';
     } else {
       // Each variant gets its own download button (matches screenshot)
       downloadsEl.innerHTML =
@@ -167,7 +260,7 @@
                       '</span>'
                     : '') +
                 '</div>' +
-                '<a href="' + escapeHtml(href) + '" target="_blank" rel="noopener" class="wp-variant-dl">↓ Download</a>' +
+                '<a href="' + escapeHtml(href) + '" class="wp-variant-dl">↓ Download</a>' +
               '</div>'
             );
           }).join('') +
@@ -188,31 +281,69 @@
     }
   }
 
-  function handleDownloadAll() {
-    var assets = list.filter(function (a) { return hasDownload(a); });
-    if (assets.length === 0) return;
-    var btn = document.getElementById('download-all-btn');
-    if (btn) { btn.disabled = true; btn.textContent = 'Preparing zip\u2026'; }
-    fetch('/api/download-zip', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ids: assets.map(function (a) { return a.id; }) })
-    })
-      .then(function (r) {
-        if (!r.ok) throw new Error(r.status === 503 ? 'Downloads unavailable' : 'Failed to create zip');
-        return r.blob();
-      })
-      .then(function (blob) {
-        var a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'maya-' + category + '.zip';
-        a.click();
-        URL.revokeObjectURL(a.href);
-      })
-      .catch(function (err) { alert(err.message || 'Download failed'); })
-      .finally(function () {
-        if (btn) { btn.disabled = false; btn.textContent = 'Download All (' + list.length + ')'; }
-      });
+  function openUnlockModal(asset) {
+    var modal = document.getElementById('unlock-modal');
+    if (!modal) return;
+    var titleEl = document.getElementById('unlock-modal-title');
+    var descEl = document.getElementById('unlock-modal-desc');
+    var copyEl = document.getElementById('unlock-modal-copy');
+    var fillEl = document.getElementById('unlock-modal-fill');
+    var threshold = Number(asset.unlockThreshold || 0);
+    var remaining = Number(asset.downloadsRemaining || 0);
+    if (titleEl) titleEl.textContent = asset.title || 'Locked giveaway';
+    if (descEl) descEl.textContent = asset.description || 'A new giveaway will unlock soon.';
+    if (copyEl) {
+      copyEl.textContent =
+        'Unlocks at ' + threshold + ' total downloads. ' + remaining + ' more downloads needed.';
+    }
+    if (fillEl && threshold > 0) {
+      var pct = Math.max(0, Math.min(100, Math.round(((threshold - remaining) / threshold) * 100)));
+      fillEl.style.width = pct + '%';
+    }
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeUnlockModal() {
+    var modal = document.getElementById('unlock-modal');
+    if (!modal) return;
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  function handleCopyUnlockLink() {
+    var btn = document.getElementById('unlock-share-btn');
+    if (!btn) return;
+    var original = btn.textContent;
+    var link = window.location.origin + window.location.pathname;
+    var done = function () {
+      btn.textContent = 'Link copied ✓';
+      btn.disabled = true;
+      setTimeout(function () {
+        btn.textContent = original;
+        btn.disabled = false;
+      }, 1400);
+    };
+    // Optimistic immediate UI feedback on user click.
+    done();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(link).catch(function () {});
+      return;
+    }
+    // Fallback for older browsers
+    var ta = document.createElement('textarea');
+    ta.value = link;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'absolute';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand('copy');
+    } catch (e) {}
+    document.body.removeChild(ta);
   }
 
   function init() {
@@ -221,11 +352,17 @@
     if (titleEl) titleEl.textContent = pageTitle;
     if (descEl) descEl.textContent = pageDesc;
 
-    fetch('/api/downloads')
-      .then(function (r) { return r.json(); })
-      .then(function (data) {
+    Promise.all([
+      fetch('/api/downloads').then(function (r) { return r.json(); }).catch(function () { return []; }),
+      fetch('/api/unlocks/progress').then(function (r) { return r.json(); }).catch(function () { return null; })
+    ])
+      .then(function (result) {
+        var data = result[0];
+        var progress = result[1];
         list = Array.isArray(data) ? data.filter(function (i) { return i.category === category; }) : [];
-        if (category === 'ebook') list.sort(function (a, b) { return (a.chapter || 0) - (b.chapter || 0); });
+        list = sortByUnlockOrder(list);
+        unlockProgress = progress || unlockProgress;
+        renderUnlockProgress();
         render();
       })
       .catch(function () { list = []; render(); });
@@ -249,11 +386,29 @@
     });
 
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeModal();
+      if (e.key === 'Escape') { closeModal(); closeUnlockModal(); }
     });
 
-    var downloadAllBtn = document.getElementById('download-all-btn');
-    if (downloadAllBtn) downloadAllBtn.addEventListener('click', handleDownloadAll);
+    var modalDownloads = document.getElementById('modal-downloads');
+    if (modalDownloads) {
+      modalDownloads.addEventListener('click', function (e) {
+        var link = e.target.closest('a[href*="/api/download/"]');
+        if (!link) return;
+        closeModal();
+      });
+    }
+
+    var unlockClose = document.getElementById('unlock-modal-close');
+    if (unlockClose) unlockClose.addEventListener('click', closeUnlockModal);
+    var unlockModal = document.getElementById('unlock-modal');
+    if (unlockModal) {
+      unlockModal.addEventListener('click', function (e) {
+        if (e.target === this) closeUnlockModal();
+      });
+    }
+    var unlockShareBtn = document.getElementById('unlock-share-btn');
+    if (unlockShareBtn) unlockShareBtn.addEventListener('click', handleCopyUnlockLink);
+
   }
 
   init();
