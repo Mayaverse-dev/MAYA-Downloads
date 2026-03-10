@@ -12,3 +12,16 @@ data/analytics.db-shm
 data/analytics.db-wal
 Wallpaper/
 instructions.md
+test-results/
+test-screenshots/
+tests/report/
+*-TEST-REPORT.md
+*-test-report.json
+debug-*.js
+inspect-*.js
+test-admin-*.js
+test-comprehensive-*.js
+test-login-*.js
+test-step*.js
+test-variant-*.js
+test-wallpapers-*.js

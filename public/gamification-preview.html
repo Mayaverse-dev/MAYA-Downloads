@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAYA Gamification Preview</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .gm-wrap {
+      max-width: 1080px;
+      margin: 30px auto;
+      padding: 0 16px 24px;
+    }
+    .gm-shell {
+      position: relative;
+      border-radius: 24px;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(230,30,37,0.45), rgba(255,255,255,0.06) 35%, rgba(230,30,37,0.22));
+      box-shadow: 0 24px 70px rgba(0,0,0,0.45);
+    }
+    .gm-card {
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      background:
+        radial-gradient(120% 120% at 10% -20%, rgba(230,30,37,0.24), transparent 55%),
+        radial-gradient(100% 100% at 110% 120%, rgba(230,30,37,0.14), transparent 65%),
+        #0d0e11;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .gm-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 18px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .gm-label {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .gm-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #f5f5f5;
+    }
+    .gm-status::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #28d17c;
+      box-shadow: 0 0 0 4px rgba(40,209,124,0.16);
+    }
+    .gm-head-copy {
+      margin-left: auto;
+      max-width: min(760px, 72%);
+      text-align: right;
+    }
+    .gm-head-copy-title {
+      font-family: var(--font-mono);
+      font-size: clamp(1rem, 1.5vw, 1.45rem);
+      line-height: 1.3;
+      color: #fff;
+    }
+    .gm-head-copy-title .accent { color: var(--accent); }
+    .gm-head-copy-sub {
+      margin-top: 8px;
+      color: var(--text-muted);
+      font-size: 0.96rem;
+      line-height: 1.5;
+    }
+    .gm-main { padding: 18px 20px 20px; }
+    .gm-content {
+      min-width: 0;
+    }
+    .gm-media {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: #15161a;
+      margin-bottom: 16px;
+    }
+    .gm-thumb {
+      width: 100%;
+      aspect-ratio: 3440 / 1440;
+      object-fit: cover;
+      display: block;
+      background: #15161a;
+    }
+    .gm-progress-panel {
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      background: rgba(0,0,0,0.22);
+      padding: 14px;
+    }
+    .gm-progress-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .gm-progress-label {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .gm-progress-value {
+      font-family: var(--font-mono);
+      color: #fff;
+      font-size: 0.88rem;
+    }
+    .gm-meter {
+      position: relative;
+      height: 12px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #1a1b1f;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .gm-fill {
+      height: 100%;
+      width: 0;
+      border-radius: 999px;
+      background:
+        linear-gradient(90deg, #f23645 0%, #ff8c94 100%);
+      transition: width .55s cubic-bezier(.22,.8,.25,1);
+      position: relative;
+    }
+    .gm-fill::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(255,255,255,0.18), rgba(255,255,255,0));
+      mix-blend-mode: screen;
+    }
+    .gm-progress-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      gap: 10px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+    }
+    .gm-pct {
+      color: #fff;
+      font-size: 0.94rem;
+    }
+    @keyframes gmPulse {
+      0%,100% { text-shadow: 0 0 0 rgba(242,54,69,0); }
+      50% { text-shadow: 0 0 14px rgba(242,54,69,0.65); }
+    }
+    @media (max-width: 680px) {
+      .gm-wrap { margin-top: 16px; }
+      .gm-head { padding: 14px; flex-direction: column; align-items: flex-start; }
+      .gm-head-copy { max-width: 100%; text-align: left; }
+      .gm-head-copy-title { font-size: 1rem; }
+      .gm-head-copy-sub { font-size: 0.9rem; }
+      .gm-main { padding: 14px; gap: 12px; }
+      .gm-progress-panel { padding: 12px; }
+    }
+  </style>
+</head>
+<body class="adm-body">
+  <main class="gm-wrap">
+    <div class="gm-shell">
+      <div class="gm-card">
+        <div class="gm-head">
+          <div>
+            <div class="gm-label">Community Mission</div>
+            <div class="gm-status">Live Progress</div>
+          </div>
+          <div class="gm-head-copy">
+            <div id="gm-head-copy-title" class="gm-head-copy-title">Unlock <span class="accent">next reward</span> at <span class="accent">--</span> downloads. <span class="accent">--</span> more to go.</div>
+            <div class="gm-head-copy-sub">Each download pushes the community closer to the next unlock. </div>
+          </div>
+        </div>
+        <div class="gm-main">
+          <section class="gm-content">
+            <div class="gm-media">
+              <img id="gm-thumb" class="gm-thumb" src="/images/discord-popup-thumb.webp" alt="Next reward preview">
+            </div>
+
+            <div class="gm-progress-panel">
+              <div class="gm-progress-head">
+                <span class="gm-progress-label">Mission Progress</span>
+                <span id="gm-progress-value" class="gm-progress-value">0 / 0</span>
+              </div>
+              <div class="gm-meter" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Mission completion progress">
+                <div id="gm-fill" class="gm-fill"></div>
+              </div>
+              <div class="gm-progress-foot">
+                <span id="gm-target">Target: 0 downloads</span>
+                <span id="gm-pct" class="gm-pct">0%</span>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script>
+    (function () {
+      function esc(s){return String(s||'').replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
+      function clamp(val, min, max) { return Math.max(min, Math.min(max, val)); }
+      function fmt(n){ return new Intl.NumberFormat('en-US').format(Number(n || 0)); }
+
+      fetch('/api/unlocks/progress').then(function(r){return r.json();}).then(function(p){
+        if (!p || !p.hasActiveGoal || !p.nextAsset) {
+          document.getElementById('gm-head-copy-title').textContent = 'No active mission right now.';
+          return;
+        }
+
+        var total = Number(p.totalDownloads||0);
+        var left = Number(p.downloadsToNext||0);
+        var target = Number(p.nextThreshold||0);
+        var title = p.nextAsset.title || 'Next Reward';
+        var pct = clamp(Number(p.progressPct||0), 0, 100);
+        var thumb = p.nextAsset.id ? ('/api/preview-image/' + encodeURIComponent(p.nextAsset.id)) : (p.nextAsset.thumbnailUrl || '/images/discord-popup-thumb.webp');
+
+        document.getElementById('gm-head-copy-title').innerHTML = 'Unlock <span class="accent">' + esc(title) + '</span> at <span class="accent">' + fmt(target) + '</span> downloads. <span class="accent">' + fmt(left) + '</span> more to go.';
+        document.getElementById('gm-progress-value').textContent = fmt(total) + ' / ' + fmt(target);
+        document.getElementById('gm-target').textContent = 'Target: ' + fmt(target) + ' downloads';
+        document.getElementById('gm-pct').textContent = Math.round(pct) + '%';
+
+        var meter = document.querySelector('.gm-meter');
+        meter.setAttribute('aria-valuenow', String(Math.round(pct)));
+        document.getElementById('gm-fill').style.width = pct + '%';
+
+        var img = document.getElementById('gm-thumb');
+        img.src = thumb;
+        img.onerror = function(){ if (p.nextAsset.id) img.src = '/api/thumbnail/' + encodeURIComponent(p.nextAsset.id); };
+      }).catch(function(){
+        document.getElementById('gm-head-copy-title').textContent = 'Unable to load mission data.';
+      });
+    })();
+  </script>
+</body>
+</html>

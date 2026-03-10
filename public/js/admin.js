@@ -6,6 +6,9 @@
   var STORAGE_KEY = 'maya_admin_pw';
   var allCategories = [];
   var allAssets = [];
+  var gamificationEnabled = true;
+  var dashboardStats = { total_downloads: 0, downloads_24h: 0, by_asset_id: [] };
+  var assetDownloadCounts = {};
   var editingId = null;
   var drawerThumbUrl = '';
   var drawerVisible = true;
@@ -56,6 +59,16 @@
     return bytes + ' B';
   }
 
+  function formatInt(n) {
+    return Number(n || 0).toLocaleString('en-US');
+  }
+
+  function toUnlockThreshold(v) {
+    var n = Number(v);
+    if (!isFinite(n) || n <= 0) return 0;
+    return Math.floor(n);
+  }
+
   function createDT(file) {
     try { var dt = new DataTransfer(); dt.items.add(file); return dt.files; } catch (e) { return null; }
   }
@@ -104,6 +117,8 @@
   function showDashboard() {
     loginEl.style.display = 'none';
     dashboardEl.style.display = 'block';
+    loadGamificationSetting();
+    loadDashboardStats();
     loadCategories();
     loadAssets();
   }
@@ -259,6 +274,11 @@
   var assetGridEl = document.getElementById('admin-asset-grid');
   var searchEl = document.getElementById('admin-search');
   var filterCatEl = document.getElementById('admin-filter-cat');
+  var totalDownloadsEl = document.getElementById('adm-total-downloads');
+  var downloads24hEl = document.getElementById('adm-downloads-24h');
+  var dashboardUpdatedAtEl = document.getElementById('adm-dashboard-updated-at');
+  var refreshDashboardBtn = document.getElementById('adm-refresh-dashboard-btn');
+  var gamificationToggleBtn = document.getElementById('adm-gamification-toggle-btn');
 
   searchEl.addEventListener('input', renderAssets);
   filterCatEl.addEventListener('change', renderAssets);
@@ -277,7 +297,9 @@
 
   function renderAssetCard(asset) {
     var visible = asset.visible !== false;
+    var unlockThreshold = toUnlockThreshold(asset.unlockThreshold);
     var variants = asset.variants || [];
+    var totalDownloads = getAssetDownloadCount(asset);
     var cat = allCategories.find(function (c) { return c.slug === asset.category; });
     var catLabel = cat ? cat.label : (asset.category || '').toUpperCase();
     var variantNames = variants.slice(0, 3).map(function (v) { return v.name || '?'; }).join(' \xb7 ');
@@ -293,7 +315,9 @@
         '<div class="adm-asset-body">' +
           '<div class="adm-asset-meta">' +
             '<span class="adm-asset-cat">' + escapeHtml(catLabel) + '</span>' +
+            '<span class="adm-asset-vcount">' + formatInt(totalDownloads) + ' download' + (totalDownloads === 1 ? '' : 's') + '</span>' +
             (variants.length ? '<span class="adm-asset-vcount">' + variants.length + ' variant' + (variants.length !== 1 ? 's' : '') + '</span>' : '') +
+            (gamificationEnabled && unlockThreshold > 0 ? '<span class="adm-asset-vcount">Unlock @ ' + unlockThreshold + '</span>' : '') +
           '</div>' +
           '<div class="adm-asset-title">' + escapeHtml(asset.title || '(no title)') + '</div>' +
           (variantNames ? '<div class="adm-asset-variants">' + escapeHtml(variantNames) + '</div>' : '') +
@@ -310,9 +334,106 @@
   function loadAssets() {
     api('GET', '/api/admin/downloads').then(function (data) {
       allAssets = Array.isArray(data) ? data : [];
+      recomputeAssetDownloadCounts();
       renderAssets();
     }).catch(function (e) {
       if (e.message === 'Unauthorized') showLogin();
+    });
+  }
+
+  function loadDashboardStats() {
+    return api('GET', '/api/admin/dashboard').then(function (data) {
+      dashboardStats = data || { total_downloads: 0, downloads_24h: 0, by_asset_id: [] };
+      if (totalDownloadsEl) totalDownloadsEl.textContent = formatInt(dashboardStats.total_downloads);
+      if (downloads24hEl) downloads24hEl.textContent = formatInt(dashboardStats.downloads_24h);
+      if (dashboardUpdatedAtEl) dashboardUpdatedAtEl.textContent = new Date().toLocaleString();
+      recomputeAssetDownloadCounts();
+      renderAssets();
+    }).catch(function () {
+      if (totalDownloadsEl) totalDownloadsEl.textContent = '-';
+      if (downloads24hEl) downloads24hEl.textContent = '-';
+      if (dashboardUpdatedAtEl) dashboardUpdatedAtEl.textContent = '-';
+    });
+  }
+
+  function setGamificationButtonState() {
+    if (!gamificationToggleBtn) return;
+    gamificationToggleBtn.textContent = 'Gamification: ' + (gamificationEnabled ? 'ON' : 'OFF');
+    gamificationToggleBtn.classList.toggle('btn-primary', gamificationEnabled);
+  }
+
+  function loadGamificationSetting() {
+    return api('GET', '/api/admin/gamification').then(function (data) {
+      gamificationEnabled = !!(data && data.enabled);
+      setGamificationButtonState();
+      renderAssets();
+    }).catch(function () {
+      gamificationEnabled = true;
+      setGamificationButtonState();
+    });
+  }
+
+  function getRawDownloadCountMap() {
+    var map = Object.create(null);
+    var rows = (dashboardStats && dashboardStats.by_asset_id) || [];
+    rows.forEach(function (r) {
+      if (!r || !r.asset_id) return;
+      map[r.asset_id] = Number(r.n || 0);
+    });
+    return map;
+  }
+
+  function recomputeAssetDownloadCounts() {
+    var raw = getRawDownloadCountMap();
+    var counts = Object.create(null);
+    (allAssets || []).forEach(function (asset) {
+      var total = Number(raw[asset.id] || 0);
+      var variants = asset.variants || [];
+      variants.forEach(function (v) {
+        if (!v || !v.id) return;
+        total += Number(raw[v.id] || 0);
+      });
+      counts[asset.id] = total;
+    });
+    assetDownloadCounts = counts;
+  }
+
+  function getAssetDownloadCount(asset) {
+    if (!asset || !asset.id) return 0;
+    return Number(assetDownloadCounts[asset.id] || 0);
+  }
+
+  if (refreshDashboardBtn) {
+    refreshDashboardBtn.addEventListener('click', function () {
+      var prev = refreshDashboardBtn.textContent;
+      refreshDashboardBtn.disabled = true;
+      refreshDashboardBtn.textContent = 'Refreshing…';
+      loadDashboardStats().finally(function () {
+        refreshDashboardBtn.disabled = false;
+        refreshDashboardBtn.textContent = prev;
+      });
+    });
+  }
+
+  if (gamificationToggleBtn) {
+    gamificationToggleBtn.addEventListener('click', function () {
+      var nextEnabled = !gamificationEnabled;
+      var prevText = gamificationToggleBtn.textContent;
+      gamificationToggleBtn.disabled = true;
+      gamificationToggleBtn.textContent = 'Updating…';
+      api('PATCH', '/api/admin/gamification', { enabled: nextEnabled })
+        .then(function (data) {
+          gamificationEnabled = !!(data && data.enabled);
+          setGamificationButtonState();
+          loadAssets();
+        })
+        .catch(function (e) {
+          alert('Failed: ' + e.message);
+          gamificationToggleBtn.textContent = prevText;
+        })
+        .finally(function () {
+          gamificationToggleBtn.disabled = false;
+        });
     });
   }
 
@@ -361,6 +482,7 @@
   var thumbPreview = document.getElementById('d-thumb-preview');
   var thumbImg = document.getElementById('d-thumb-img');
   var catSelect = document.getElementById('d-category');
+  var unlockThresholdInput = document.getElementById('d-unlock-threshold');
   var ebookFields = document.getElementById('d-ebook-fields');
   var visibleToggle = document.getElementById('d-visible');
 
@@ -523,6 +645,7 @@
     document.getElementById('d-title').value = asset ? (asset.title || '') : '';
     document.getElementById('d-desc').value = asset ? (asset.description || '') : '';
     document.getElementById('d-chapter').value = (asset && asset.chapter) ? asset.chapter : '';
+    unlockThresholdInput.value = asset ? String(toUnlockThreshold(asset.unlockThreshold)) : '';
 
     populateCatSelect(catSelect, asset ? asset.category : (allCategories[0] ? allCategories[0].slug : ''));
     if (ebookFields) ebookFields.hidden = catSelect.value !== 'ebook';
@@ -610,6 +733,7 @@
           description: document.getElementById('d-desc').value.trim() || '',
           category: catSelect.value,
           thumbnailUrl: thumbnailUrl,
+          unlockThreshold: toUnlockThreshold(unlockThresholdInput.value),
           visible: drawerVisible,
           tags: [],
           variants: variants.map(function (v) {

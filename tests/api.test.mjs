@@ -337,6 +337,37 @@ describe('Admin API (password auth)', () => {
     const res = await get('/api/admin/analytics', ADMIN_HEADERS);
     assert.ok([200, 204].includes(res.status), `expected 200/204, got ${res.status}`);
   });
+
+  test('analytics top_downloads groups by id + title + category', async () => {
+    const seed = Date.now();
+    const assetId = `analytics-group-${seed}`;
+    const sidBase = `analytics-sid-${seed}`;
+    const eventPayloads = [
+      { sid: `${sidBase}-1`, asset_title: 'Variant A', asset_category: 'wallpapers' },
+      { sid: `${sidBase}-2`, asset_title: 'Variant B', asset_category: 'ebook' },
+    ];
+
+    for (const payload of eventPayloads) {
+      const trackRes = await post('/api/track', {
+        type: 'download',
+        sid: payload.sid,
+        asset_id: assetId,
+        asset_title: payload.asset_title,
+        asset_category: payload.asset_category,
+      });
+      assert.ok([200, 204].includes(trackRes.status), `track failed with ${trackRes.status}`);
+    }
+
+    const analytics = await get('/api/admin/analytics?days=1', ADMIN_HEADERS).then(json);
+    assert.ok(Array.isArray(analytics.top_downloads), 'top_downloads must be an array');
+
+    const groupedRows = analytics.top_downloads.filter((row) => row.asset_id === assetId);
+    assert.ok(groupedRows.length >= 2, `expected >=2 grouped rows, got ${groupedRows.length}`);
+
+    const rowKeys = new Set(groupedRows.map((row) => `${row.asset_title}|${row.asset_category}`));
+    assert.ok(rowKeys.has('Variant A|wallpapers'), 'missing grouped row for Variant A/wallpapers');
+    assert.ok(rowKeys.has('Variant B|ebook'), 'missing grouped row for Variant B/ebook');
+  });
 });
 
 // ── /api/download-zip ─────────────────────────────────────────────────────────
