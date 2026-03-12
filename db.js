@@ -185,6 +185,58 @@ if (process.env.DATABASE_URL) {
     };
   }
 
+  async function getDownloadData(options = {}) {
+    await ensureReady();
+    const limit = Math.min(Math.max(parseInt(options.limit, 10) || 200, 1), 5000);
+    const offset = Math.max(parseInt(options.offset, 10) || 0, 0);
+    const where = [`type='download'`];
+    const params = [];
+    if (options.from) { params.push(options.from); where.push(`ts >= $${params.length}`); }
+    if (options.to) { params.push(options.to); where.push(`ts <= $${params.length}`); }
+    if (options.asset_id) { params.push(options.asset_id); where.push(`asset_id = $${params.length}`); }
+    if (options.session_id) { params.push(options.session_id); where.push(`session_id = $${params.length}`); }
+    const whereSql = where.join(' AND ');
+    const paramsWithPage = params.slice();
+    paramsWithPage.push(limit, offset);
+    const rowsSql = `
+      SELECT id, session_id, ts, asset_id, asset_title, asset_category, page, utm_source, utm_campaign, utm_term
+      FROM events
+      WHERE ${whereSql}
+      ORDER BY ts DESC
+      LIMIT $${paramsWithPage.length - 1} OFFSET $${paramsWithPage.length}
+    `;
+    const [total, items, byAsset, byDay] = await Promise.all([
+      pool.query(`SELECT COUNT(*) n FROM events WHERE ${whereSql}`, params),
+      pool.query(rowsSql, paramsWithPage),
+      pool.query(`
+        SELECT
+          asset_id,
+          COALESCE(MAX(NULLIF(asset_title, '')), '') AS asset_title,
+          COALESCE(MAX(NULLIF(asset_category, '')), '') AS asset_category,
+          COUNT(*) n
+        FROM events
+        WHERE ${whereSql}
+        GROUP BY asset_id
+        ORDER BY n DESC
+      `, params),
+      pool.query(`
+        SELECT to_char(date_trunc('day', ts::timestamptz), 'YYYY-MM-DD') day, COUNT(*) n
+        FROM events
+        WHERE ${whereSql}
+        GROUP BY 1
+        ORDER BY 1 DESC
+      `, params),
+    ]);
+    return {
+      total: Number((total.rows && total.rows[0] && total.rows[0].n) || 0),
+      limit,
+      offset,
+      items: items.rows || [],
+      by_asset: (byAsset.rows || []).map((r) => ({ ...r, n: Number(r.n || 0) })),
+      by_day: (byDay.rows || []).map((r) => ({ day: r.day, n: Number(r.n || 0) })),
+    };
+  }
+
   async function getGamificationEnabled() {
     await ensureReady();
     await pool.query(
@@ -261,6 +313,7 @@ if (process.env.DATABASE_URL) {
     getStats,
     getAllTimeDownloadCount,
     getDownloadDashboard,
+    getDownloadData,
     getGamificationEnabled,
     setGamificationEnabled,
     getCategories,
@@ -377,6 +430,52 @@ if (process.env.DATABASE_URL) {
     });
   }
 
+  function getDownloadData(options = {}) {
+    const limit = Math.min(Math.max(parseInt(options.limit, 10) || 200, 1), 5000);
+    const offset = Math.max(parseInt(options.offset, 10) || 0, 0);
+    const where = [`type='download'`];
+    const params = [];
+    if (options.from) { where.push('ts >= ?'); params.push(options.from); }
+    if (options.to) { where.push('ts <= ?'); params.push(options.to); }
+    if (options.asset_id) { where.push('asset_id = ?'); params.push(options.asset_id); }
+    if (options.session_id) { where.push('session_id = ?'); params.push(options.session_id); }
+    const whereSql = where.join(' AND ');
+    const total = db.prepare(`SELECT COUNT(*) n FROM events WHERE ${whereSql}`).get(...params);
+    const items = db.prepare(`
+      SELECT id, session_id, ts, asset_id, asset_title, asset_category, page, utm_source, utm_campaign, utm_term
+      FROM events
+      WHERE ${whereSql}
+      ORDER BY ts DESC
+      LIMIT ? OFFSET ?
+    `).all(...params, limit, offset);
+    const byAsset = db.prepare(`
+      SELECT
+        asset_id,
+        COALESCE(MAX(NULLIF(asset_title, '')), '') AS asset_title,
+        COALESCE(MAX(NULLIF(asset_category, '')), '') AS asset_category,
+        COUNT(*) n
+      FROM events
+      WHERE ${whereSql}
+      GROUP BY asset_id
+      ORDER BY n DESC
+    `).all(...params);
+    const byDay = db.prepare(`
+      SELECT substr(ts, 1, 10) day, COUNT(*) n
+      FROM events
+      WHERE ${whereSql}
+      GROUP BY day
+      ORDER BY day DESC
+    `).all(...params);
+    return Promise.resolve({
+      total: Number((total && total.n) || 0),
+      limit,
+      offset,
+      items: items || [],
+      by_asset: (byAsset || []).map((r) => ({ ...r, n: Number(r.n || 0) })),
+      by_day: (byDay || []).map((r) => ({ day: r.day, n: Number(r.n || 0) })),
+    });
+  }
+
   function getGamificationEnabled() {
     db.prepare(`INSERT OR IGNORE INTO app_settings (key, value) VALUES ('gamification_enabled', '1')`).run();
     const row = db.prepare(`SELECT value FROM app_settings WHERE key = 'gamification_enabled'`).get();
@@ -398,6 +497,7 @@ if (process.env.DATABASE_URL) {
     getStats,
     getAllTimeDownloadCount,
     getDownloadDashboard,
+    getDownloadData,
     getGamificationEnabled,
     setGamificationEnabled,
     getCategories,

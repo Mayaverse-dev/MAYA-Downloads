@@ -1,4 +1,5 @@
-/* MAYA Downloads - MAYA x NOTHING design system (IBM Plex Mono + Inter) */
+/* MAYA Downloads - MAYA x NOTHING design system (Space Grotesk + Inter) */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
 
 :root {
   --void: #0a0a0a;
@@ -20,7 +21,7 @@
   --radius: 8px;
   --radius-lg: 12px;
   --max-width: 1100px;
-  --font-mono: 'IBM Plex Mono', monospace;
+  --font-mono: 'Space Grotesk', sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --transition: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -2242,9 +2243,9 @@ body {
   max-width: 960px;
   margin: 0 auto;
   padding: 0 24px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .adm-empty {
@@ -2260,6 +2261,7 @@ body {
   grid-template-columns: 72px 1fr auto;
   gap: 12px;
   align-items: center;
+  width: 100%;
   padding: 12px;
   background: var(--matter);
   border: 1px solid var(--border);

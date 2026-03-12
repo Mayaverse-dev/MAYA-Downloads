@@ -20,6 +20,89 @@ function createPublicRouter(deps) {
   } = deps;
 
   const router = express.Router();
+  const DEFAULT_DISCORD_INVITE = 'https://discord.gg/qsVMynfNZb';
+  const DISCORD_INVITE_CACHE_TTL_MS = 5 * 60 * 1000;
+  let discordInviteCache = { url: null, checkedAt: 0 };
+  const EVENT_DEDUP_WINDOW_MS = 2500;
+  const eventDedupCache = new Map();
+
+  function normalizeInviteUrl(url) {
+    const clean = cleanEnv(url);
+    if (!clean) return '';
+    try {
+      const u = new URL(clean);
+      if (!/^https?:$/.test(u.protocol)) return '';
+      return u.toString();
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function parseDiscordInviteCode(url) {
+    try {
+      const u = new URL(url);
+      if (u.hostname === 'discord.gg') {
+        return u.pathname.replace(/^\/+/, '').split('/')[0] || '';
+      }
+      if (u.hostname === 'discord.com' || u.hostname === 'www.discord.com') {
+        const parts = u.pathname.split('/').filter(Boolean);
+        if (parts[0] === 'invite' && parts[1]) return parts[1];
+      }
+    } catch (e) {}
+    return '';
+  }
+
+  async function isDiscordInviteValid(url) {
+    const code = parseDiscordInviteCode(url);
+    if (!code) return false;
+    try {
+      const r = await fetch(`https://discord.com/api/v10/invites/${encodeURIComponent(code)}?with_counts=true`);
+      return r.ok;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function getDiscordInviteCandidates() {
+    const candidates = [
+      normalizeInviteUrl(process.env.DISCORD_INVITE_URL),
+      normalizeInviteUrl(process.env.DISCORD_INVITE_FALLBACK_URL),
+      DEFAULT_DISCORD_INVITE,
+    ].filter(Boolean);
+    return [...new Set(candidates)];
+  }
+
+  async function resolveDiscordInviteUrl() {
+    const now = Date.now();
+    if (discordInviteCache.url && (now - discordInviteCache.checkedAt) < DISCORD_INVITE_CACHE_TTL_MS) {
+      return discordInviteCache.url;
+    }
+    const candidates = getDiscordInviteCandidates();
+    for (const url of candidates) {
+      if (await isDiscordInviteValid(url)) {
+        discordInviteCache = { url, checkedAt: now };
+        return url;
+      }
+    }
+    const fallback = candidates[0] || DEFAULT_DISCORD_INVITE;
+    discordInviteCache = { url: fallback, checkedAt: now };
+    return fallback;
+  }
+
+  function shouldDedupDownloadEvent(body) {
+    if (!body || body.type !== 'download' || !body.sid || !body.asset_id) return false;
+    const now = Date.now();
+    const key = `${body.sid}|${body.asset_id}|${body.page || ''}`;
+    const prev = Number(eventDedupCache.get(key) || 0);
+    eventDedupCache.set(key, now);
+    if (eventDedupCache.size > 5000) {
+      const cutoff = now - EVENT_DEDUP_WINDOW_MS * 4;
+      for (const [k, ts] of eventDedupCache.entries()) {
+        if (ts < cutoff) eventDedupCache.delete(k);
+      }
+    }
+    return prev > 0 && (now - prev) < EVENT_DEDUP_WINDOW_MS;
+  }
 
   router.get('/', (req, res) => {
     res.sendFile(path.join(rootDir, 'public', 'index.html'));
@@ -63,6 +146,22 @@ function createPublicRouter(deps) {
       gaId: cleanEnv(process.env.GA_ID) || '',
       metaPixelId: cleanEnv(process.env.META_PIXEL_ID) || '',
     });
+  });
+
+  router.get('/api/discord-invite', async (req, res) => {
+    try {
+      res.json({ url: await resolveDiscordInviteUrl() });
+    } catch (e) {
+      res.json({ url: DEFAULT_DISCORD_INVITE });
+    }
+  });
+
+  router.get('/discord', async (req, res) => {
+    try {
+      return res.redirect(302, await resolveDiscordInviteUrl());
+    } catch (e) {
+      return res.redirect(302, DEFAULT_DISCORD_INVITE);
+    }
   });
 
   router.get('/api/categories', async (req, res) => {
@@ -400,6 +499,7 @@ function createPublicRouter(deps) {
           client_tz: s(body.tz, 60),
         });
       } else {
+        if (shouldDedupDownloadEvent(body)) return;
         await db.insertEvent({
           session_id: body.sid,
           ts,

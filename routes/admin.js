@@ -226,6 +226,23 @@ function createAdminRouter(deps) {
     }
   });
 
+  router.get('/api/admin/download-data', async (req, res) => {
+    if (!checkAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
+    try {
+      const data = await db.getDownloadData({
+        limit: req.query.limit,
+        offset: req.query.offset,
+        from: req.query.from,
+        to: req.query.to,
+        asset_id: req.query.asset_id,
+        session_id: req.query.session_id,
+      });
+      res.json(data);
+    } catch (e) {
+      res.status(500).json({ error: e.message || 'Failed to load download data' });
+    }
+  });
+
   router.get('/api/admin/gamification', async (req, res) => {
     if (!checkAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
     try {

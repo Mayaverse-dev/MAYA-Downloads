@@ -3,9 +3,12 @@
 
   var SESSION_KEY = 'maya_sid';
   var UTM_KEY = 'maya_utm';
-  var DISCORD_SHOWN_KEY = 'maya_discord_shown';
-  var DISCORD_URL = 'https://discord.gg/7HwhQaN6';
+  var DISCORD_LAST_DOWNLOAD_AT_KEY = 'maya_discord_last_download_at';
+  var DOWNLOAD_DEDUP_KEY = 'maya_last_download_event';
+  var DISCORD_URL = '/discord';
   var DISCORD_THUMB = '/images/discord-popup-thumb.webp?v=1';
+  var DISCORD_SHOW_GAP_MS = 5 * 60 * 1000;
+  var DOWNLOAD_DEDUP_MS = 2000;
 
   function uuid() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -100,14 +103,35 @@
     });
   }
 
-  function showDiscordPopupOnce() {
-    var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    if (!isLocal) {
-      try {
-        if (sessionStorage.getItem(DISCORD_SHOWN_KEY) === '1') return;
-        sessionStorage.setItem(DISCORD_SHOWN_KEY, '1');
-      } catch (e) {}
+  function shouldShowDiscordPopupForDownload() {
+    var now = Date.now();
+    var lastTs = 0;
+    try {
+      lastTs = Number(sessionStorage.getItem(DISCORD_LAST_DOWNLOAD_AT_KEY) || '0');
+      sessionStorage.setItem(DISCORD_LAST_DOWNLOAD_AT_KEY, String(now));
+    } catch (e) {
+      return true;
     }
+    if (!lastTs) return true;
+    return (now - lastTs) >= DISCORD_SHOW_GAP_MS;
+  }
+
+  function shouldTrackDownload(assetId) {
+    if (!assetId) return false;
+    var now = Date.now();
+    try {
+      var raw = sessionStorage.getItem(DOWNLOAD_DEDUP_KEY) || '';
+      var prev = raw ? JSON.parse(raw) : null;
+      var isDup = !!(prev && prev.assetId === assetId && (now - Number(prev.ts || 0)) < DOWNLOAD_DEDUP_MS);
+      sessionStorage.setItem(DOWNLOAD_DEDUP_KEY, JSON.stringify({ assetId: assetId, ts: now }));
+      return !isDup;
+    } catch (e) {
+      return true;
+    }
+  }
+
+  function showDiscordPopupIfEligible() {
+    if (!shouldShowDiscordPopupForDownload()) return;
     ensureDiscordPopup();
     var el = document.getElementById('discord-popup');
     if (!el) return;
@@ -125,7 +149,7 @@
   // Pageview
   beacon(base('pageview'));
 
-  // Individual download click (fires before the new tab opens)
+  // Download click (fires before navigation/new tab opens)
   document.addEventListener('click', function (e) {
     var a = e.target.closest('a[href*="/api/download/"]');
     if (!a) return;
@@ -135,25 +159,11 @@
     var titleEl = card && card.querySelector('.card-title');
     var payload = base('download');
     payload.asset_id = decodeURIComponent(m[1]);
+    if (!shouldTrackDownload(payload.asset_id)) return;
     payload.asset_title = titleEl ? titleEl.textContent.trim() : '';
     payload.asset_category = document.body.getAttribute('data-category') || '';
     beacon(payload);
-    setTimeout(showDiscordPopupOnce, 0);
-  }, true);
-
-  // Modal download button (inside #modal-downloads)
-  document.addEventListener('click', function (e) {
-    var a = e.target.closest('#modal-downloads a[href*="/api/download/"]');
-    if (!a) return;
-    var m = (a.getAttribute('href') || '').match(/\/api\/download\/([^?#/]+)/);
-    if (!m) return;
-    var titleEl = document.getElementById('modal-title');
-    var payload = base('download');
-    payload.asset_id = decodeURIComponent(m[1]);
-    payload.asset_title = titleEl ? titleEl.textContent.trim() : '';
-    payload.asset_category = document.body.getAttribute('data-category') || '';
-    beacon(payload);
-    setTimeout(showDiscordPopupOnce, 0);
+    setTimeout(showDiscordPopupIfEligible, 0);
   }, true);
 
   // Download-all button
@@ -163,7 +173,7 @@
     var payload = base('download_all');
     payload.asset_category = document.body.getAttribute('data-category') || '';
     beacon(payload);
-    setTimeout(showDiscordPopupOnce, 0);
+    setTimeout(showDiscordPopupIfEligible, 0);
   }, true);
 
   // Modal preview open (card click)
