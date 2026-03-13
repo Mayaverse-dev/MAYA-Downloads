@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 
 test.describe('Download flow', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/wallpapers');
+    await page.goto('/wallpapers', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('[data-id]', { timeout: 10_000 });
   });
 
@@ -126,14 +126,14 @@ test.describe('Ebook & STL download pages', () => {
     { slug: 'stl', label: 'STL' },
   ]) {
     test(`${label} page loads and shows assets`, async ({ page }) => {
-      await page.goto(`/${slug}`);
+      await page.goto(`/${slug}`, { waitUntil: 'domcontentloaded' });
       await page.waitForSelector('[data-id]', { timeout: 10_000 });
       const cards = page.locator('[data-id]');
       expect(await cards.count()).toBeGreaterThan(0);
     });
 
     test(`${label} card opens modal with download button`, async ({ page }) => {
-      await page.goto(`/${slug}`);
+      await page.goto(`/${slug}`, { waitUntil: 'domcontentloaded' });
       await page.waitForSelector('[data-id]', { timeout: 10_000 });
       const card = page.locator('[data-id]').first();
       await card.click({ position: { x: 10, y: 10 } });
@@ -146,7 +146,7 @@ test.describe('Ebook & STL download pages', () => {
 
 test.describe('Download All (zip)', () => {
   test('Download All button exists on wallpapers page', async ({ page }) => {
-    await page.goto('/wallpapers');
+    await page.goto('/wallpapers', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('[data-id]', { timeout: 10_000 });
     const btn = page.locator('#download-all-btn');
     if (await btn.count() > 0) {

@@ -3,7 +3,7 @@ const { test, expect } = require('@playwright/test');
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '700062';
 
 async function adminLogin(page) {
-  await page.goto('/admin');
+  await page.goto('/admin', { waitUntil: 'domcontentloaded' });
   // If already on dashboard (cached session), we're done
   const dashVisible = await page.locator('#admin-dashboard').isVisible().catch(() => false);
   if (dashVisible) return;
@@ -14,13 +14,13 @@ async function adminLogin(page) {
 
 test.describe('Admin panel — login', () => {
   test('login page shows at /admin', async ({ page }) => {
-    await page.goto('/admin');
+    await page.goto('/admin', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#admin-login')).toBeVisible();
     await expect(page.locator('#admin-dashboard')).not.toBeVisible();
   });
 
   test('wrong password shows error message', async ({ page }) => {
-    await page.goto('/admin');
+    await page.goto('/admin', { waitUntil: 'domcontentloaded' });
     await page.locator('#admin-pw').fill('wrongpassword');
     await page.locator('#admin-login-btn').click();
     const err = page.locator('#login-error');
@@ -31,7 +31,7 @@ test.describe('Admin panel — login', () => {
   });
 
   test('correct password (700062) shows dashboard', async ({ page }) => {
-    await page.goto('/admin');
+    await page.goto('/admin', { waitUntil: 'domcontentloaded' });
     await page.locator('#admin-pw').fill(ADMIN_PASSWORD);
     await page.locator('#admin-login-btn').click();
     await expect(page.locator('#admin-dashboard')).toBeVisible({ timeout: 8_000 });
@@ -39,7 +39,7 @@ test.describe('Admin panel — login', () => {
   });
 
   test('show/hide password toggle works', async ({ page }) => {
-    await page.goto('/admin');
+    await page.goto('/admin', { waitUntil: 'domcontentloaded' });
     const input = page.locator('#admin-pw');
     await expect(input).toHaveAttribute('type', 'password');
     await page.locator('#pw-toggle').click();

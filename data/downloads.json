@@ -5,7 +5,7 @@
     "description": "VAANAR wallpaper from the MAYA universe.",
     "category": "wallpapers",
     "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/VAANAR/Tablet.png.webp",
-    "visible": false,
+    "visible": true,
     "createdAt": "2026-02-25T14:44:41.918Z",
     "tags": [],
     "variants": [
@@ -35,10 +35,10 @@
   {
     "id": "wp-lib-rk-saswat-ultrawide",
     "title": "Rakshasi",
-    "description": "wallpaper from the MAYA universe.",
+    "description": "RK SASWAT wallpaper from the MAYA universe.",
     "category": "wallpapers",
     "thumbnailUrl": "https://t3.storageapi.dev/embedded-drop-iunbltzf2y1/_thumbs/Assets/Wallpaper/Library/RK_SASWAT/Ultrawide.png.webp",
-    "visible": false,
+    "visible": true,
     "createdAt": "2026-02-25T14:44:32.936Z",
     "tags": [],
     "variants": [

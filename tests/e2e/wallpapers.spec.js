@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 
 test.describe('Wallpapers page', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/wallpapers');
+    await page.goto('/wallpapers', { waitUntil: 'domcontentloaded' });
     // wait for cards to load from API
     await page.waitForSelector('[data-id]', { timeout: 10_000 });
   });
@@ -67,7 +67,7 @@ test.describe('Wallpapers page', () => {
 
 test.describe('Wallpaper modal — variant rows', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/wallpapers');
+    await page.goto('/wallpapers', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('[data-id]', { timeout: 10_000 });
 
     // open first card with multiple variants

@@ -2,6 +2,7 @@
 
 function createAssetsService({
   fs,
+  db,
   dataPath,
   uuidv4,
   toUnlockThreshold,
@@ -92,12 +93,28 @@ function createAssetsService({
   }
 
   async function readData() {
+    const canUseDb = !!(db && typeof db.getAssetsData === 'function' && typeof db.saveAssetsData === 'function');
+    if (canUseDb) {
+      try {
+        const dbData = await db.getAssetsData();
+        if (Array.isArray(dbData) && dbData.length > 0) {
+          const { data, changed } = migrateToVariants(dbData);
+          if (changed) await db.saveAssetsData(data);
+          return data;
+        }
+      } catch (e) {
+        // fall through to file
+      }
+    }
     try {
       const raw = await fs.readFile(dataPath, 'utf8');
       const parsed = JSON.parse(raw);
       const { data, changed } = migrateToVariants(parsed);
       if (changed) {
         writeData(data).catch((e) => console.warn('Migration write failed:', e.message));
+      }
+      if (canUseDb) {
+        db.saveAssetsData(data).catch((e) => console.warn('Assets DB sync failed:', e.message));
       }
       return data;
     } catch (e) {
@@ -106,6 +123,9 @@ function createAssetsService({
   }
 
   async function writeData(data) {
+    if (db && typeof db.saveAssetsData === 'function') {
+      await db.saveAssetsData(data);
+    }
     await fs.writeFile(dataPath, JSON.stringify(data, null, 2), 'utf8');
   }
 

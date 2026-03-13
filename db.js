@@ -258,6 +258,32 @@ if (process.env.DATABASE_URL) {
     return enabled;
   }
 
+  async function getAssetsData() {
+    await ensureReady();
+    await pool.query(
+      `INSERT INTO app_settings (key, value) VALUES ('assets_data_json', '') ON CONFLICT (key) DO NOTHING`
+    );
+    const r = await pool.query(`SELECT value FROM app_settings WHERE key = 'assets_data_json' LIMIT 1`);
+    const raw = (r.rows && r.rows[0] && r.rows[0].value) || '';
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async function saveAssetsData(data) {
+    await ensureReady();
+    const raw = JSON.stringify(Array.isArray(data) ? data : []);
+    await pool.query(
+      `INSERT INTO app_settings (key, value) VALUES ('assets_data_json', $1)
+       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`,
+      [raw]
+    );
+  }
+
   async function getCategories() {
     await ensureReady();
     const r = await pool.query('SELECT slug, label, "desc", color_class, visible, sort_order, built_in FROM categories ORDER BY sort_order, slug');
@@ -316,6 +342,8 @@ if (process.env.DATABASE_URL) {
     getDownloadData,
     getGamificationEnabled,
     setGamificationEnabled,
+    getAssetsData,
+    saveAssetsData,
     getCategories,
     saveCategories,
   };
@@ -491,6 +519,28 @@ if (process.env.DATABASE_URL) {
     return Promise.resolve(enabled);
   }
 
+  function getAssetsData() {
+    db.prepare(`INSERT OR IGNORE INTO app_settings (key, value) VALUES ('assets_data_json', '')`).run();
+    const row = db.prepare(`SELECT value FROM app_settings WHERE key = 'assets_data_json'`).get();
+    const raw = (row && row.value) || '';
+    if (!raw) return Promise.resolve(null);
+    try {
+      const parsed = JSON.parse(raw);
+      return Promise.resolve(Array.isArray(parsed) ? parsed : null);
+    } catch (e) {
+      return Promise.resolve(null);
+    }
+  }
+
+  function saveAssetsData(data) {
+    const raw = JSON.stringify(Array.isArray(data) ? data : []);
+    db.prepare(`
+      INSERT INTO app_settings (key, value) VALUES ('assets_data_json', ?)
+      ON CONFLICT(key) DO UPDATE SET value = excluded.value
+    `).run(raw);
+    return Promise.resolve();
+  }
+
   module.exports = {
     insertVisit,
     insertEvent,
@@ -500,6 +550,8 @@ if (process.env.DATABASE_URL) {
     getDownloadData,
     getGamificationEnabled,
     setGamificationEnabled,
+    getAssetsData,
+    saveAssetsData,
     getCategories,
     saveCategories,
   };

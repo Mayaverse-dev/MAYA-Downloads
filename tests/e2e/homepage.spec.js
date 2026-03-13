@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 
 test.describe('Homepage', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
   });
 
   test('has correct page title', async ({ page }) => {

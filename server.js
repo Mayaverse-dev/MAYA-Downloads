@@ -116,6 +116,7 @@ function formatBytes(bytes) {
 
 const assetService = createAssetsService({
   fs,
+  db,
   dataPath: DATA_PATH,
   uuidv4,
   toUnlockThreshold: unlockService.toUnlockThreshold,
